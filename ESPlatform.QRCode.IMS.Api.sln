@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_docs", "_docs", "{A1C6E8C3-B48C-4E50-A54B-9FB62015B676}"
+	ProjectSection(SolutionItems) = preProject
+		_docs\notes.md = _docs\notes.md
+		_docs\notes_hieunl.md = _docs\notes_hieunl.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_libs", "_libs", "{839E56FB-F1AF-47F5-A549-5CDAD195E7BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Library", "ESPlatform.QRCode.IMS.Library\ESPlatform.QRCode.IMS.Library.csproj", "{F4EC3BB2-2426-4BCE-BE83-1D475B89F6D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Domain", "ESPlatform.QRCode.IMS.Domain\ESPlatform.QRCode.IMS.Domain.csproj", "{BC8E5929-83DC-4986-A361-D7FA4402C54A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Infra", "ESPlatform.QRCode.IMS.Infra\ESPlatform.QRCode.IMS.Infra.csproj", "{93F5023C-2DDC-4FE8-9CE8-B07B5373AFE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Core", "ESPlatform.QRCode.IMS.Core\ESPlatform.QRCode.IMS.Core.csproj", "{6B6005CB-B264-47E4-AFAA-3C578B4CD286}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Api", "ESPlatform.QRCode.IMS.Api\ESPlatform.QRCode.IMS.Api.csproj", "{B79B0247-9AC2-4AFD-A1B5-49CEE01594D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Test", "ESPlatform.QRCode.IMS.Test\ESPlatform.QRCode.IMS.Test.csproj", "{BDE9530F-D9AD-4D06-9AA8-FC511ABD43A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Contracts", "ESPlatform.QRCode.IMS.Contracts\ESPlatform.QRCode.IMS.Contracts.csproj", "{23B63FEF-0D4B-470D-ACED-9F596B6C1581}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F4EC3BB2-2426-4BCE-BE83-1D475B89F6D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4EC3BB2-2426-4BCE-BE83-1D475B89F6D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4EC3BB2-2426-4BCE-BE83-1D475B89F6D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4EC3BB2-2426-4BCE-BE83-1D475B89F6D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC8E5929-83DC-4986-A361-D7FA4402C54A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC8E5929-83DC-4986-A361-D7FA4402C54A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC8E5929-83DC-4986-A361-D7FA4402C54A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC8E5929-83DC-4986-A361-D7FA4402C54A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93F5023C-2DDC-4FE8-9CE8-B07B5373AFE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93F5023C-2DDC-4FE8-9CE8-B07B5373AFE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93F5023C-2DDC-4FE8-9CE8-B07B5373AFE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93F5023C-2DDC-4FE8-9CE8-B07B5373AFE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B6005CB-B264-47E4-AFAA-3C578B4CD286}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B6005CB-B264-47E4-AFAA-3C578B4CD286}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B6005CB-B264-47E4-AFAA-3C578B4CD286}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B6005CB-B264-47E4-AFAA-3C578B4CD286}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B79B0247-9AC2-4AFD-A1B5-49CEE01594D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B79B0247-9AC2-4AFD-A1B5-49CEE01594D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B79B0247-9AC2-4AFD-A1B5-49CEE01594D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B79B0247-9AC2-4AFD-A1B5-49CEE01594D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDE9530F-D9AD-4D06-9AA8-FC511ABD43A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDE9530F-D9AD-4D06-9AA8-FC511ABD43A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDE9530F-D9AD-4D06-9AA8-FC511ABD43A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDE9530F-D9AD-4D06-9AA8-FC511ABD43A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23B63FEF-0D4B-470D-ACED-9F596B6C1581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23B63FEF-0D4B-470D-ACED-9F596B6C1581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23B63FEF-0D4B-470D-ACED-9F596B6C1581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23B63FEF-0D4B-470D-ACED-9F596B6C1581}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F4EC3BB2-2426-4BCE-BE83-1D475B89F6D7} = {839E56FB-F1AF-47F5-A549-5CDAD195E7BA}
+	EndGlobalSection
+EndGlobal

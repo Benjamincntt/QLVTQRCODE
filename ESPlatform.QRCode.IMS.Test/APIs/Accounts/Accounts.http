@@ -1,0 +1,52 @@
+### Api chi tiết tài khoản
+GET {{host}}/{{accountsPath}}/b014fb5f-4b1d-4d61-a82d-34815d2f9bae
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+// Api lọc và phân trang tài khoản
+### case lấy tất cả tài khoản
+GET {{host}}/{{accountsPath}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+### case lọc theo trang thái
+GET {{host}}/{{accountsPath}}?status=Registered
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+### case lọc theo cụm từ khóa
+GET {{host}}/{{accountsPath}}?keywords=long
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+### case lọc theo trang thái và cụm từ khóa
+GET {{host}}/{{accountsPath}}?status=Registered&keywords=long
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+### [CMS-89] Api danh sách người dùng được phân quyền theo Role và chuyên mục
+//categoryId=b900f741-c3fa-4dfc-b8e9-597b3d27e504&roleId=fe1234e4-8a48-4f5e-bb70-b325524f985d
+GET {{host}}/{{accountsPath}}/list-authorized?categoryId={{categoryId}}&roleId={{roleId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+
+### [CMS-140] Api list tất cả người dùng theo Site-Id
+GET {{host}}/{{accountsPath}}/list-by-current-site
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+### Reset password
+PATCH {{host}}/{{accountsPath}}/189a27d6-6477-4b8d-8a4a-06c85cd9d839/reset-password
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+"tienphong123$"

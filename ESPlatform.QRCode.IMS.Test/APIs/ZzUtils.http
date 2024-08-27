@@ -1,0 +1,19 @@
+###
+POST {{host}}/utils/add-roles?
+    username=test_editor&
+    roleNames=editor&
+    catUrlSlugs=*
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+Key: 234j3k41a
+
+###
+DELETE {{host}}/utils/remove-roles?
+    username=test_publisher&
+    roleNames=publisher&
+    catUrlSlugs=phap-luat
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+Key: 234j3k41a

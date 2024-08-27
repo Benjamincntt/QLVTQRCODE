@@ -1,0 +1,108 @@
+using ESPlatform.QRCode.IMS.Core.DTOs.Accounts.Requests;
+using ESPlatform.QRCode.IMS.Core.DTOs.NguoiDungs.Requests;
+using ESPlatform.QRCode.IMS.Core.Engine;
+using ESPlatform.QRCode.IMS.Core.Facades.Context;
+using ESPlatform.QRCode.IMS.Core.Validations.NguoiDungs;
+using ESPlatform.QRCode.IMS.Domain.Entities;
+using ESPlatform.QRCode.IMS.Domain.Interfaces;
+using ESPlatform.QRCode.IMS.Library.Exceptions;
+using ESPlatform.QRCode.IMS.Library.Extensions;
+using ESPlatform.QRCode.IMS.Library.Utils.Validation;
+using Mapster;
+
+namespace ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
+
+public class NguoiDungService : INguoiDungService
+{
+    private readonly INguoiDungRepository _nguoiDungRepository;
+    private readonly IDonViSuDungRepository _donviDungRepository;
+    private readonly IAuthorizedContextFacade _authorizedContextFacade;
+
+    public NguoiDungService(
+        INguoiDungRepository nguoiDungRepository,
+        IAuthorizedContextFacade authorizedContextFacade,
+        IDonViSuDungRepository donviDungRepository)
+    {
+        _nguoiDungRepository = nguoiDungRepository;
+        _authorizedContextFacade = authorizedContextFacade;
+        _donviDungRepository = donviDungRepository;
+    }
+
+    public async Task<int> ModifyAsync(int maNguoiDung, NguoiDungModifyRequest request)
+    {
+        var nguoiDung = await _nguoiDungRepository.GetAsync(maNguoiDung);
+        if (nguoiDung == null)
+        {
+            throw new NotFoundException(nguoiDung.GetTypeEx(), maNguoiDung.ToString());
+        }
+
+        await ValidationHelper.ValidateAsync(request, new NguoiDungModifyRequestValidation());
+
+        // if (request.KichHoat == true) {
+        // 	throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidStatus);
+        // }
+
+        nguoiDung = request.Adapt(nguoiDung);
+
+        var response = await _nguoiDungRepository.UpdateAsync(nguoiDung);
+
+        return response;
+    }
+
+    public async Task<int> ResetPasswordAsync(int maNguoiDung, string password)
+    {
+        var nguoiDung = await _nguoiDungRepository.GetAsync(maNguoiDung);
+        if (nguoiDung == null)
+        {
+            throw new NotFoundException(nguoiDung.GetTypeEx(), maNguoiDung.ToString());
+        }
+
+        // account.MatKhau = BCrypt.Net.BCrypt.HashPassword(password);
+        nguoiDung.MatKhau = GetPassword.GetMD5(nguoiDung.Salt + password);
+        return await _nguoiDungRepository.UpdateAsync(nguoiDung);
+    }
+
+    public async Task<int> UpdatePassWordAsync(AccountUpdatePasswordRequest request)
+    {
+        var maNguoiDung = _authorizedContextFacade.AccountId;
+        var nguoiDung = await _nguoiDungRepository.GetAsync(maNguoiDung);
+        if (nguoiDung == null)
+        {
+            throw new NotFoundException(nguoiDung.GetTypeEx(), maNguoiDung.ToString());
+        }
+
+        var inputPasswordHash = GetPassword.GetMD5(nguoiDung.Salt + request.CurrentPassword);
+        if (inputPasswordHash != nguoiDung.MatKhau)
+        {
+            throw new BadRequestException(Constants.Authentication.Messages.InvalidCurrentPassword);
+        }
+
+        nguoiDung.MatKhau = GetPassword.GetMD5(nguoiDung.Salt + request.NewPassword);
+        
+        return await _nguoiDungRepository.UpdateAsync(nguoiDung);
+    }
+
+    public async Task<int> CreateAsync(NguoiDungCreatedRequest request)
+    {
+        await ValidationHelper.ValidateAsync(request, new NguoiDungCreatedRequestValidation());
+        var currentAccount = await _nguoiDungRepository.GetAsync(a => a.TenDangNhap == request.TenDangNhap);
+        if (currentAccount != null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.DuplicatedAccountName);
+        }
+        var currentPortal = await _donviDungRepository.GetAsync(x => x.MaDonViSuDung == request.MaDonViSuDung && x.KichHoat == true);
+
+        var nguoiDung = request.Adapt<TbNguoiDung>();
+        nguoiDung.Ho = "";
+        nguoiDung.Ten = nguoiDung.TenDangNhap;
+        nguoiDung.KichHoat = false;
+        nguoiDung.Salt = GetPassword.GetRandomLetters(5);
+        nguoiDung.MatKhau = GetPassword.GetMD5(nguoiDung.Salt + nguoiDung.Salt);
+        nguoiDung.NgayTao = DateTime.UtcNow;
+        nguoiDung.CoChoPhepHienThi = true;
+        nguoiDung.MaKieuNguoiDung = 4223;
+        nguoiDung.ThoiGianMatKhau = DateTime.Now;
+        nguoiDung.MaTimeZone = currentPortal != null ? currentPortal.MaTimeZone : 0;
+        return await _nguoiDungRepository.InsertAsync(nguoiDung);
+    }
+}

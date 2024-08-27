@@ -1,0 +1,102 @@
+###
+GET {{host}}/test/test1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+###
+GET {{host}}/test/test2?
+    name=&
+    age=123
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+###
+GET {{host}}/test/test3
+
+###
+GET {{host}}/test/test7
+
+###
+GET {{host}}/content-publisher/list-published?
+    pageIndex=1&
+    pageSize=20
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+###
+GET {{host}}/content-publisher/list-published?
+    pageIndex=1&
+    pageSize=30&
+    keywords=&
+    categoryId=d66f4b25-b0c8-4ba4-8c3d-baeed54a8ae5&
+    writerAccountId=00000000-0000-0000-0000-000000000000&
+    contentType=Unknown&
+    fromPublishedDate=&
+    toPublishedDate
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+###
+GET {{host}}/content-writer/list-all?
+    pageIndex=1&
+    pageSize=30&
+    keywords=&
+    categoryId=d66f4b25-b0c8-4ba4-8c3d-baeed54a8ae5&
+    writerAccountId=00000000-0000-0000-0000-000000000000&
+    contentType=Unknown&
+    fromPublishedDate=&
+    toPublishedDate
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+
+###
+GET https://{{host}}/content-publisher/list-published?
+    siteId=00000000-0000-0000-0000-000000000000&
+    pageIndex=1&
+    pageSize=10&
+    keywords=&
+    categoryId=00000000-0000-0000-0000-000000000000&
+    writerAccountId=00000000-0000-0000-0000-000000000000&
+    contentType=Unknown&
+    fromPublishedDate=&
+    toPublishedDate
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+GET https://dbnd.c.hemera.com.vn/api/v1/content-publisher/list-published?
+    siteId=00000000-0000-0000-0000-000000000000&
+    pageIndex=1&
+    pageSize=10&
+    keywords=&
+    categoryId=00000000-0000-0000-0000-000000000000&
+    writerAccountId=00000000-0000-0000-0000-000000000000&
+    contentType=Unknown&
+    fromPublishedDate=&
+    toPublishedDate
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Publishing Publish Test
+PATCH {{host}}/{{contentsPath}}/b36f50e5-214b-4d47-9bef-0ff526a94fea/publishing-publish
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+
+### ClearCache
+DELETE {{host}}/{{authenticationPath}}/clear-cache?accountId=e36a0f51-aca7-4146-989c-2bde1c56ad6c
+Content-Type: application/json
+
+### ClearCache
+DELETE {{host}}/{{authenticationPath}}/clear-cache
+Content-Type: application/json
+
+### ClearCache OnSite
+DELETE https://dbnd.c.hemera.com.vn/api/v1/{{authenticationPath}}/clear-cache?accountId=e36a0f51-aca7-4146-989c-2bde1c56ad6c
+Content-Type: application/json

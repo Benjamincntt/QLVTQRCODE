@@ -1,0 +1,29 @@
+POST {{host}}/{{authenticationPath}}/login
+Content-Type: application/json
+Site-Id: {{siteId}}
+
+{
+	"username": "{{username}}",
+	"password": "{{password}}"
+}
+
+###
+#POST {{host}}/{{authenticationPath}}/login-verify
+#Content-Type: application/json
+#Site-Id: {{siteId}}
+#
+#{
+#	"username": "{{username}}",
+#	"securityKey": "{{securityKey}}",
+#	"otp": "{{otp}}"
+#}
+
+###
+#POST {{host}}/{{authenticationPath}}/activate-account
+#Content-Type: application/json
+#
+#{
+#	"username": "{{username}}",
+#	"otp": "{{otp}}"
+#}
+

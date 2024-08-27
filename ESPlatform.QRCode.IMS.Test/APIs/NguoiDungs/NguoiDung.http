@@ -1,0 +1,62 @@
+﻿### Them nguoi dung
+POST {{host}}/{{nguoiDungPath}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+{
+  "fullName": "hieunl",
+  "tenDangNhap": "hieunl",
+  "email": "hieunl@gmail.com",
+  "ngaySinh": "2024-08-27T01:53:07.856Z",
+  "diaChi": "Tiền Hải, Thái Bình",
+  "matKhau": "123456",
+  "soDienThoai": "1231231231",
+  "maDonViSuDung": 202
+}
+
+### Đổi mật khẩu
+PATCH {{host}}/{{nguoiDungPath}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+{
+  "currentPassword": "123456",
+  "newPassword": "12345678"
+}
+
+### Cập nhật thông tin
+PATCH {{host}}/{{nguoiDungPath}}/{{maNguoiDung}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+{
+  "fullName": "hieunl",
+  "tenDangNhap": "hieunl",
+  "email": "hieunl@gmail.com",
+  "ngaySinh": "2024-08-27T06:08:18.004Z",
+  "diaChi": "Tiền Hải, Thái Bình",
+  "ho": "Nguyễn",
+  "ten": "Lương Hiếu",
+  "anhDaiDien": "",
+  "gioiTinh": true,
+  "hocHam": "",
+  "hocVi": "",
+  "noiCongTac": "",
+  "soDienThoai": "0969992857",
+  "kichHoat": true,
+  "tieuSu": "",
+  "tienTrongTaiKhoan": 1000000,
+  "coChoPhepHienThi": true,
+  "laQuanTriVienCaoCap": true,
+  "daXoa": false,
+  "idluongXuLy": 0,
+  "iddonVi": 0,
+  "queQuan": "Thái Bình",
+  "chucVu": "",
+  "doiTuong": "Unknown"
+}
+
+

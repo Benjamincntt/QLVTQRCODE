@@ -1,0 +1,32 @@
+### Api sửa tài khoản
+PATCH {{host}}/{{accountsPath}}/{{accountId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+{
+	"fullName": "hieunl",
+	"email": "dtb@gmail.com",
+	"phoneNumber": "12345678910",
+	"isLocked": false,
+	"status": "Unknown",
+    "title": "Phóng viên ngầm",
+    "departmentLabelId": "81264ba5-a181-4322-9383-38f448d4c315",
+    "GroupLabelId": "d7842d0d-f241-42c5-aceb-14b42a7b6670"
+}
+
+### Api sửa mật khẩu
+PATCH {{host}}/{{accountsPath}}/{{accountId}}/reset-password
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+ "123456"
+
+### Api reset otp
+PATCH {{host}}/{{accountsPath}}/{{accountId}}/reset-otp
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+Site-Id: {{siteId}}
+
+"123456"
