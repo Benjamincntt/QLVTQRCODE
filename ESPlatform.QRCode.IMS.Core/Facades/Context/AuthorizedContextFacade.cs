@@ -8,9 +8,8 @@ namespace ESPlatform.QRCode.IMS.Core.Facades.Context;
 public class AuthorizedContextFacade : IAuthorizedContextFacade {
 	public AuthorizedContextFacade(IHttpContextAccessor httpContextAccessor) {
 		var httpContext = httpContextAccessor.HttpContext;
-
-		// OBSOLETED
-		// SiteId = httpContext?.Items[Constants.ContextKeys.SiteId] as Guid? ?? Guid.Empty;
+		
+		KyKiemKeId = httpContext?.Items[Constants.ContextKeys.KyKiemKeId] as int? ?? Constants.KyKiemKeId;
 
 		AccountId = httpContext?.Items[Constants.ContextKeys.AccountId] as int? ?? 0;
 		Username = httpContext?.Items[Constants.ContextKeys.Username] as string ?? string.Empty;
@@ -19,9 +18,8 @@ public class AuthorizedContextFacade : IAuthorizedContextFacade {
 		RoleDictionary = httpContext?.Items[Constants.ContextKeys.RoleDictionary] as Dictionary<Guid, HashSet<ZoneInfo>> ?? new();
 		PermissionDictionary = httpContext?.Items[Constants.ContextKeys.PermissionDictionary] as Dictionary<Guid, HashSet<ZoneInfo>> ?? new();
 	}
-
-	// OBSOLETED
-	// public Guid SiteId { get; set; }
+	
+	public int KyKiemKeId { get; set; }
 
 	public int AccountId { get; set; }
 
@@ -37,42 +35,42 @@ public class AuthorizedContextFacade : IAuthorizedContextFacade {
 		return RoleDictionary.ContainsKey(roleId);
 	}
 
-	public bool IsAnyOfRolesGranted(IEnumerable<Guid> roleIds) {
-		return roleIds.Any(roleId => RoleDictionary.ContainsKey(roleId));
-	}
-
-	public bool IsRoleGrantedOnZones(Guid roleId, IEnumerable<ZoneInfo> zones) {
-		if (!RoleDictionary.ContainsKey(roleId)) {
-			return false;
-		}
-
-		return RoleDictionary.TryGetValue(roleId, out var zoneSet) && zones.Any(zone => zoneSet.Contains(zone));
-	}
-
-	public bool IsAnyOfRolesGrantedOnZone(IEnumerable<Guid> roleIds, Guid zoneId, ZoneType type) {
-		return ListZonesHavingAnyOfRolesGrantedOn(roleIds, type).Select(x => x.ZoneId).Contains(zoneId);
-	}
-
-	public bool IsAnyOfRolesGrantedOnZones(IEnumerable<Guid> roleIds, IEnumerable<Guid> zoneIds, ZoneType type) {
-		var eligibleZones = ListZonesHavingAnyOfRolesGrantedOn(roleIds, type).Select(x => x.ZoneId);
-		return !zoneIds.Except(eligibleZones).Any();
-	}
-
-	public bool IsPermissionGranted(Guid permissionId) {
-		return PermissionDictionary.ContainsKey(permissionId);
-	}
-
-	public bool IsAnyOfPermissionsGranted(IEnumerable<Guid> permissionIds) {
-		return permissionIds.Any(permissionId => PermissionDictionary.ContainsKey(permissionId));
-	}
-
-	public bool IsPermissionGrantedOnZones(Guid permissionId, IEnumerable<ZoneInfo> zones) {
-		if (!PermissionDictionary.ContainsKey(permissionId)) {
-			return false;
-		}
-
-		return PermissionDictionary.TryGetValue(permissionId, out var zoneSet) && zones.Any(zone => zoneSet.Contains(zone));
-	}
+	// public bool IsAnyOfRolesGranted(IEnumerable<Guid> roleIds) {
+	// 	return roleIds.Any(roleId => RoleDictionary.ContainsKey(roleId));
+	// }
+	//
+	// public bool IsRoleGrantedOnZones(Guid roleId, IEnumerable<ZoneInfo> zones) {
+	// 	if (!RoleDictionary.ContainsKey(roleId)) {
+	// 		return false;
+	// 	}
+	//
+	// 	return RoleDictionary.TryGetValue(roleId, out var zoneSet) && zones.Any(zone => zoneSet.Contains(zone));
+	// }
+	//
+	// public bool IsAnyOfRolesGrantedOnZone(IEnumerable<Guid> roleIds, Guid zoneId, ZoneType type) {
+	// 	return ListZonesHavingAnyOfRolesGrantedOn(roleIds, type).Select(x => x.ZoneId).Contains(zoneId);
+	// }
+	//
+	// public bool IsAnyOfRolesGrantedOnZones(IEnumerable<Guid> roleIds, IEnumerable<Guid> zoneIds, ZoneType type) {
+	// 	var eligibleZones = ListZonesHavingAnyOfRolesGrantedOn(roleIds, type).Select(x => x.ZoneId);
+	// 	return !zoneIds.Except(eligibleZones).Any();
+	// }
+	//
+	// public bool IsPermissionGranted(Guid permissionId) {
+	// 	return PermissionDictionary.ContainsKey(permissionId);
+	// }
+	//
+	// public bool IsAnyOfPermissionsGranted(IEnumerable<Guid> permissionIds) {
+	// 	return permissionIds.Any(permissionId => PermissionDictionary.ContainsKey(permissionId));
+	// }
+	//
+	// public bool IsPermissionGrantedOnZones(Guid permissionId, IEnumerable<ZoneInfo> zones) {
+	// 	if (!PermissionDictionary.ContainsKey(permissionId)) {
+	// 		return false;
+	// 	}
+	//
+	// 	return PermissionDictionary.TryGetValue(permissionId, out var zoneSet) && zones.Any(zone => zoneSet.Contains(zone));
+	// }
 
 	public IEnumerable<ZoneInfo> ListZonesHavingAnyOfRolesGrantedOn(IEnumerable<Guid> roleIds, ZoneType type) {
 		return roleIds

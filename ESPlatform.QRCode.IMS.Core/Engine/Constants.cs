@@ -3,6 +3,7 @@ namespace ESPlatform.QRCode.IMS.Core.Engine;
 public static partial class Constants {
 	public const int DefaultPageIndex = 1;
 	public const int DefaultPageSize = 20;
+	public const int KyKiemKeId = 15;
 
 	public static class Http {
 		public const string CorsPolicyName = "CorsPolicyOrigins";
@@ -13,13 +14,13 @@ public static partial class Constants {
 		}
 
 		public static class HeaderNames {
-			public const string SiteId = "Site-Id";
+			public const string KiKiemKeId = "KiKiemKe-Id";
 			public const string TokenExpired = "Token-Expired";
 		}
 	}
 
 	public static class ContextKeys {
-		public const string SiteId = "SiteId";
+		public const string KyKiemKeId = "KyKiemKeId";
 		public const string AccountId = "AccountId";
 		public const string Username = "Username";
 		public const string IpAddress = "IpAddress";

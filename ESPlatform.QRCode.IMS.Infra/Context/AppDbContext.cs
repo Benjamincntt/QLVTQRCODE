@@ -8,17 +8,21 @@ public partial class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
-       
     }
-    
 
     public virtual DbSet<DonViHanhChinh> DonViHanhChinhs { get; set; }
 
     public virtual DbSet<GetNewId> GetNewIds { get; set; }
 
     public virtual DbSet<NguoiDungViTriCongViec> NguoiDungViTriCongViecs { get; set; }
+    
+    public virtual DbSet<QlvtAttachment> QlvtAttachments { get; set; }
+
+    public virtual DbSet<QlvtKho> QlvtKhos { get; set; }
 
     public virtual DbSet<QlvtKyKiemKe> QlvtKyKiemKes { get; set; }
+
+    public virtual DbSet<QlvtKyKiemKeChiTiet> QlvtKyKiemKeChiTiets { get; set; }
 
     public virtual DbSet<QlvtMuaSamPhieuDeXuat> QlvtMuaSamPhieuDeXuats { get; set; }
 
@@ -26,17 +30,15 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<QlvtMuaSamPhieuDeXuatLichSu> QlvtMuaSamPhieuDeXuatLichSus { get; set; }
 
+    public virtual DbSet<QlvtVatTu> QlvtVatTus { get; set; }
+
     public virtual DbSet<QlvtVatTuImage> QlvtVatTuImages { get; set; }
+
+    public virtual DbSet<QlvtVatTuKho> QlvtVatTuKhos { get; set; }
 
     public virtual DbSet<QlvtVatTuViTri> QlvtVatTuViTris { get; set; }
 
-    public virtual DbSet<QlvtVtGiaKe> QlvtVtGiaKes { get; set; }
-
-    public virtual DbSet<QlvtVtHop> QlvtVtHops { get; set; }
-
-    public virtual DbSet<QlvtVtNgan> QlvtVtNgans { get; set; }
-
-    public virtual DbSet<QlvtVtToMay> QlvtVtToMays { get; set; }
+    public virtual DbSet<QlvtViTri> QlvtViTris { get; set; }
 
     public virtual DbSet<TbAudience> TbAudiences { get; set; }
 
@@ -132,9 +134,6 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // var converter = new ValueConverter<AccountInfo, string>(
-        //     v => JsonConvert.SerializeObject(v), // Chuyển đổi từ đối tượng sang JSON
-        //     v => v != null ? JsonConvert.DeserializeObject<AccountInfo>(v) : new AccountInfo());// Chuyển đổi từ JSON sang đối tượng
         modelBuilder.Entity<DonViHanhChinh>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_EDM_DonViHanhChinh");
@@ -168,6 +167,76 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.DenNgay).HasColumnType("datetime");
             entity.Property(e => e.TrangThai).HasComment("=1:(tồn tại);=10(đã xóa)");
             entity.Property(e => e.TuNgay).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<QlvtAttachment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Attachme__3214EC07E1949B48");
+
+            entity.ToTable("QLVT_Attachments");
+
+            entity.Property(e => e.AttachmentUrl).HasMaxLength(500);
+            entity.Property(e => e.ContentType)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.FileName).HasMaxLength(500);
+            entity.Property(e => e.ThumbnailUrl).HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<QlvtKho>(entity =>
+        {
+            entity.HasKey(e => e.OrganizationId);
+
+            entity.ToTable("QLVT_Kho");
+
+            entity.Property(e => e.OrganizationId).HasColumnName("Organization_Id");
+            entity.Property(e => e.CreatedBy)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasComment("Người tạo")
+                .HasColumnName("Created_By");
+            entity.Property(e => e.CreationDate)
+                .HasComment("Creation_Date")
+                .HasColumnType("date")
+                .HasColumnName("Creation_Date");
+            entity.Property(e => e.MasterOrganizationId)
+                .HasDefaultValueSql("((0))")
+                .HasComment("Id Tổng kho")
+                .HasColumnName("Master_Organization_Id");
+            entity.Property(e => e.OperatingUnit)
+                .HasComment("Id đơn vị")
+                .HasColumnName("Operating_Unit");
+            entity.Property(e => e.OrganizationCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasComment("Mã Kho")
+                .HasColumnName("Organization_Code");
+            entity.Property(e => e.OrganizationName)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasComment("Tên Kho")
+                .HasColumnName("Organization_Name");
+            entity.Property(e => e.OrganizationType)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasComment("Loại kho")
+                .HasColumnName("Organization_Type");
+            entity.Property(e => e.PrimaryCostMethod)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasComment("Phương pháp tính giá")
+                .HasColumnName("Primary_Cost_Method");
+            entity.Property(e => e.SubInventoryCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasComment("Mã kho phụ")
+                .HasColumnName("Subinventory_Code");
+            entity.Property(e => e.SubInventoryName)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasComment("Tên kho phụ")
+                .HasColumnName("Subinventory_Name");
         });
 
         modelBuilder.Entity<QlvtKyKiemKe>(entity =>
@@ -212,6 +281,25 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("user_name");
         });
 
+        modelBuilder.Entity<QlvtKyKiemKeChiTiet>(entity =>
+        {
+            entity.HasKey(e => e.TheId).HasName("PK_QLVT_TheKiemKe");
+
+            entity.ToTable("QLVT_KyKiemKe_ChiTiet");
+
+            entity.Property(e => e.TheId).HasColumnName("The_Id");
+            entity.Property(e => e.KhoChinhId).HasColumnName("KhoChinh_Id");
+            entity.Property(e => e.KhoPhuId).HasColumnName("KhoPhu_Id");
+            entity.Property(e => e.KyKiemKeId).HasColumnName("KyKiemKe_Id");
+            entity.Property(e => e.SoLuongChenhLech).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongKiemKe).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongSoSach).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoThe)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+        });
+
         modelBuilder.Entity<QlvtMuaSamPhieuDeXuat>(entity =>
         {
             entity.ToTable("QLVT_MuaSam_PhieuDeXuat");
@@ -242,7 +330,7 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.DonViTinh).HasMaxLength(50);
-            entity.Property(e => e.IdvatTu)
+            entity.Property(e => e.IdVatTu)
                 .HasComment("Nếu IDVatTu tồn tại thì vật tư được lấy từ hệ thông ERP, nếu không tồn tại thì Vật tư đc thêm mới vào phiếu đề xuất")
                 .HasColumnName("IDVatTu");
             entity.Property(e => e.MaVatTu).HasMaxLength(50);
@@ -263,84 +351,110 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.TrangThai).HasComment("=0: Nháp; =1: tạo và gửi duyệt; =2: duyệt; =4 Hủy duyệt");
         });
 
+        modelBuilder.Entity<QlvtVatTu>(entity =>
+        {
+            entity.HasKey(e => e.VatTuId).HasName("PK_QL_VatTu");
+
+            entity.ToTable("QLVT_VatTu");
+
+            entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+            entity.Property(e => e.DonViTinh).HasMaxLength(100);
+            entity.Property(e => e.GhiChu).HasMaxLength(250);
+            entity.Property(e => e.KhoId).HasColumnName("Kho_Id");
+            entity.Property(e => e.MaVatTu)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.NgayTao).HasColumnType("datetime");
+            entity.Property(e => e.NguoiTao).HasMaxLength(100);
+            entity.Property(e => e.NguoiTaoId).HasColumnName("NguoiTao_Id");
+            entity.Property(e => e.TenVatTu).HasMaxLength(100);
+        });
+
         modelBuilder.Entity<QlvtVatTuImage>(entity =>
         {
-            entity.HasKey(e => e.IdvatTu);
+            entity.HasKey(e => new { e.IdVatTu, e.AttachmentId });
 
             entity.ToTable("QLVT_VatTu_Image");
 
-            entity.Property(e => e.IdvatTu)
-                .ValueGeneratedNever()
+            entity.Property(e => e.IdVatTu)
                 .HasComment("Tên folder chứa danh sách ảnh lấy theo IDVatTu")
                 .HasColumnName("IDVatTu");
-            entity.Property(e => e.Image)
-                .HasMaxLength(100)
-                .HasComment("Tên ảnh.");
+            entity.Property(e => e.AttachmentId).HasComment("Tên ảnh.");
+        });
+
+        modelBuilder.Entity<QlvtVatTuKho>(entity =>
+        {
+            entity.HasKey(e => new { e.InventoryItemId, e.OrganizationId });
+
+            entity.ToTable("QLVT_VatTu_Kho");
+
+            entity.Property(e => e.InventoryItemId)
+                .HasComment("Id vật tư")
+                .HasColumnName("Inventory_Item_Id");
+            entity.Property(e => e.OrganizationId)
+                .HasComment("ID kho")
+                .HasColumnName("Organization_Id");
+            entity.Property(e => e.CreatedBy)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasComment("Người tạo")
+                .HasColumnName("Created_By");
+            entity.Property(e => e.CreationDate)
+                .HasComment("Ngày tạo")
+                .HasColumnType("date")
+                .HasColumnName("Creation_Date");
+            entity.Property(e => e.LotNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasComment("Số lô vật tư")
+                .HasColumnName("Lot_Number");
+            entity.Property(e => e.OnhandQuantity)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasComment("Số lượng tồn")
+                .HasColumnName("Onhand_Quantity");
+            entity.Property(e => e.SubinventoryCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasComment("Mã kho phụ")
+                .HasColumnName("Subinventory_Code");
         });
 
         modelBuilder.Entity<QlvtVatTuViTri>(entity =>
         {
-            entity.HasKey(e => e.IdvatTu);
+            entity.HasKey(e => e.IdVatTu);
 
             entity.ToTable("QLVT_VatTu_ViTri");
 
-            entity.Property(e => e.IdvatTu)
+            entity.Property(e => e.IdVatTu)
                 .ValueGeneratedNever()
                 .HasColumnName("IDVatTu");
-            entity.Property(e => e.IdgiaKe).HasColumnName("IDGiaKe");
-            entity.Property(e => e.Idhop).HasColumnName("IDHop");
-            entity.Property(e => e.IdkhoErp).HasColumnName("IDKhoERP");
-            entity.Property(e => e.Idngan).HasColumnName("IDNgan");
-            entity.Property(e => e.IdtoMay).HasColumnName("IDToMay");
+            entity.Property(e => e.IdGiaKe).HasColumnName("IDGiaKe");
+            entity.Property(e => e.IdHop).HasColumnName("IDHop");
+            entity.Property(e => e.IdKhoErp).HasColumnName("IDKhoERP");
+            entity.Property(e => e.IdNgan).HasColumnName("IDNgan");
+            entity.Property(e => e.IdToMay).HasColumnName("IDToMay");
             entity.Property(e => e.MaVatTu).HasMaxLength(50);
             entity.Property(e => e.TenVatTu).HasMaxLength(250);
+            entity.Property(e => e.ViTri).HasMaxLength(500);
         });
 
-        modelBuilder.Entity<QlvtVtGiaKe>(entity =>
+        modelBuilder.Entity<QlvtViTri>(entity =>
         {
-            entity.ToTable("QLVT_VT_GiaKe");
+            entity.HasKey(e => e.Id).HasName("PK_QLVT_VT_ToMay");
 
-            entity.Property(e => e.IdtoMay).HasColumnName("IDToMay");
+            entity.ToTable("QLVT_ViTri");
+
+            entity.Property(e => e.IdKhoErp)
+                .HasDefaultValueSql("((0))")
+                .HasColumnName("IDKhoERP");
             entity.Property(e => e.KichThuoc).HasMaxLength(255);
-            entity.Property(e => e.MaGiaKe).HasMaxLength(30);
+            entity.Property(e => e.Ma).HasMaxLength(30);
             entity.Property(e => e.MoTa).HasMaxLength(2000);
-            entity.Property(e => e.TenGiaKe).HasMaxLength(200);
-        });
-
-        modelBuilder.Entity<QlvtVtHop>(entity =>
-        {
-            entity.ToTable("QLVT_VT_Hop");
-
-            entity.Property(e => e.IdgiaKe).HasColumnName("IDGiaKe");
-            entity.Property(e => e.Idngan).HasColumnName("IDNgan");
-            entity.Property(e => e.IdtoMay).HasColumnName("IDToMay");
-            entity.Property(e => e.KichThuoc).HasMaxLength(255);
-            entity.Property(e => e.MaHop).HasMaxLength(30);
-            entity.Property(e => e.MoTa).HasMaxLength(2000);
-            entity.Property(e => e.TenHop).HasMaxLength(200);
-        });
-
-        modelBuilder.Entity<QlvtVtNgan>(entity =>
-        {
-            entity.ToTable("QLVT_VT_Ngan");
-
-            entity.Property(e => e.IdgiaKe).HasColumnName("IDGiaKe");
-            entity.Property(e => e.IdtoMay).HasColumnName("IDToMay");
-            entity.Property(e => e.KichThuoc).HasMaxLength(255);
-            entity.Property(e => e.MaNgan).HasMaxLength(30);
-            entity.Property(e => e.MoTa).HasMaxLength(2000);
-            entity.Property(e => e.TenNgan).HasMaxLength(200);
-        });
-
-        modelBuilder.Entity<QlvtVtToMay>(entity =>
-        {
-            entity.ToTable("QLVT_VT_ToMay");
-
-            entity.Property(e => e.IdkhoErp).HasColumnName("IDKhoERP");
-            entity.Property(e => e.KichThuoc).HasMaxLength(255);
-            entity.Property(e => e.MaToMay).HasMaxLength(30);
-            entity.Property(e => e.MoTa).HasMaxLength(2000);
-            entity.Property(e => e.TenToMay).HasMaxLength(200);
+            entity.Property(e => e.ParentId)
+                .HasComment("=0 đây là mức cha\r\n<>0 đây là ID cha")
+                .HasColumnName("ParentID");
+            entity.Property(e => e.Ten).HasMaxLength(200);
         });
 
         modelBuilder.Entity<TbAudience>(entity =>
@@ -982,28 +1096,45 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("Tb_NguoiDung");
 
-            entity.Property(e => e.AnhDaiDien).HasMaxLength(255);
+            entity.Property(e => e.AnhDaiDien)
+                .HasMaxLength(255)
+                .HasDefaultValueSql("('')");
             entity.Property(e => e.CoChoPhepHienThi)
                 .IsRequired()
                 .HasDefaultValueSql("((1))");
             entity.Property(e => e.DiaChi).HasMaxLength(255);
-            entity.Property(e => e.DoiTuong).HasComment("1: Cán bộ; 2: Công chức; 3: Viên chức");
+            entity.Property(e => e.DoiTuong)
+                .HasDefaultValueSql("((0))")
+                .HasComment("1: Cán bộ; 2: Công chức; 3: Viên chức");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.Ho).HasMaxLength(50);
             entity.Property(e => e.HocHam).HasMaxLength(50);
             entity.Property(e => e.HocVi).HasMaxLength(50);
-            entity.Property(e => e.IddonVi).HasColumnName("IDDonVi");
-            entity.Property(e => e.IdluongXuLy).HasColumnName("IDLuongXuLy");
+            entity.Property(e => e.IddonVi)
+                .HasDefaultValueSql("((0))")
+                .HasColumnName("IDDonVi");
+            entity.Property(e => e.IdluongXuLy)
+                .HasDefaultValueSql("((0))")
+                .HasColumnName("IDLuongXuLy");
+            entity.Property(e => e.Info)
+                .HasDefaultValueSql("('{}')")
+                .HasColumnName("info");
             entity.Property(e => e.KichHoat)
                 .IsRequired()
                 .HasDefaultValueSql("((1))");
             entity.Property(e => e.MaDinhDanh).HasMaxLength(20);
             entity.Property(e => e.MatKhau).HasMaxLength(50);
-            entity.Property(e => e.NgaySinh).HasColumnType("date");
+            entity.Property(e => e.NgaySinh)
+                .HasDefaultValueSql("('1900-01-01')")
+                .HasColumnType("date");
             entity.Property(e => e.NgayTao)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.NoiCongTac).HasMaxLength(255);
+            entity.Property(e => e.OtpSecret)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("otp_secret");
             entity.Property(e => e.Salt).HasMaxLength(10);
             entity.Property(e => e.SoDienThoai).HasMaxLength(20);
             entity.Property(e => e.SoNguoiDungThich).HasDefaultValueSql("((0))");
@@ -1012,13 +1143,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ThoiGianMatKhau).HasColumnType("datetime");
             entity.Property(e => e.TienTrongTaiKhoan).HasDefaultValueSql("((0))");
             entity.Property(e => e.TieuSu).HasMaxLength(3000);
-            entity.Property(e => e.OtpSecret)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("otp_secret");
-            entity.Property(e => e.Info)
-                .IsUnicode(false)
-                .HasColumnName("info");
 
             entity.HasOne(d => d.MaDonViSuDungNavigation).WithMany(p => p.TbNguoiDungs)
                 .HasForeignKey(d => d.MaDonViSuDung)

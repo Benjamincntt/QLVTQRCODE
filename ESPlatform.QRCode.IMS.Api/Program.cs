@@ -62,6 +62,8 @@ app.UseMiddleware<PerformanceMiddleware>()
 // Configure Controllers
 app.MapControllers();
 
+app.UseStaticFiles(); 
+
 try {
 	Log.Information("STARTED");
 	await app.RunAsync();

@@ -3,12 +3,12 @@
 public partial class QlvtVatTuImage
 {
     /// <summary>
-    /// Tên folder chứa danh sách ảnh lấy theo IDVatTu
+    /// Tên folder chứa danh sách ảnh lấy theo IdVatTu
     /// </summary>
-    public int IdvatTu { get; set; }
+    public int IdVatTu { get; set; }
 
     /// <summary>
     /// Tên ảnh.
     /// </summary>
-    public string? Image { get; set; }
+    public int AttachmentId { get; set; }
 }

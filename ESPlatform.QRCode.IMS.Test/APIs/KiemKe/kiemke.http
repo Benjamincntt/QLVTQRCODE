@@ -1,0 +1,5 @@
+GET {{host}}/{{kiemkePath}}/{{vatTuId}}
+Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
+Authorization: Bearer {{accessToken}}
+

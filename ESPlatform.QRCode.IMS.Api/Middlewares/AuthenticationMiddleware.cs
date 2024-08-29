@@ -1,11 +1,7 @@
-using System.Text.Json;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Utils;
-using ESPlatform.QRCode.IMS.Domain.Entities;
-using ESPlatform.QRCode.IMS.Domain.Enums;
-using ESPlatform.QRCode.IMS.Domain.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 
@@ -20,7 +16,7 @@ public class AuthenticationMiddleware {
 
 	public async Task InvokeAsync(HttpContext context,
 								  IDistributedCache distributedCache) {
-		var currentSiteId = context.GetSiteId();
+		var currentKyKiemKeId = context.GetKyKiemKeId();
 
 		var endpoint = context.GetEndpoint();
 		if (endpoint?.Metadata.GetMetadata<IAllowAnonymous>() == null && context.User.Identity?.IsAuthenticated != true) {
@@ -29,11 +25,11 @@ public class AuthenticationMiddleware {
 
 		var currentAccountId = context.GetAccountId();
 
-		context.Items[Constants.ContextKeys.SiteId] = currentSiteId;
+		context.Items[Constants.ContextKeys.KyKiemKeId] = currentKyKiemKeId;
 		context.Items[Constants.ContextKeys.IpAddress] = context.GetClientIpAddress();
 		context.Items[Constants.ContextKeys.AccountId] = currentAccountId;
 		context.Items[Constants.ContextKeys.Username] = context.GetUsername();
-
+		await _next(context);
 		// Build Role Dictionary
 		//var cacheKey = string.Format(Constants.CacheKeys.RoleDictionaryFormat, currentAccountId);
 		// var cacheKey = currentAccountId.ToString();
@@ -81,7 +77,7 @@ public class AuthenticationMiddleware {
 		// }
 
 		// Awaiting next sequence
-		await _next(context);
+		// await _next(context);
 	}
 
 	// private static Dictionary<Guid, HashSet<ZoneInfo>> BuildRoleDictionary(List<AccountRole> accountRoles) {
@@ -101,34 +97,34 @@ public class AuthenticationMiddleware {
 	// 	return roleDictionary;
 	// }
 
-	private static Dictionary<Guid, HashSet<ZoneInfo>> BuildPermissionDictionary(List<AccountPermission> allowedAccountPermissions,
-																				 List<AccountPermission> blockedAccountPermissions) {
-		var permissionDictionary = new Dictionary<Guid, HashSet<ZoneInfo>>();
-		foreach (var accountPermission in allowedAccountPermissions) {
-			var zoneInfo = new ZoneInfo { ZoneId = accountPermission.ZoneId, ZoneType = accountPermission.ZoneType };
-
-			if (permissionDictionary.TryGetValue(accountPermission.PermissionId, out var zoneSet)) {
-				zoneSet.Add(zoneInfo);
-				continue;
-			}
-
-			zoneSet = new HashSet<ZoneInfo> { zoneInfo };
-			permissionDictionary.Add(accountPermission.PermissionId, zoneSet);
-		}
-
-		foreach (var accountPermission in blockedAccountPermissions) {
-			var zoneInfo = new ZoneInfo { ZoneId = accountPermission.ZoneId, ZoneType = accountPermission.ZoneType };
-
-			if (!permissionDictionary.TryGetValue(accountPermission.PermissionId, out var zoneSet)) {
-				continue;
-			}
-
-			zoneSet.Remove(zoneInfo);
-			if (zoneSet.Count == 0) {
-				permissionDictionary.Remove(accountPermission.PermissionId);
-			}
-		}
-
-		return permissionDictionary;
-	}
+	// private static Dictionary<Guid, HashSet<ZoneInfo>> BuildPermissionDictionary(List<AccountPermission> allowedAccountPermissions,
+	// 																			 List<AccountPermission> blockedAccountPermissions) {
+	// 	var permissionDictionary = new Dictionary<Guid, HashSet<ZoneInfo>>();
+	// 	foreach (var accountPermission in allowedAccountPermissions) {
+	// 		var zoneInfo = new ZoneInfo { ZoneId = accountPermission.ZoneId, ZoneType = accountPermission.ZoneType };
+	//
+	// 		if (permissionDictionary.TryGetValue(accountPermission.PermissionId, out var zoneSet)) {
+	// 			zoneSet.Add(zoneInfo);
+	// 			continue;
+	// 		}
+	//
+	// 		zoneSet = new HashSet<ZoneInfo> { zoneInfo };
+	// 		permissionDictionary.Add(accountPermission.PermissionId, zoneSet);
+	// 	}
+	//
+	// 	foreach (var accountPermission in blockedAccountPermissions) {
+	// 		var zoneInfo = new ZoneInfo { ZoneId = accountPermission.ZoneId, ZoneType = accountPermission.ZoneType };
+	//
+	// 		if (!permissionDictionary.TryGetValue(accountPermission.PermissionId, out var zoneSet)) {
+	// 			continue;
+	// 		}
+	//
+	// 		zoneSet.Remove(zoneInfo);
+	// 		if (zoneSet.Count == 0) {
+	// 			permissionDictionary.Remove(accountPermission.PermissionId);
+	// 		}
+	// 	}
+	//
+	// 	return permissionDictionary;
+	// }
 }
