@@ -34,7 +34,6 @@
 
 
     <ItemGroup>
-      <Folder Include="DTOs\KiemKe\Requests\" />
       <Folder Include="DTOs\NguoiDungs\Responses\" />
     </ItemGroup>
 

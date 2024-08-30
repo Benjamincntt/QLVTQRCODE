@@ -41,19 +41,20 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         return response;
     }
 
-    public async Task<dynamic?> GetPositionAsync(int vatTuId)
+    public async Task<IEnumerable<dynamic>> GetPositionAsync(int vatTuId)
     {
         var response = await DbContext.QlvtVatTuViTris
             .Where(x => x.IdVatTu == vatTuId)
             .Select(x => new 
-            {
+            {   
+                x.IdViTri,
                 x.IdToMay,
                 x.IdGiaKe,
                 x.IdNgan,
                 x.IdHop,
                 x.ViTri
             })
-            .FirstOrDefaultAsync();
+            .ToListAsync();
         return response;
     }
 

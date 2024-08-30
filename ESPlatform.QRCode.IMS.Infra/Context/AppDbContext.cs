@@ -393,18 +393,19 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<QlvtVatTuViTri>(entity =>
         {
-            entity.HasKey(e => e.IdVatTu);
+            entity.HasKey(e => e.IdViTri);
 
             entity.ToTable("QLVT_VatTu_ViTri");
 
-            entity.Property(e => e.IdVatTu)
+            entity.Property(e => e.IdViTri)
                 .ValueGeneratedNever()
-                .HasColumnName("IDVatTu");
+                .HasColumnName("IDViTri");
             entity.Property(e => e.IdGiaKe).HasColumnName("IDGiaKe");
             entity.Property(e => e.IdHop).HasColumnName("IDHop");
             entity.Property(e => e.IdKhoErp).HasColumnName("IDKhoERP");
             entity.Property(e => e.IdNgan).HasColumnName("IDNgan");
             entity.Property(e => e.IdToMay).HasColumnName("IDToMay");
+            entity.Property(e => e.IdVatTu).HasColumnName("IDVatTu");
             entity.Property(e => e.MaVatTu).HasMaxLength(50);
             entity.Property(e => e.TenVatTu).HasMaxLength(250);
             entity.Property(e => e.ViTri).HasMaxLength(500);

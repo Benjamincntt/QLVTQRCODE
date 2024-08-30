@@ -1,10 +1,14 @@
-﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
+﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
+using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
+using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
+using ESPlatform.QRCode.IMS.Library.Utils.Validation;
+using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -14,18 +18,19 @@ public class KiemKeService : IKiemKeService
 {
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
-    private readonly IMemoryCache _memoryCache;
-    private const string CacheKey = "LocationIds";
+    // private readonly IMemoryCache _memoryCache;
+    // private const string CacheKey = "LocationIds";
     private readonly IMapper _mapper;
 
     public KiemKeService(
         IVatTuRepository vatTuRepository,
         IAuthorizedContextFacade authorizedContextFacade,
-        IMemoryCache memoryCache, IMapper mapper)
+        //IMemoryCache memoryCache,
+        IMapper mapper)
     {
         _vatTuRepository = vatTuRepository;
         _authorizedContextFacade = authorizedContextFacade;
-        _memoryCache = memoryCache;
+        //_memoryCache = memoryCache;
         _mapper = mapper;
     }
 
@@ -33,7 +38,7 @@ public class KiemKeService : IKiemKeService
     {
         if (vatTuId <= 0)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
         }
             
         var kyKiemkeId = _authorizedContextFacade.KyKiemKeId;
@@ -88,26 +93,23 @@ public class KiemKeService : IKiemKeService
         }
 
         // vị trí
-        var position = await _vatTuRepository.GetPositionAsync(vatTuId);
-         if (position != null)
-        {
-            var positionMapper = _mapper.Map<InventoryCheckResponse>(position);
-            response.IdToMay = positionMapper.IdToMay;
-            response.IdGiaKe = positionMapper.IdGiaKe;
-            response.IdNgan = positionMapper.IdNgan;
-            response.IdHop = positionMapper.IdHop;
-            response.ViTri = positionMapper.ViTri;
+        var positions = (await _vatTuRepository.GetPositionAsync(vatTuId)).Adapt<IEnumerable<SuppliesLocation>>().ToList();
 
-            //lưu 4 id vào cache key phục vụ cho cập nhật vị trí
-            var locationIds = new Dictionary<string, int>
-            {
-                { "IdToMay", positionMapper.IdToMay },
-                { "IdGiaKe", positionMapper.IdGiaKe },
-                { "IdNgan", positionMapper.IdNgan },
-                { "IdHop", positionMapper.IdHop }
-            };
-            _memoryCache.Set(CacheKey, locationIds, TimeSpan.FromMinutes(15));
+        if (positions.Count > 0)
+        {
+            response.SuppliesLocation = positions;
         }
+
+        //lưu 4 id vào cache key phục vụ cho cập nhật vị trí
+            // var locationIds = new Dictionary<string, int>
+            // {
+            //     { "IdToMay", positionMapper.IdToMay },
+            //     { "IdGiaKe", positionMapper.IdGiaKe },
+            //     { "IdNgan", positionMapper.IdNgan },
+            //     { "IdHop", positionMapper.IdHop }
+            // };
+            // _memoryCache.Set(CacheKey, locationIds, TimeSpan.FromMinutes(15));
+       //}
 
         // LOT
         var wareHouse = await _vatTuRepository.GetWareHouseAsync(vatTuId);
@@ -115,5 +117,27 @@ public class KiemKeService : IKiemKeService
         var wareHouseMapper = _mapper.Map<InventoryCheckResponse>(wareHouse);
         response.LotNumber = wareHouseMapper.LotNumber;
         return response;
+    }
+
+    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, ModifiedSuppliesLocationRequest request)
+    {
+        //validate
+        // if (vatTuId < 0)
+        // {
+        //     throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+        // }
+        // var vatTu = await _vatTuRepository.GetAsync(vatTuId);
+        // if (vatTu == null)
+        // {
+        //     throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
+        // }
+        // await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesLocationRequestValidation());
+        // if 
+        // {
+        //     
+        // }
+        //
+
+        return 1;
     }
 }

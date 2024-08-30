@@ -1,4 +1,5 @@
 ﻿using ESPlatform.QRCode.IMS.Api.Controllers.Base;
+using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 using ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,11 @@ public class KiemKeController : ApiControllerBase
     public async Task<InventoryCheckResponse> GetAsync(int vatTuId)
     {
         return await _kiemKeService.GetAsync(vatTuId);
+    }
+
+    [HttpPatch("{vatTuId:int}")]
+    public async Task<int> ModifySuppliesLocationAsync(int vatTuId,[FromBody]ModifiedSuppliesLocationRequest request) {
+        return await _kiemKeService.ModifySuppliesLocationAsync(vatTuId, request);
     }
     
 }
