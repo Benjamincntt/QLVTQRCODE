@@ -27,8 +27,6 @@ public class InventoryCheckResponse
     public string LotNumber { get; set; } = string.Empty;
     
     public string DonViTinh { get; set; } = string.Empty;
-    
-    public List<ImagesInfo> ImagesInfo { get; set; } = new();
 
     public int IdToMay { get; set; }
     
@@ -43,11 +41,8 @@ public class InventoryCheckResponse
     public decimal SoLuongKiemKe { get; set; }
 
     public decimal SoLuongChenhLech { get; set; }
-}
-
-public class ImagesInfo
-{
-    public string AttachmentUrl { get; set; } = string.Empty;
     
-    public string ThumbnailUrl { get; set; } = string.Empty;
+    public string Image { get; set; } = string.Empty;
+
+    public List<string> ImagePaths { get; set; } = new List<string>();
 }

@@ -15,8 +15,6 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<GetNewId> GetNewIds { get; set; }
 
     public virtual DbSet<NguoiDungViTriCongViec> NguoiDungViTriCongViecs { get; set; }
-    
-    public virtual DbSet<QlvtAttachment> QlvtAttachments { get; set; }
 
     public virtual DbSet<QlvtKho> QlvtKhos { get; set; }
 
@@ -31,11 +29,7 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<QlvtMuaSamPhieuDeXuatLichSu> QlvtMuaSamPhieuDeXuatLichSus { get; set; }
 
     public virtual DbSet<QlvtVatTu> QlvtVatTus { get; set; }
-
-    public virtual DbSet<QlvtVatTuImage> QlvtVatTuImages { get; set; }
-
     public virtual DbSet<QlvtVatTuKho> QlvtVatTuKhos { get; set; }
-
     public virtual DbSet<QlvtVatTuViTri> QlvtVatTuViTris { get; set; }
 
     public virtual DbSet<QlvtViTri> QlvtViTris { get; set; }
@@ -168,22 +162,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.TrangThai).HasComment("=1:(tồn tại);=10(đã xóa)");
             entity.Property(e => e.TuNgay).HasColumnType("datetime");
         });
-
-        modelBuilder.Entity<QlvtAttachment>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Attachme__3214EC07E1949B48");
-
-            entity.ToTable("QLVT_Attachments");
-
-            entity.Property(e => e.AttachmentUrl).HasMaxLength(500);
-            entity.Property(e => e.ContentType)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
-            entity.Property(e => e.FileName).HasMaxLength(500);
-            entity.Property(e => e.ThumbnailUrl).HasMaxLength(500);
-        });
-
+        
         modelBuilder.Entity<QlvtKho>(entity =>
         {
             entity.HasKey(e => e.OrganizationId);
@@ -360,6 +339,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
             entity.Property(e => e.DonViTinh).HasMaxLength(100);
             entity.Property(e => e.GhiChu).HasMaxLength(250);
+            entity.Property(e => e.Image)
+                .HasMaxLength(200)
+                .HasComment("Ảnh đại diện, mặc định ảnh đầu tiên sẽ là ảnh mặc định hiển thị ban đầu. Khi tồn tại ảnh này thì cần check folder tương ứng xem còn ảnh ko");
             entity.Property(e => e.KhoId).HasColumnName("Kho_Id");
             entity.Property(e => e.MaVatTu)
                 .HasMaxLength(100)
@@ -368,18 +350,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NguoiTao).HasMaxLength(100);
             entity.Property(e => e.NguoiTaoId).HasColumnName("NguoiTao_Id");
             entity.Property(e => e.TenVatTu).HasMaxLength(100);
-        });
-
-        modelBuilder.Entity<QlvtVatTuImage>(entity =>
-        {
-            entity.HasKey(e => new { e.IdVatTu, e.AttachmentId });
-
-            entity.ToTable("QLVT_VatTu_Image");
-
-            entity.Property(e => e.IdVatTu)
-                .HasComment("Tên folder chứa danh sách ảnh lấy theo IDVatTu")
-                .HasColumnName("IDVatTu");
-            entity.Property(e => e.AttachmentId).HasComment("Tên ảnh.");
+            entity.Property(e => e.TrangThaiInQr).HasColumnName("TrangThai_InQr");
         });
 
         modelBuilder.Entity<QlvtVatTuKho>(entity =>

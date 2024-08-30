@@ -14,9 +14,15 @@ public class KiemKeController : ApiControllerBase
         _kiemKeService = kiemKeService;
     }
     
+    /// <summary>
+    /// Hiển thị chi tiết kiểm kê: Quét QR Code kiểm kê/ Nhập mã tay
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <returns></returns>
     [HttpGet("{vatTuId:int}")]
     public async Task<InventoryCheckResponse> GetAsync(int vatTuId)
     {
         return await _kiemKeService.GetAsync(vatTuId);
     }
+    
 }

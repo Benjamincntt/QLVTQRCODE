@@ -48,9 +48,14 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</None>
-		<None Include="wwwroot\Images\5\anh1.jpg" />
-		<None Include="wwwroot\Images\5\anh2.jpg" />
-		<None Include="wwwroot\Images\5\anh3.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="wwwroot\Images\5\anh2.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
 	</ItemGroup>
 
 	<Target Name="PublishCleanup" AfterTargets="Publish">

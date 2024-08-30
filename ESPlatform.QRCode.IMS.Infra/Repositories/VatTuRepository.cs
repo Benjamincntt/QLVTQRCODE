@@ -74,22 +74,4 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
             .FirstOrDefaultAsync();
         return response;
     }
-
-    public async Task<IEnumerable<dynamic>> ListAsync(int vatTuId)
-    {
-        var response = await DbContext.QlvtVatTuImages
-            .Join(DbContext.QlvtAttachments,
-                x => x.AttachmentId,
-                y => y.Id,
-                (x, y) => new { QlvtVatTuImage = x, QlvtAttachment = y })
-
-            .Where(x => x.QlvtVatTuImage.IdVatTu == vatTuId)
-            .Select(x => new 
-            {
-                x.QlvtAttachment.AttachmentUrl,
-                x.QlvtAttachment.Id
-            })
-            .ToListAsync();
-        return response;
-    }
 }

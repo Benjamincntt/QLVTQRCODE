@@ -14,6 +14,8 @@ public class AppConfig {
 	public JwtSettings JwtSettings { get; set; } = new();
 
 	public OtpSettings OtpSettings { get; set; } = new();
+	
+	public ImagePath Image { get; set; }
 
 	/* END Settings */
 

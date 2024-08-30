@@ -1,10 +1,11 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
+using ESPlatform.QRCode.IMS.Core.Engine;
+using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
-using Mapster;
+using ESPlatform.QRCode.IMS.Library.Exceptions;
+using ESPlatform.QRCode.IMS.Library.Extensions;
 using MapsterMapper;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.KiemKe;
@@ -12,78 +13,68 @@ namespace ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 public class KiemKeService : IKiemKeService
 {
     private readonly IVatTuRepository _vatTuRepository;
-    private readonly IVatTuImageRepository _vatTuImageRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IMemoryCache _memoryCache;
     private const string CacheKey = "LocationIds";
-    private readonly IWebHostEnvironment _env;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
 
     public KiemKeService(
         IVatTuRepository vatTuRepository,
-        IVatTuImageRepository vatTuImageRepository,
         IAuthorizedContextFacade authorizedContextFacade,
-        IWebHostEnvironment env,
-        IHttpContextAccessor httpContextAccessor,
         IMemoryCache memoryCache, IMapper mapper)
     {
         _vatTuRepository = vatTuRepository;
-        _vatTuImageRepository = vatTuImageRepository;
         _authorizedContextFacade = authorizedContextFacade;
-        _env = env;
-        _httpContextAccessor = httpContextAccessor;
         _memoryCache = memoryCache;
         _mapper = mapper;
     }
 
     public async Task<InventoryCheckResponse> GetAsync(int vatTuId)
     {
+        if (vatTuId <= 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+        }
+            
         var kyKiemkeId = _authorizedContextFacade.KyKiemKeId;
         var response = new InventoryCheckResponse();
 
-        // lấy path ảnh từ wwwroot
-        // var webRootPath = _env.WebRootPath;
-        // var folderPath = Path.Combine(webRootPath, "Images", vatTuId.ToString());
-        // if (Directory.Exists(folderPath))
-        // {
-        //     var imagePaths = Directory.GetFiles(folderPath)
-        //         .Select(Path.GetFileName)
-        //         .Select(fileName =>
-        //         {
-        //             var httpContext = _httpContextAccessor.HttpContext;
-        //             if (httpContext == null)
-        //             {
-        //                 return string.Empty;
-        //             }
-        //
-        //             var actionContext = new ActionContext(httpContext, httpContext.GetRouteData(),
-        //                 new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor());
-        //             var urlHelper = new UrlHelper(actionContext);
-        //             return urlHelper.Content($"~/Images/{vatTuId}/{fileName}");
-        //         })
-        //         .Where(url => !string.IsNullOrEmpty(url)) // Loại bỏ các URL rỗng
-        //         .ToList();
-        //
-        //     response.ImageUrls = imagePaths;
-        //}
-
-        // vật tư
+        // vật tư 
         var vatTu = await _vatTuRepository.GetAsync(vatTuId);
-        if (vatTu != null)
+        if (vatTu == null)
         {
-            response.MaVatTu = !string.IsNullOrWhiteSpace(vatTu.MaVatTu) ? vatTu.MaVatTu : string.Empty;
-            response.TenVatTu = !string.IsNullOrWhiteSpace(vatTu.TenVatTu) ? vatTu.TenVatTu : string.Empty;
-            response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
+            throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
+        }
+        response.MaVatTu = !string.IsNullOrWhiteSpace(vatTu.MaVatTu) ? vatTu.MaVatTu : string.Empty;
+        response.TenVatTu = !string.IsNullOrWhiteSpace(vatTu.TenVatTu) ? vatTu.TenVatTu : string.Empty;
+        response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
+        // ảnh đại diện
+        response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
+        var folderPath =  $@"{AppConfig.Instance.Image.FolderPath}\{vatTuId}";
+        var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
+        
+        if (Directory.Exists(folderPath))
+        {
+            var imageFiles = Directory.GetFiles(folderPath);
+
+            // Xây dựng đường dẫn hoàn chỉnh cho mỗi ảnh
+            foreach (var file in imageFiles)
+            {
+                // Lấy tên file (không bao gồm đường dẫn)
+                var fileName = Path.GetFileName(file);
+                
+                // Tạo URL hoàn chỉnh từ urlPath và tên file
+                var fullPath = $"{urlPath}/{fileName}";
+                
+                // Thêm vào danh sách đường dẫn
+                response.ImagePaths .Add(fullPath);
+            }
         }
         
-        // danh sách ảnh cua vật tư
-        var images = (await _vatTuRepository.ListAsync(vatTuId)).Adapt<IEnumerable<ImagesInfo>>();;
-        response.ImagesInfo = images.ToList();
-
+        
         // kỳ kiểm kê và thông tin kho phụ
         var inventoryCheckInformation = await _vatTuRepository.GetInventoryCheckInformationAsync(vatTuId, kyKiemkeId);
-        if (inventoryCheckInformation != null)
+         if (inventoryCheckInformation != null) 
         {
             var inventoryCheckInformationMapper =
                 _mapper.Map<InventoryCheckResponse>(inventoryCheckInformation);
@@ -98,7 +89,7 @@ public class KiemKeService : IKiemKeService
 
         // vị trí
         var position = await _vatTuRepository.GetPositionAsync(vatTuId);
-        if (position != null)
+         if (position != null)
         {
             var positionMapper = _mapper.Map<InventoryCheckResponse>(position);
             response.IdToMay = positionMapper.IdToMay;

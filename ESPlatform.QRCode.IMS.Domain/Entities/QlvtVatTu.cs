@@ -1,6 +1,6 @@
 ﻿namespace ESPlatform.QRCode.IMS.Domain.Entities;
 
-public partial class QlvtVatTu
+public class QlvtVatTu
 {
     public int KhoId { get; set; }
 
@@ -19,4 +19,11 @@ public partial class QlvtVatTu
     public string? GhiChu { get; set; }
 
     public int VatTuId { get; set; }
+    
+    public short? TrangThaiInQr { get; set; }
+
+    /// <summary>
+    /// Ảnh đại diện, mặc định ảnh đầu tiên sẽ là ảnh mặc định hiển thị ban đầu. Khi tồn tại ảnh này thì cần check folder tương ứng xem còn ảnh ko
+    /// </summary>
+    public string? Image { get; set; }
 }
