@@ -37,17 +37,42 @@ public class KiemKeController : ApiControllerBase
     public async Task<int> ModifySuppliesLocationAsync(int vatTuId, int idViTri, [FromBody]ModifiedSuppliesLocationRequest request) {
         return await _kiemKeService.ModifySuppliesLocationAsync(vatTuId, idViTri, request);
     }
-    
+
     /// <summary>
     /// Cập nhật ảnh vật tư
     /// </summary>
     /// <param name="vatTuId"></param>
-    /// <param name="imageUrl"></param>
+    /// <param name="currentImagePath"></param>
+    /// <param name="file"></param>
     /// <returns></returns>
     [HttpPatch("{vatTuId:int}/update-supplies-image")]
-    public async Task<int> ModifiedSuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
+    public async Task<int> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
     {
-        return await _kiemKeService.ModifiedSuppliesImageAsync(vatTuId, currentImagePath, file);
+        return await _kiemKeService.ModifySuppliesImageAsync(vatTuId, currentImagePath, file);
+    }
+    
+    /// <summary>
+    /// Thêm ảnh vật tư
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    [HttpPost("{vatTuId:int}/create-supplies-image")]
+    public async Task<int> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
+    {
+        return await _kiemKeService.CreateSuppliesImageAsync(vatTuId, file);
+    }
+    
+    /// <summary>
+    /// Xóa ảnh vật tư
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <param name="currentImagePath"></param>
+    /// <returns></returns>
+    [HttpDelete("{vatTuId:int}/delete-supplies-image")]
+    public async Task<int> DeleteSuppliesImageAsync(int vatTuId, string currentImagePath)
+    {
+        return await _kiemKeService.DeleteSuppliesImageAsync(vatTuId, currentImagePath);
     }
     
 }

@@ -21,6 +21,14 @@ Authorization: Bearer {{accessToken}}
   "TenHop": "Hộc 1"
 }
 
+### Xóa ảnh vật tư
+DELETE {{host}}/{{kiemkePath}}/{{vatTuId}}//delete-supplies-image?currentImagePath=D%3A%5CImages%5C5%5CVattu1.jpg
+Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
+Authorization: Bearer {{accessToken}}
+
+
+
 
 
 

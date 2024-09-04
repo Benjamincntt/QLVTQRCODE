@@ -164,7 +164,7 @@ public class KiemKeService : IKiemKeService
         return await _vatTuViTriRepository.UpdateAsync(vitri);
     }
 
-    public async Task<int> ModifiedSuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
+    public async Task<int> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
     {
         #region validate
         if (vatTuId < 0 || file == null || file.Length <= 0)
@@ -183,16 +183,71 @@ public class KiemKeService : IKiemKeService
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidFileType);
         }
         #endregion 
+        // delete old image
+        if (File.Exists(currentImagePath))
+        {
+            File.Delete(currentImagePath);
+        }
         
-        var pathUpload = AppConfig.Instance.Image.FolderPath;
+        // create new image
+        var pathUpload =  Path.Combine(AppConfig.Instance.Image.FolderPath,vatTuId.ToString());
         var fileName = $"{Path.GetFileName(file.FileName)}";
         var fullPath = Path.Combine(pathUpload, fileName);
 
-        // Lưu file
+        // save file
         using (var stream = new FileStream(fullPath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
-        throw new NotImplementedException();
+        return 1;
+    }
+
+    public async Task<int> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
+    {
+        #region validate
+        if (vatTuId < 0 || file == null || file.Length <= 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+        }
+        var vatTu = await _vatTuRepository.GetAsync(vatTuId);
+        if (vatTu == null)
+        {
+            throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
+        }
+        string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" }; 
+        var extension = Path.GetExtension(file.FileName).ToLower();
+        if (!allowedExtensions.Contains(extension))
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidFileType);
+        }
+        #endregion 
+        // create new image
+        var pathUpload =  Path.Combine(AppConfig.Instance.Image.FolderPath,vatTuId.ToString());
+        var fileName = $"{Path.GetFileName(file.FileName)}";
+        var fullPath = Path.Combine(pathUpload, fileName);
+
+        // save file
+        using (var stream = new FileStream(fullPath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+        return 1;
+    }
+
+    public async Task<int> DeleteSuppliesImageAsync(int vatTuId, string currentImagePath)
+    {
+        if (vatTuId < 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+        }
+        var vatTu = await _vatTuRepository.GetAsync(vatTuId);
+        if (vatTu == null)
+        {
+            throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
+        }
+        // delete old image
+        if (!File.Exists(currentImagePath)) return default;
+        File.Delete(currentImagePath);
+        return 1;
     }
 }

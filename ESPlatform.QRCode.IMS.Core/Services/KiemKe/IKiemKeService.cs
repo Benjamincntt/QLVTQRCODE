@@ -9,5 +9,7 @@ public interface IKiemKeService
     Task<InventoryCheckResponse> GetAsync(int vatTuId);
 
     Task<int> ModifySuppliesLocationAsync(int vatTuId, int idViTri, ModifiedSuppliesLocationRequest request);
-    Task<int> ModifiedSuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file);
+    Task<int> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file);
+    Task<int> CreateSuppliesImageAsync(int vatTuId, IFormFile file);
+    Task<int> DeleteSuppliesImageAsync(int vatTuId, string currentImagePath);
 }
