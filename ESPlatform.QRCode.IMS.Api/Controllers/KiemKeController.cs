@@ -38,4 +38,16 @@ public class KiemKeController : ApiControllerBase
         return await _kiemKeService.ModifySuppliesLocationAsync(vatTuId, idViTri, request);
     }
     
+    /// <summary>
+    /// Cập nhật ảnh vật tư
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <param name="imageUrl"></param>
+    /// <returns></returns>
+    [HttpPatch("{vatTuId:int}/update-supplies-image")]
+    public async Task<int> ModifiedSuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
+    {
+        return await _kiemKeService.ModifiedSuppliesImageAsync(vatTuId, currentImagePath, file);
+    }
+    
 }

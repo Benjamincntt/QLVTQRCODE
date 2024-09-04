@@ -19,6 +19,7 @@ public static partial class Constants {
 			
 			public static class Supplies {
 				public const string InvalidId = "Mã vật tư không hợp lệ";
+				public const string InvalidFileType = "Loại file không được phép";
 			}
 
 			public static class Login {
