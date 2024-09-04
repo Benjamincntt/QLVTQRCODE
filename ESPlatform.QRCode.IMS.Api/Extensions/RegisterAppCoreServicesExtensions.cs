@@ -37,6 +37,7 @@ public static class RegisterAppCoreServicesExtensions {
 		   .AddScoped<INguoiDungRepository, NguoiDungRepository>()
 		   .AddScoped<IVatTuRepository, VatTuRepository>()
 		   .AddScoped<IVatTuViTriRepository, VatTuViTriRepository>()
+		   .AddScoped<IKyKiemKeChiTietDffRepository, KyKiemKeChiTietDffRepository>()
 
 			// Facades
 		   .AddScoped<IAuthorizedContextFacade, AuthorizedContextFacade>()

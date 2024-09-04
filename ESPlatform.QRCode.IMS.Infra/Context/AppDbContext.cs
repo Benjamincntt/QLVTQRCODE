@@ -21,6 +21,8 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<QlvtKyKiemKe> QlvtKyKiemKes { get; set; }
 
     public virtual DbSet<QlvtKyKiemKeChiTiet> QlvtKyKiemKeChiTiets { get; set; }
+    
+    public virtual DbSet<QlvtKyKiemKeChiTietDff> QlvtKyKiemKeChiTietDffs { get; set; }
 
     public virtual DbSet<QlvtMuaSamPhieuDeXuat> QlvtMuaSamPhieuDeXuats { get; set; }
 
@@ -278,7 +280,25 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
         });
+        
+        modelBuilder.Entity<QlvtKyKiemKeChiTietDff>(entity =>
+        {
+            entity.ToTable("QLVT_KyKiemKe_ChiTiet_DFF");
 
+            entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
+            entity.Property(e => e.PhanTramDong).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.PhanTramKemPhamChat).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.PhanTramMatPhamChat).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.SoLuongDeNghiThanhLy).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongDong).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongKemPhamChat).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongMatPhamChat).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.TsKemPcMatPc)
+                .HasColumnType("numeric(18, 0)")
+                .HasColumnName("TS_KemPc_MatPc");
+            entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+        });
+        
         modelBuilder.Entity<QlvtMuaSamPhieuDeXuat>(entity =>
         {
             entity.ToTable("QLVT_MuaSam_PhieuDeXuat");

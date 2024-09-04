@@ -1,5 +1,5 @@
 ### Hiển thị chi tiết kiểm kê: Quét QR Code kiểm kê/ Nhập mã tay
-GET {{host}}/{{kiemkePath}}/{{vatTuId}}
+GET {{host}}/{{kiemkePath}}/{{maVatTu}}
 Content-Type: application/json
 kikiemke-id: {{kikiemkeId}}
 Authorization: Bearer {{accessToken}}
@@ -26,6 +26,24 @@ DELETE {{host}}/{{kiemkePath}}/{{vatTuId}}//delete-supplies-image?currentImagePa
 Content-Type: application/json
 kikiemke-id: {{kikiemkeId}}
 Authorization: Bearer {{accessToken}}
+
+### Cập nhật DFF vật tư
+PATCH {{host}}/{{kiemkePath}}/{{vatTuId}}/{{kyKiemKeChiTietId}}/update-supplies-dff
+Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "soLuongMatPhamChat": 2,
+  "phanTramMatPhamChat": 2,
+  "soLuongKemPhamChat": 3,
+  "phanTramKemPhamChat": 4,
+  "soLuongDong": 5,
+  "soLuongDeNghiThanhLy": 6,
+  "phanTramDong": 7,
+  "tsKemPcMatPc": 8
+}
+
 
 
 

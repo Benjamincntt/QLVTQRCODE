@@ -4,6 +4,7 @@ using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
+using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
@@ -18,28 +19,29 @@ public class KiemKeService : IKiemKeService
 {
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IVatTuViTriRepository _vatTuViTriRepository;
+    private readonly IKyKiemKeChiTietDffRepository _kyKiemKeChiTietDffRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IMapper _mapper;
-    // private readonly IMemoryCache _memoryCache;
-    // private const string CacheKey = "LocationIds";
 
     public KiemKeService(
         IVatTuRepository vatTuRepository,
+        IVatTuViTriRepository vatTuViTriRepository,
+        IKyKiemKeChiTietDffRepository kyKiemKeChiTietDffRepository,
         IAuthorizedContextFacade authorizedContextFacade,
-        //IMemoryCache memoryCache,
-        IMapper mapper,
-        IVatTuViTriRepository vatTuViTriRepository)
+        IMapper mapper
+)
     {
         _vatTuRepository = vatTuRepository;
-        _authorizedContextFacade = authorizedContextFacade;
-        //_memoryCache = memoryCache;
-        _mapper = mapper;
         _vatTuViTriRepository = vatTuViTriRepository;
+        _kyKiemKeChiTietDffRepository = kyKiemKeChiTietDffRepository;
+        _authorizedContextFacade = authorizedContextFacade;
+        _mapper = mapper;
+
     }
 
-    public async Task<InventoryCheckResponse> GetAsync(int vatTuId)
+    public async Task<InventoryCheckResponse> GetAsync(string maVatTu)
     {
-        if (vatTuId <= 0)
+        if (string.IsNullOrWhiteSpace(maVatTu))
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
         }
@@ -48,12 +50,13 @@ public class KiemKeService : IKiemKeService
         var response = new InventoryCheckResponse();
 
         // vật tư 
-        var vatTu = await _vatTuRepository.GetAsync(vatTuId);
+        var vatTu = await _vatTuRepository.GetAsync(x => x.MaVatTu == maVatTu);
         if (vatTu == null)
         {
-            throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
+            throw new NotFoundException(vatTu.GetTypeEx(), maVatTu);
         }
 
+        var vatTuId = vatTu.VatTuId;
         response.MaVatTu = !string.IsNullOrWhiteSpace(vatTu.MaVatTu) ? vatTu.MaVatTu : string.Empty;
         response.TenVatTu = !string.IsNullOrWhiteSpace(vatTu.TenVatTu) ? vatTu.TenVatTu : string.Empty;
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
@@ -249,5 +252,29 @@ public class KiemKeService : IKiemKeService
         if (!File.Exists(currentImagePath)) return default;
         File.Delete(currentImagePath);
         return 1;
+    }
+
+    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId, ModifiedSuppliesDffRequest request)
+    {
+        if (vatTuId < 0 || kyKiemKeChiTietId < 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+        }
+
+        
+        await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesDffRequestValidation());
+        var currentSuppliesDff = await _kyKiemKeChiTietDffRepository.GetAsync(x => x.VatTuId == vatTuId && x.KyKiemKeChiTietId == kyKiemKeChiTietId);
+        // if has no DFF => create
+        if (currentSuppliesDff == null)
+        {
+            var dff = new QlvtKyKiemKeChiTietDff();
+            dff.VatTuId = vatTuId;
+            dff.KyKiemKeChiTietId = kyKiemKeChiTietId;
+            var responseToCreate = _mapper.Map(request, dff);
+            return await _kyKiemKeChiTietDffRepository.InsertAsync(responseToCreate);
+        }
+        // has DFF => update
+        var response = _mapper.Map(request, currentSuppliesDff);
+        return await _kyKiemKeChiTietDffRepository.UpdateAsync(response);
     }
 }

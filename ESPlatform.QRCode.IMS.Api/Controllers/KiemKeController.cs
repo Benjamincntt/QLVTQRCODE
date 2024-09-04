@@ -18,12 +18,12 @@ public class KiemKeController : ApiControllerBase
     /// <summary>
     /// Hiển thị chi tiết kiểm kê: Quét QR Code kiểm kê/ Nhập mã tay
     /// </summary>
-    /// <param name="vatTuId"></param>
+    /// <param name="maVatTu"></param>
     /// <returns></returns>
-    [HttpGet("{vatTuId:int}")]
-    public async Task<InventoryCheckResponse> GetAsync(int vatTuId)
+    [HttpGet("{maVatTu}")]
+    public async Task<InventoryCheckResponse> GetAsync(string maVatTu)
     {
-        return await _kiemKeService.GetAsync(vatTuId);
+        return await _kiemKeService.GetAsync(maVatTu);
     }
     
     /// <summary>
@@ -73,6 +73,19 @@ public class KiemKeController : ApiControllerBase
     public async Task<int> DeleteSuppliesImageAsync(int vatTuId, string currentImagePath)
     {
         return await _kiemKeService.DeleteSuppliesImageAsync(vatTuId, currentImagePath);
+    }
+
+    /// <summary>
+    /// Cập nhật DFF vật tư
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <param name="kyKiemKeChiTietId"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPatch("{vatTuId:int}/{kyKiemKeChiTietId:int}/update-supplies-dff")]
+    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId,[FromBody] ModifiedSuppliesDffRequest request)
+    {
+        return await _kiemKeService.ModifySuppliesDffAsync(vatTuId,kyKiemKeChiTietId, request);
     }
     
 }
