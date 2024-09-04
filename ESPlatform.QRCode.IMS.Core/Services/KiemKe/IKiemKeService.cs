@@ -7,5 +7,5 @@ public interface IKiemKeService
 {
     Task<InventoryCheckResponse> GetAsync(int vatTuId);
 
-    Task<int> ModifySuppliesLocationAsync(int vatTuId, ModifiedSuppliesLocationRequest request);
+    Task<int> ModifySuppliesLocationAsync(int vatTuId, int idViTri, ModifiedSuppliesLocationRequest request);
 }

@@ -32,6 +32,7 @@ public class InventoryCheckResponse
     public List<string> ImagePaths { get; set; } = new List<string>();
 
     public List<SuppliesLocation> SuppliesLocation { get; set; } = new List<SuppliesLocation>();
+    
 }
 
 public class SuppliesLocation

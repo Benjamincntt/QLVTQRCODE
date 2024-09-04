@@ -9,4 +9,13 @@ public class ModifiedSuppliesLocationRequest
     public int IdNgan { get; set; }
     
     public int IdHop { get; set; }
+
+    public string TenToMay { get; set; } = string.Empty;
+    
+    public string TenGiaKe { get; set; } = string.Empty;
+    
+    public string TenNgan { get; set; } = string.Empty;
+    
+    public string TenHop { get; set; } = string.Empty;
+    
 }

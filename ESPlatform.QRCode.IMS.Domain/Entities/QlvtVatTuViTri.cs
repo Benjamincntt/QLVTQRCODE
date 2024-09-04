@@ -4,6 +4,7 @@ public partial class QlvtVatTuViTri
 {
     
     public int IdViTri { get; set; }
+    
     public int IdVatTu { get; set; }
 
     public string MaVatTu { get; set; } = null!;

@@ -25,10 +25,17 @@ public class KiemKeController : ApiControllerBase
     {
         return await _kiemKeService.GetAsync(vatTuId);
     }
-
-    [HttpPatch("{vatTuId:int}")]
-    public async Task<int> ModifySuppliesLocationAsync(int vatTuId,[FromBody]ModifiedSuppliesLocationRequest request) {
-        return await _kiemKeService.ModifySuppliesLocationAsync(vatTuId, request);
+    
+    /// <summary>
+    /// Cập nhật vị trí vật tư
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <param name="idViTri"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPatch("{vatTuId:int}/{idViTri:int}")]
+    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, int idViTri, [FromBody]ModifiedSuppliesLocationRequest request) {
+        return await _kiemKeService.ModifySuppliesLocationAsync(vatTuId, idViTri, request);
     }
     
 }
