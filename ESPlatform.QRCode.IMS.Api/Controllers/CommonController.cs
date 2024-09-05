@@ -1,0 +1,67 @@
+﻿using ESPlatform.QRCode.IMS.Api.Controllers.Base;
+using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
+using ESPlatform.QRCode.IMS.Core.Services.Common;
+using ESPlatform.QRCode.IMS.Core.Services.KiemKe;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ESPlatform.QRCode.IMS.Api.Controllers;
+
+public class CommonController: ApiControllerBase
+{
+    private readonly ICommonService _commonService;
+
+    public CommonController(ICommonService commonService)
+    {
+        _commonService = commonService;
+    }
+
+    /// <summary>
+    /// Cập nhật vị trí vật tư
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <param name="idViTri"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPatch("{vatTuId:int}/{idViTri:int}")]
+    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, int idViTri, [FromBody]ModifiedSuppliesLocationRequest request) {
+        return await _commonService.ModifySuppliesLocationAsync(vatTuId, idViTri, request);
+    }
+
+    /// <summary>
+    /// Cập nhật ảnh vật tư
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <param name="currentImagePath"></param>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    [HttpPatch("{vatTuId:int}/update-supplies-image")]
+    public async Task<int> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
+    {
+        return await _commonService.ModifySuppliesImageAsync(vatTuId, currentImagePath, file);
+    }
+    
+    /// <summary>
+    /// Thêm ảnh vật tư
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    [HttpPost("{vatTuId:int}/create-supplies-image")]
+    public async Task<int> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
+    {
+        return await _commonService.CreateSuppliesImageAsync(vatTuId, file);
+    }
+    
+    /// <summary>
+    /// Xóa ảnh vật tư
+    /// </summary>
+    /// <param name="vatTuId"></param>
+    /// <param name="currentImagePath"></param>
+    /// <returns></returns>
+    [HttpDelete("{vatTuId:int}/delete-supplies-image")]
+    public async Task<int> DeleteSuppliesImageAsync(int vatTuId, string currentImagePath)
+    {
+        return await _commonService.DeleteSuppliesImageAsync(vatTuId, currentImagePath);
+    }
+   
+}

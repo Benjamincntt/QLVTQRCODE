@@ -1,0 +1,20 @@
+﻿### Cập nhật vị trí vật tư
+PATCH {{host}}/{{commonPath}}/{{vatTuId}}/{{idViTri}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "IdToMay": 5,
+  "IdGiaKe": 8,
+  "IdNgan": 9,
+  "IdHop": 10,
+  "TenToMay": "Tổ máy 01",
+  "TenGiaKe": "Kệ 02",
+  "TenNgan": "Ngăn 01",
+  "TenHop": "Hộc 1"
+}
+
+### Xóa ảnh vật tư
+DELETE {{host}}/{{commonPath}}/{{vatTuId}}//delete-supplies-image?currentImagePath=D%3A%5CImages%5C5%5CVattu1.jpg
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

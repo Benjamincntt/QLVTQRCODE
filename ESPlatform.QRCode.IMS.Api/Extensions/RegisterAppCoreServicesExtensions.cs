@@ -2,6 +2,7 @@ using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Services.Accounts;
 using ESPlatform.QRCode.IMS.Core.Services.Authentication;
+using ESPlatform.QRCode.IMS.Core.Services.Common;
 using ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 using ESPlatform.QRCode.IMS.Core.Services.Lookup;
 using ESPlatform.QRCode.IMS.Core.Services.TbDonViSuDungs;
@@ -54,6 +55,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<INguoiDungService, NguoiDungService>()
             .AddScoped<IKiemKeService, KiemKeService>()
             .AddScoped<ILookupService, LookupService>()
+            .AddScoped<ICommonService, CommonService>()
             ;
 
         return services;

@@ -19,20 +19,11 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 x => x.KyKiemKeId,
                 y => y.Id,
                 (x, y) => new { QlvtKyKiemKeChiTiet = x, QlvtKyKiemKe = y })
-            // .GroupJoin(DbContext.QlvtKhos,
-            //     x => x.QlvtKyKiemKeChiTiet.KhoChinhId,
-            //     y => y.OrganizationId,
-            //     (x, y) => new { x.QlvtKyKiemKeChiTiet, x.QlvtKyKiemKe, QlvtKho = y })
-            // .SelectMany(x => x.QlvtKho.DefaultIfEmpty(),
-            //     (x, y) => new { x.QlvtKyKiemKeChiTiet, x.QlvtKyKiemKe, QlvtKho = y })
             .Where(x => x.QlvtKyKiemKeChiTiet.VatTuId == vatTuId)
             .Where(x => x.QlvtKyKiemKeChiTiet.KyKiemKeId == kykiemkeId)
             .Select(x => new 
             {
                 x.QlvtKyKiemKe.PhysicalInventoryName,// ten ky kiem ke
-                //x.QlvtKyKiemKe.OrganizationCode,// mã kho,
-                // SubInventoryCode = x.QlvtKho != null ? x.QlvtKho.SubInventoryCode : string.Empty,
-                // SubInventoryName =  x.QlvtKho != null ? x.QlvtKho.SubInventoryName : string.Empty,
                 x.QlvtKyKiemKeChiTiet.SoLuongSoSach,
                 x.QlvtKyKiemKeChiTiet.SoLuongKiemKe,
                 x.QlvtKyKiemKeChiTiet.SoLuongChenhLech
