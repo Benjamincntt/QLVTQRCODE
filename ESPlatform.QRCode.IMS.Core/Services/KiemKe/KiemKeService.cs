@@ -21,22 +21,24 @@ public class KiemKeService : IKiemKeService
     private readonly IVatTuViTriRepository _vatTuViTriRepository;
     private readonly IKyKiemKeChiTietDffRepository _kyKiemKeChiTietDffRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
+    private readonly IKhoRepository _khoRepository;
     private readonly IMapper _mapper;
 
     public KiemKeService(
         IVatTuRepository vatTuRepository,
         IVatTuViTriRepository vatTuViTriRepository,
         IKyKiemKeChiTietDffRepository kyKiemKeChiTietDffRepository,
+        IKhoRepository khoRepository,
         IAuthorizedContextFacade authorizedContextFacade,
-        IMapper mapper
-)
+        IMapper mapper)
     {
         _vatTuRepository = vatTuRepository;
         _vatTuViTriRepository = vatTuViTriRepository;
         _kyKiemKeChiTietDffRepository = kyKiemKeChiTietDffRepository;
+        _khoRepository = khoRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _mapper = mapper;
-
+        
     }
 
     public async Task<InventoryCheckResponse> GetAsync(string maVatTu)
@@ -84,22 +86,31 @@ public class KiemKeService : IKiemKeService
         }
 
 
-        // kỳ kiểm kê và thông tin kho phụ
+        // kỳ kiểm kê
         var inventoryCheckInformation = await _vatTuRepository.GetInventoryCheckInformationAsync(vatTuId, kyKiemkeId);
         if (inventoryCheckInformation != null)
         {
             var inventoryCheckInformationMapper =
                 _mapper.Map<InventoryCheckResponse>(inventoryCheckInformation);
             response.PhysicalInventoryName = inventoryCheckInformationMapper.PhysicalInventoryName;
-            response.OrganizationCode = inventoryCheckInformationMapper.OrganizationCode;
-            response.SubInventoryCode = inventoryCheckInformationMapper.SubInventoryCode;
-            response.SubInventoryName = inventoryCheckInformationMapper.SubInventoryName;
+            //response.OrganizationCode = inventoryCheckInformationMapper.OrganizationCode;
+            //response.SubInventoryCode = inventoryCheckInformationMapper.SubInventoryCode;
+            //response.SubInventoryName = inventoryCheckInformationMapper.SubInventoryName;
             response.SoLuongSoSach = inventoryCheckInformationMapper.SoLuongSoSach;
             response.SoLuongKiemKe = inventoryCheckInformationMapper.SoLuongKiemKe;
             response.SoLuongChenhLech = inventoryCheckInformationMapper.SoLuongChenhLech;
         }
 
-        // vị trí
+        // vị trí kho chính và phụ
+        var warehouse = await _khoRepository.GetAsync(x => x.OrganizationId == vatTu.KhoId);
+        if (warehouse != null)
+        {
+            if (warehouse.OrganizationCode != null) response.OrganizationCode = warehouse.OrganizationCode;
+            if (warehouse.SubInventoryCode != null) response.SubInventoryCode = warehouse.SubInventoryCode;
+            if (warehouse.SubInventoryName != null) response.SubInventoryName = warehouse.SubInventoryName;
+        }
+        
+        // vị trí chi tiết trong kho
         var positions = (await _vatTuRepository.GetPositionAsync(vatTuId)).Adapt<IEnumerable<SuppliesLocation>>()
             .ToList();
 
@@ -108,22 +119,11 @@ public class KiemKeService : IKiemKeService
             response.SuppliesLocation = positions;
         }
 
-        //lưu 4 id vào cache key phục vụ cho cập nhật vị trí
-        // var locationIds = new Dictionary<string, int>
-        // {
-        //     { "IdToMay", positionMapper.IdToMay },
-        //     { "IdGiaKe", positionMapper.IdGiaKe },
-        //     { "IdNgan", positionMapper.IdNgan },
-        //     { "IdHop", positionMapper.IdHop }
-        // };
-        // _memoryCache.Set(CacheKey, locationIds, TimeSpan.FromMinutes(15));
-        //}
-
         // LOT
-        var wareHouse = await _vatTuRepository.GetWareHouseAsync(vatTuId);
-        if (wareHouse == null) return response;
-        var wareHouseMapper = _mapper.Map<InventoryCheckResponse>(wareHouse);
-        response.LotNumber = wareHouseMapper.LotNumber;
+        var inventory = await _vatTuRepository.GetInventoryAsync(vatTuId, vatTu.KhoId);
+        if (inventory == null) return response;
+        var inventoryMapper = _mapper.Map<InventoryCheckResponse>(inventory);
+        response.LotNumber = inventoryMapper.LotNumber;
         return response;
     }
 

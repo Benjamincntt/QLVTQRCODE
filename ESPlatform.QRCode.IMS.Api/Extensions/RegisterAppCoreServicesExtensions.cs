@@ -42,11 +42,10 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IVatTuRepository, VatTuRepository>()
             .AddScoped<IVatTuViTriRepository, VatTuViTriRepository>()
             .AddScoped<IKyKiemKeChiTietDffRepository, KyKiemKeChiTietDffRepository>()
+            .AddScoped<IKhoRepository, KhoRepository>()
 
             // Facades
             .AddScoped<IAuthorizedContextFacade, AuthorizedContextFacade>()
-            //.AddScoped<IContentEventsFacade, ContentEventsFacade>()
-            //.AddScoped<ICategoryEventsFacade, CategoryEventsFacade>()
 
             // Services
             .AddScoped<IAccountService, AccountService>()

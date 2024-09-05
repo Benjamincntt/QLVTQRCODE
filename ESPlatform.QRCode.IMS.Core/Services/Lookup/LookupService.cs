@@ -13,13 +13,16 @@ namespace ESPlatform.QRCode.IMS.Core.Services.Lookup;
 public class LookupService : ILookupService
 {
     private readonly IVatTuRepository _vatTuRepository;
+    private readonly IKhoRepository _khoRepository;
     private readonly IMapper _mapper;
 
     public LookupService(
         IVatTuRepository vatTuRepository,
+        IKhoRepository khoRepository,
         IMapper mapper)
     {
         _vatTuRepository = vatTuRepository;
+        _khoRepository = khoRepository;
         _mapper = mapper;
     }
 
@@ -31,7 +34,7 @@ public class LookupService : ILookupService
         }
         var response = new LookupSuppliesResponse();
 
-        // vật tư : mã vt, 
+        // vật tư
         var vatTu = await _vatTuRepository.GetAsync(x => x.MaVatTu == maVatTu);
         if (vatTu == null)
         {
@@ -59,7 +62,14 @@ public class LookupService : ILookupService
                 response.ImagePaths.Add(fullPath);
             }
         }
-        // vị trí
+        // vị trí kho chính và phụ
+        var warehouse = await _khoRepository.GetAsync(x => x.OrganizationId == vatTu.KhoId);
+        if (warehouse != null)
+        {
+            if (warehouse.OrganizationCode != null) response.OrganizationCode = warehouse.OrganizationCode;
+            if (warehouse.SubInventoryCode != null) response.SubInventoryCode = warehouse.SubInventoryCode;
+        }
+        // vị trí chi tiết trong kho
         var positions = (await _vatTuRepository.GetPositionAsync(vatTuId)).Adapt<IEnumerable<SuppliesLocation>>()
             .ToList();
 
@@ -67,15 +77,12 @@ public class LookupService : ILookupService
         {
             response.SuppliesLocation = positions;
         }
-        //todo
-        //chưa có phần mã kho chính kho phụ
         
         // LOT
-        var wareHouse = await _vatTuRepository.GetWareHouseAsync(vatTuId);
+        var wareHouse = await _vatTuRepository.GetInventoryAsync(vatTuId, vatTu.KhoId);
         if (wareHouse == null) return response;
         var wareHouseMapper = _mapper.Map<InventoryCheckResponse>(wareHouse);
         response.LotNumber = wareHouseMapper.LotNumber;
         return response;
-        
     }
 }
