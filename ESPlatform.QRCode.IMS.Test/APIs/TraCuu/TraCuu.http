@@ -1,0 +1,4 @@
+﻿### Tra cứu vật tư
+GET {{host}}/{{traCuuPath}}/{{maVatTu}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

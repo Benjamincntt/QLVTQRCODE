@@ -57,7 +57,7 @@ public class KiemKeService : IKiemKeService
         }
 
         var vatTuId = vatTu.VatTuId;
-        response.MaVatTu = !string.IsNullOrWhiteSpace(vatTu.MaVatTu) ? vatTu.MaVatTu : string.Empty;
+        response.MaVatTu = maVatTu;
         response.TenVatTu = !string.IsNullOrWhiteSpace(vatTu.TenVatTu) ? vatTu.TenVatTu : string.Empty;
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
         // ảnh đại diện
@@ -131,7 +131,7 @@ public class KiemKeService : IKiemKeService
     {
         #region validate
         
-        if (vatTuId < 0 || idViTri < 0)
+        if (vatTuId < 1 || idViTri < 1)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
         }
@@ -170,7 +170,7 @@ public class KiemKeService : IKiemKeService
     public async Task<int> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
     {
         #region validate
-        if (vatTuId < 0 || file == null || file.Length <= 0)
+        if (vatTuId < 1 || file == null || file.Length <= 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
         }
@@ -208,7 +208,7 @@ public class KiemKeService : IKiemKeService
     public async Task<int> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
     {
         #region validate
-        if (vatTuId < 0 || file == null || file.Length <= 0)
+        if (vatTuId < 1 || file == null || file.Length <= 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
         }
@@ -239,7 +239,7 @@ public class KiemKeService : IKiemKeService
 
     public async Task<int> DeleteSuppliesImageAsync(int vatTuId, string currentImagePath)
     {
-        if (vatTuId < 0)
+        if (vatTuId < 1)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
         }
@@ -256,7 +256,7 @@ public class KiemKeService : IKiemKeService
 
     public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId, ModifiedSuppliesDffRequest request)
     {
-        if (vatTuId < 0 || kyKiemKeChiTietId < 0)
+        if (vatTuId < 1 || kyKiemKeChiTietId < 1)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
         }
