@@ -19,4 +19,12 @@ public partial class QlvtKyKiemKeChiTiet
     public decimal? SoLuongChenhLech { get; set; }
 
     public string? SoThe { get; set; }
+    
+    public short? TrangThai { get; set; }
+
+    public DateTime? NgayKiemKe { get; set; }
+
+    public int? NguoiKiemKeId { get; set; }
+
+    public string? NguoiKiemKeTen { get; set; }
 }

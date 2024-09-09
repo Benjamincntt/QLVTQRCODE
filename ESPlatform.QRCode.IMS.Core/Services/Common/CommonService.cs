@@ -1,4 +1,5 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
+using ESPlatform.QRCode.IMS.Core.DTOs.ViTris.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
@@ -6,6 +7,7 @@ using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
+using Mapster;
 using Microsoft.AspNetCore.Http;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.Common;
@@ -14,11 +16,13 @@ public class CommonService : ICommonService
 {
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IVatTuViTriRepository _vatTuViTriRepository;
+    private readonly IViTriRepository _viTriRepository;
 
-    public CommonService(IVatTuRepository vatTuRepository, IVatTuViTriRepository vatTuViTriRepository)
+    public CommonService(IVatTuRepository vatTuRepository, IVatTuViTriRepository vatTuViTriRepository, IViTriRepository viTriRepository)
     {
         _vatTuRepository = vatTuRepository;
         _vatTuViTriRepository = vatTuViTriRepository;
+        _viTriRepository = viTriRepository;
     }
 
     public async Task<int> ModifySuppliesLocationAsync(int vatTuId, int idViTri, ModifiedSuppliesLocationRequest request)
@@ -119,6 +123,12 @@ public class CommonService : ICommonService
         }
         #endregion 
         // create new image
+        var folderPath = AppConfig.Instance.Image.FolderPath;
+        // check if server don't have path => create a new directory by path
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
         var pathUpload =  Path.Combine(AppConfig.Instance.Image.FolderPath,vatTuId.ToString());
         var fileName = $"{Path.GetFileName(file.FileName)}";
         var fullPath = Path.Combine(pathUpload, fileName);
@@ -148,4 +158,14 @@ public class CommonService : ICommonService
         return 1;
     }
 
+    public async Task<IEnumerable<SupplyLocationListResponseItem>> ListSuppliesLocationAsync(int parentId)
+    {
+        if (parentId is < 0 or > 4)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+        }
+        var response = (await _viTriRepository.ListSuppliesLocationAsync(parentId))
+            .Adapt<IEnumerable<SupplyLocationListResponseItem>>();
+        return response;
+    }
 }

@@ -11,6 +11,6 @@ public class ModifiedSuppliesDffRequestValidation: AbstractValidator<ModifiedSup
         RuleFor(o => o.SoLuongMatPhamChat).GreaterThanOrEqualTo(0);
         RuleFor(o => o.SoLuongDong).GreaterThanOrEqualTo(0);
         RuleFor(x => x.SoLuongDeNghiThanhLy).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.TsKemPcMatPc).GreaterThanOrEqualTo(0);
+        //RuleFor(x => x.TsKemPcMatPc).GreaterThanOrEqualTo(0);
     }
 }

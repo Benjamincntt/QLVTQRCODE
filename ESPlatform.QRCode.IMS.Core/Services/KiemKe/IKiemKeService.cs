@@ -7,5 +7,6 @@ public interface IKiemKeService
 {
     Task<InventoryCheckResponse> GetAsync(string maVatTu);
 
-    Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId, ModifiedSuppliesDffRequest request);
+    Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId, int soLuongKiemKe, ModifiedSuppliesDffRequest request);
+    Task<int> ModifySuppliesQtyAsync(int vatTuId, int soLuongKiemKe);
 }

@@ -18,6 +18,7 @@ public class KiemKeService : IKiemKeService
 {
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IKyKiemKeChiTietDffRepository _kyKiemKeChiTietDffRepository;
+    private readonly IKyKiemKeChiTietRepository _kyKiemKeChiTietRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IKhoRepository _khoRepository;
     private readonly IMapper _mapper;
@@ -26,15 +27,16 @@ public class KiemKeService : IKiemKeService
         IVatTuRepository vatTuRepository,
         IKyKiemKeChiTietDffRepository kyKiemKeChiTietDffRepository,
         IKhoRepository khoRepository,
+        IKyKiemKeChiTietRepository kyKiemKeChiTietRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IMapper mapper)
     {
         _vatTuRepository = vatTuRepository;
         _kyKiemKeChiTietDffRepository = kyKiemKeChiTietDffRepository;
         _khoRepository = khoRepository;
+        _kyKiemKeChiTietRepository = kyKiemKeChiTietRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _mapper = mapper;
-        
     }
 
     public async Task<InventoryCheckResponse> GetAsync(string maVatTu)
@@ -88,11 +90,14 @@ public class KiemKeService : IKiemKeService
         {
             var inventoryCheckInformationMapper =
                 _mapper.Map<InventoryCheckResponse>(inventoryCheckInformation);
+            response.TheId = inventoryCheckInformationMapper.TheId;
             response.PhysicalInventoryName = inventoryCheckInformationMapper.PhysicalInventoryName;
             response.SoLuongSoSach = inventoryCheckInformationMapper.SoLuongSoSach;
             response.SoLuongKiemKe = inventoryCheckInformationMapper.SoLuongKiemKe;
             response.SoLuongChenhLech = inventoryCheckInformationMapper.SoLuongChenhLech;
         }
+        // DFF
+        response.SupplyDff = (await _kyKiemKeChiTietDffRepository.GetAsync(x => x.VatTuId == vatTu.VatTuId && x.KyKiemKeChiTietId == response.TheId)).Adapt<SupplyDffResponse>();
 
         // vị trí kho chính và phụ
         var warehouse = await _khoRepository.GetAsync(x => x.OrganizationId == vatTu.KhoId);
@@ -121,27 +126,69 @@ public class KiemKeService : IKiemKeService
     }
 
     
-    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId, ModifiedSuppliesDffRequest request)
+    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId, int soLuongKiemKe, ModifiedSuppliesDffRequest request)
     {
-        if (vatTuId < 1 || kyKiemKeChiTietId < 1)
+        if (vatTuId < 1 || kyKiemKeChiTietId < 1 || soLuongKiemKe < 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
         }
-
-        
         await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesDffRequestValidation());
+        
         var currentSuppliesDff = await _kyKiemKeChiTietDffRepository.GetAsync(x => x.VatTuId == vatTuId && x.KyKiemKeChiTietId == kyKiemKeChiTietId);
         // if has no DFF => create
         if (currentSuppliesDff == null)
         {
-            var dff = new QlvtKyKiemKeChiTietDff();
-            dff.VatTuId = vatTuId;
-            dff.KyKiemKeChiTietId = kyKiemKeChiTietId;
-            var responseToCreate = _mapper.Map(request, dff);
+            var dffToCreate = new QlvtKyKiemKeChiTietDff();
+            
+            dffToCreate.VatTuId = vatTuId;
+            dffToCreate.KyKiemKeChiTietId = kyKiemKeChiTietId;
+            if (soLuongKiemKe > 0)
+            {
+                dffToCreate.PhanTramMatPhamChat = request.SoLuongMatPhamChat / soLuongKiemKe * 100;
+                dffToCreate.PhanTramKemPhamChat = request.SoLuongKemPhamChat / soLuongKiemKe * 100;
+                dffToCreate.PhanTramDong = request.SoLuongDong / soLuongKiemKe * 100;
+                dffToCreate.TsKemPcMatPc = request.SoLuongMatPhamChat + request.SoLuongKemPhamChat;
+            }
+            
+            var responseToCreate = _mapper.Map(request, dffToCreate);
             return await _kyKiemKeChiTietDffRepository.InsertAsync(responseToCreate);
         }
         // has DFF => update
-        var response = _mapper.Map(request, currentSuppliesDff);
-        return await _kyKiemKeChiTietDffRepository.UpdateAsync(response);
+        var dffToUpdate = _mapper.Map(request, currentSuppliesDff);
+        if (soLuongKiemKe > 0)
+        {
+            dffToUpdate.PhanTramMatPhamChat = request.SoLuongMatPhamChat / soLuongKiemKe * 100;
+            dffToUpdate.PhanTramKemPhamChat = request.SoLuongKemPhamChat / soLuongKiemKe * 100;
+            dffToUpdate.PhanTramDong = request.SoLuongDong / soLuongKiemKe * 100;
+            dffToUpdate.TsKemPcMatPc = request.SoLuongMatPhamChat + request.SoLuongKemPhamChat;
+        }
+        return await _kyKiemKeChiTietDffRepository.UpdateAsync(dffToUpdate);
+    }
+
+    public async Task<int> ModifySuppliesQtyAsync(int vatTuId, int soLuongKiemKe)
+    {
+        if (vatTuId < 1 || soLuongKiemKe < 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+        }
+        var kyKiemkeId = _authorizedContextFacade.KyKiemKeId;
+        var kyKiemKeChiTiet = await _kyKiemKeChiTietRepository.GetAsync(x => x.KyKiemKeId == kyKiemkeId && x.VatTuId == vatTuId);
+        // has no QTY => create new 
+        if (kyKiemKeChiTiet == null)
+        {
+            var qtyToCreate = new QlvtKyKiemKeChiTiet();
+            qtyToCreate.VatTuId = vatTuId;
+            qtyToCreate.KyKiemKeId = kyKiemkeId;
+            qtyToCreate.SoLuongKiemKe = soLuongKiemKe;
+            qtyToCreate.SoLuongChenhLech = soLuongKiemKe;
+            qtyToCreate.SoLuongSoSach = 0;
+            qtyToCreate.NgayKiemKe = DateTime.Now;
+            return await _kyKiemKeChiTietRepository.InsertAsync(qtyToCreate);   
+        }
+        // has QTY => update
+        kyKiemKeChiTiet.SoLuongKiemKe = soLuongKiemKe;
+        kyKiemKeChiTiet.SoLuongChenhLech = soLuongKiemKe - kyKiemKeChiTiet.SoLuongSoSach;
+        kyKiemKeChiTiet.NgayKiemKe = DateTime.Now;
+        return await _kyKiemKeChiTietRepository.UpdateAsync(kyKiemKeChiTiet);
     }
 }

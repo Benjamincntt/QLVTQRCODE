@@ -6,7 +6,7 @@ Authorization: Bearer {{accessToken}}
 
 
 ### Cập nhật DFF vật tư
-PATCH {{host}}/{{kiemkePath}}/{{vatTuId}}/{{kyKiemKeChiTietId}}/update-supplies-dff
+PATCH {{host}}/{{kiemkePath}}/{{vatTuId}}/{{kyKiemKeChiTietId}}/update-supplies-dff?soLuongKiemKe=100
 Content-Type: application/json
 kikiemke-id: {{kikiemkeId}}
 Authorization: Bearer {{accessToken}}
@@ -22,6 +22,11 @@ Authorization: Bearer {{accessToken}}
   "tsKemPcMatPc": 8
 }
 
+### Cập nhật DFF vật tư
+PATCH {{host}}/{{kiemkePath}}/{{vatTuId}}/update-supplies-qty?soLuongKiemKe=100
+Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
+Authorization: Bearer {{accessToken}}
 
 
 

@@ -18,3 +18,8 @@ Authorization: Bearer {{accessToken}}
 DELETE {{host}}/{{commonPath}}/{{vatTuId}}//delete-supplies-image?currentImagePath=D%3A%5CImages%5C5%5CVattu1.jpg
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
+
+### Danh sách vị trí của vật tư theo cấp
+GET {{host}}/{{commonPath}}/{{parentId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

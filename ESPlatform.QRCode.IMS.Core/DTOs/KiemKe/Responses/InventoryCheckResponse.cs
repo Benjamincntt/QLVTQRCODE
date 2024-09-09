@@ -5,6 +5,8 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 public class InventoryCheckResponse
 {
     public int Tag { get; set; }
+    
+    public int TheId { get; set; }
 
     public string MaVatTu { get; set; } = string.Empty;
 
@@ -33,6 +35,7 @@ public class InventoryCheckResponse
 
     public List<SuppliesLocation> SuppliesLocation { get; set; } = new List<SuppliesLocation>();
     
+    public SupplyDffResponse SupplyDff { get; set; } = new SupplyDffResponse();
 }
 
 public class SuppliesLocation

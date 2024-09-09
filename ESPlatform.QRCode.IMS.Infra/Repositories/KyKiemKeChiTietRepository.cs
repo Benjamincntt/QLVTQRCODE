@@ -5,9 +5,7 @@ using ESPlatform.QRCode.IMS.Library.Database.EfCore;
 
 namespace ESPlatform.QRCode.IMS.Infra.Repositories;
 
-public class KyKiemKeChiTietDffRepository : EfCoreRepositoryBase<QlvtKyKiemKeChiTietDff, AppDbContext>, IKyKiemKeChiTietDffRepository
+public class KyKiemKeChiTietRepository : EfCoreRepositoryBase<QlvtKyKiemKeChiTiet, AppDbContext>, IKyKiemKeChiTietRepository
 {
-    public KyKiemKeChiTietDffRepository(AppDbContext dbContext) : base(dbContext)
-    {
-    }
+    public KyKiemKeChiTietRepository(AppDbContext dbContext) : base(dbContext) {}
 }

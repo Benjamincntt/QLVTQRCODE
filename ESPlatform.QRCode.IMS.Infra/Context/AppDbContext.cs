@@ -272,6 +272,11 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.KhoChinhId).HasColumnName("KhoChinh_Id");
             entity.Property(e => e.KhoPhuId).HasColumnName("KhoPhu_Id");
             entity.Property(e => e.KyKiemKeId).HasColumnName("KyKiemKe_Id");
+            entity.Property(e => e.NgayKiemKe).HasColumnType("datetime");
+            entity.Property(e => e.NguoiKiemKeId).HasColumnName("NguoiKiemKe_Id");
+            entity.Property(e => e.NguoiKiemKeTen)
+                .HasMaxLength(50)
+                .HasColumnName("NguoiKiemKe_Ten");
             entity.Property(e => e.SoLuongChenhLech).HasColumnType("numeric(18, 0)");
             entity.Property(e => e.SoLuongKiemKe).HasColumnType("numeric(18, 0)");
             entity.Property(e => e.SoLuongSoSach).HasColumnType("numeric(18, 0)");
@@ -369,6 +374,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NgayTao).HasColumnType("datetime");
             entity.Property(e => e.NguoiTao).HasMaxLength(100);
             entity.Property(e => e.NguoiTaoId).HasColumnName("NguoiTao_Id");
+            entity.Property(e => e.MoTa).HasColumnName("MoTa");
             entity.Property(e => e.TenVatTu).HasMaxLength(100);
             entity.Property(e => e.TrangThaiInQr).HasColumnName("TrangThai_InQr");
         });

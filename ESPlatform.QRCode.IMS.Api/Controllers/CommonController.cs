@@ -1,7 +1,7 @@
 ﻿using ESPlatform.QRCode.IMS.Api.Controllers.Base;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
+using ESPlatform.QRCode.IMS.Core.DTOs.ViTris.Responses;
 using ESPlatform.QRCode.IMS.Core.Services.Common;
-using ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ESPlatform.QRCode.IMS.Api.Controllers;
@@ -63,5 +63,17 @@ public class CommonController: ApiControllerBase
     {
         return await _commonService.DeleteSuppliesImageAsync(vatTuId, currentImagePath);
     }
-   
+
+    /// <summary>
+    /// Danh sách vị trí của vật tư theo cấp
+    /// </summary>
+    /// <param name="parentId"> 0: Tất cả vị trí, 1: Tổ máy, 2: Giá Kệ, 3: Ngăn, 4: Hộc</param>
+    /// <returns></returns>
+    [HttpGet("{parentId:int}")]
+    public async Task<IEnumerable<SupplyLocationListResponseItem>> ListSuppliesLocationAsync(int parentId)
+    {
+        return await _commonService.ListSuppliesLocationAsync(parentId);
+    }
+    
+    
 }

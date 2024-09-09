@@ -1,0 +1,4 @@
+### Hiển thị chi tiết kiểm kê: Quét QR Code kiểm kê/ Nhập mã tay
+GET {{host}}/{{muaSamVatTuPath}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

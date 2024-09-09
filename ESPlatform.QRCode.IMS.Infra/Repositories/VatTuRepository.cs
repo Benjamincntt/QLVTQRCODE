@@ -2,6 +2,8 @@
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Library.Database.EfCore;
+using ESPlatform.QRCode.IMS.Library.Extensions;
+using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace ESPlatform.QRCode.IMS.Infra.Repositories;
@@ -23,6 +25,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
             .Where(x => x.QlvtKyKiemKeChiTiet.KyKiemKeId == kykiemkeId)
             .Select(x => new 
             {
+                x.QlvtKyKiemKeChiTiet.TheId,
                 x.QlvtKyKiemKe.PhysicalInventoryName,// ten ky kiem ke
                 x.QlvtKyKiemKeChiTiet.SoLuongSoSach,
                 x.QlvtKyKiemKeChiTiet.SoLuongKiemKe,
@@ -61,5 +64,33 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
             })
             .FirstOrDefaultAsync();
         return response;
+    }
+
+     public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri, int pageIndex, int pageSize)
+     {
+         var query = DbContext.QlvtVatTus
+             .Join(DbContext.QlvtKhos,
+                 x => x.KhoId,
+                 y => y.OrganizationId,
+                 (x, y) => new { QlvtVatTu = x, QlvtKho = y })
+             .Join(DbContext.QlvtVatTuViTris,
+                 x => x.QlvtVatTu.VatTuId,
+                 y => y.IdVatTu,
+                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
+             .Where(x => tenVatTu == string.Empty || x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
+             .Where(x => tenVatTu == string.Empty || x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
+             .Where(x => idKho == 0 || x.QlvtVatTu.KhoId == idKho)
+             .Where(x => idViTri == 0 || x.QlvtVatTuViTri.IdToMay == idViTri
+                                      || x.QlvtVatTuViTri.IdGiaKe == idViTri
+                                      || x.QlvtVatTuViTri.IdNgan == idViTri
+                                      || x.QlvtVatTuViTri.IdHop == idViTri)
+             .OrderBy(x => x.QlvtVatTu.TenVatTu)
+             .Select(x => new
+             {
+                 x.QlvtVatTu.VatTuId,
+                 x.QlvtVatTu.TenVatTu,
+                 x.QlvtVatTu.DonViTinh,
+             });
+         return await query.ToPagedListAsync<dynamic>(pageIndex, pageSize);
     }
 }
