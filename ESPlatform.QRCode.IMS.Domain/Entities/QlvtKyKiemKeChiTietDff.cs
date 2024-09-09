@@ -2,7 +2,7 @@
 
 public partial class QlvtKyKiemKeChiTietDff
 {
-    public int Id { get; set; }
+    public int ChiTietDffId { get; set; }
 
     public int? KyKiemKeChiTietId { get; set; }
 

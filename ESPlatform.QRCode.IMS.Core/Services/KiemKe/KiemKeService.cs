@@ -57,6 +57,7 @@ public class KiemKeService : IKiemKeService
         }
 
         var vatTuId = vatTu.VatTuId;
+        response.VatTuId = vatTuId;
         response.MaVatTu = maVatTu;
         response.TenVatTu = !string.IsNullOrWhiteSpace(vatTu.TenVatTu) ? vatTu.TenVatTu : string.Empty;
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
@@ -90,14 +91,14 @@ public class KiemKeService : IKiemKeService
         {
             var inventoryCheckInformationMapper =
                 _mapper.Map<InventoryCheckResponse>(inventoryCheckInformation);
-            response.TheId = inventoryCheckInformationMapper.TheId;
+            response.KyKiemKeChiTietId = inventoryCheckInformationMapper.KyKiemKeChiTietId;
             response.PhysicalInventoryName = inventoryCheckInformationMapper.PhysicalInventoryName;
             response.SoLuongSoSach = inventoryCheckInformationMapper.SoLuongSoSach;
             response.SoLuongKiemKe = inventoryCheckInformationMapper.SoLuongKiemKe;
             response.SoLuongChenhLech = inventoryCheckInformationMapper.SoLuongChenhLech;
         }
         // DFF
-        response.SupplyDff = (await _kyKiemKeChiTietDffRepository.GetAsync(x => x.VatTuId == vatTu.VatTuId && x.KyKiemKeChiTietId == response.TheId)).Adapt<SupplyDffResponse>();
+        response.SupplyDff = (await _kyKiemKeChiTietDffRepository.GetAsync(x => x.VatTuId == vatTu.VatTuId && x.KyKiemKeChiTietId == response.KyKiemKeChiTietId)).Adapt<SupplyDffResponse>();
 
         // vị trí kho chính và phụ
         var warehouse = await _khoRepository.GetAsync(x => x.OrganizationId == vatTu.KhoId);

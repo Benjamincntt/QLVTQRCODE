@@ -6,8 +6,9 @@ public class InventoryCheckResponse
 {
     public int Tag { get; set; }
     
-    public int TheId { get; set; }
+    public int KyKiemKeChiTietId { get; set; }
 
+    public int VatTuId { get; set; }
     public string MaVatTu { get; set; } = string.Empty;
 
     public string TenVatTu { get; set; } = string.Empty;

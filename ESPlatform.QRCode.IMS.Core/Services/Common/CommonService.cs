@@ -125,11 +125,12 @@ public class CommonService : ICommonService
         // create new image
         var folderPath = AppConfig.Instance.Image.FolderPath;
         // check if server don't have path => create a new directory by path
-        if (!Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
         var pathUpload =  Path.Combine(AppConfig.Instance.Image.FolderPath,vatTuId.ToString());
+        if (!Directory.Exists(pathUpload))
+        {
+            Directory.CreateDirectory(pathUpload);
+        }
+        
         var fileName = $"{Path.GetFileName(file.FileName)}";
         var fullPath = Path.Combine(pathUpload, fileName);
 

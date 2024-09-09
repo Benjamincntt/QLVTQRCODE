@@ -264,11 +264,11 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<QlvtKyKiemKeChiTiet>(entity =>
         {
-            entity.HasKey(e => e.TheId).HasName("PK_QLVT_TheKiemKe");
+            entity.HasKey(e => e.KyKiemKeChiTietId).HasName("PK_QLVT_TheKiemKe");
 
             entity.ToTable("QLVT_KyKiemKe_ChiTiet");
 
-            entity.Property(e => e.TheId).HasColumnName("The_Id");
+            entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
             entity.Property(e => e.KhoChinhId).HasColumnName("KhoChinh_Id");
             entity.Property(e => e.KhoPhuId).HasColumnName("KhoPhu_Id");
             entity.Property(e => e.KyKiemKeId).HasColumnName("KyKiemKe_Id");
@@ -285,11 +285,14 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
         });
-        
+
         modelBuilder.Entity<QlvtKyKiemKeChiTietDff>(entity =>
         {
+            entity.HasKey(e => e.ChiTietDffId);
+
             entity.ToTable("QLVT_KyKiemKe_ChiTiet_DFF");
 
+            entity.Property(e => e.ChiTietDffId).HasColumnName("ChiTiet_DFF_Id");
             entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
             entity.Property(e => e.PhanTramDong).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.PhanTramKemPhamChat).HasColumnType("decimal(5, 2)");
@@ -303,6 +306,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("TS_KemPc_MatPc");
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
         });
+
         
         modelBuilder.Entity<QlvtMuaSamPhieuDeXuat>(entity =>
         {

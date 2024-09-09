@@ -25,7 +25,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
             .Where(x => x.QlvtKyKiemKeChiTiet.KyKiemKeId == kykiemkeId)
             .Select(x => new 
             {
-                x.QlvtKyKiemKeChiTiet.TheId,
+                x.QlvtKyKiemKeChiTiet.KyKiemKeChiTietId,
                 x.QlvtKyKiemKe.PhysicalInventoryName,// ten ky kiem ke
                 x.QlvtKyKiemKeChiTiet.SoLuongSoSach,
                 x.QlvtKyKiemKeChiTiet.SoLuongKiemKe,
