@@ -3,7 +3,7 @@ using ESPlatform.QRCode.IMS.Api.Middlewares;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Engine.Utils;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 using AuthenticationMiddleware = ESPlatform.QRCode.IMS.Api.Middlewares.AuthenticationMiddleware;
 
@@ -57,7 +57,8 @@ app.UseSwagger()
 
 // Configure Custom middlewares
 app.UseMiddleware<PerformanceMiddleware>()
-   .UseMiddleware<AuthenticationMiddleware>();
+   .UseMiddleware<AuthenticationMiddleware>()
+   .UseMiddleware<DynamicStaticFileMiddleware>();
 
 // Configure Controllers
 app.MapControllers();
