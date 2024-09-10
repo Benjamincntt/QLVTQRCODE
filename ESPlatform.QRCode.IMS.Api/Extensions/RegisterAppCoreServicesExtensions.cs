@@ -47,6 +47,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IKhoRepository, KhoRepository>()
             .AddScoped<IViTriRepository, ViTriRepository>()
             .AddScoped<IKyKiemKeChiTietRepository, KyKiemKeChiTietRepository>()
+            .AddScoped<IKyKiemKeRepository, KyKiemKeRepository>()
 
             // Facades
             .AddScoped<IAuthorizedContextFacade, AuthorizedContextFacade>()

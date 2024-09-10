@@ -16,6 +16,15 @@ public class AuthenticationMiddleware {
 
 	public async Task InvokeAsync(HttpContext context,
 								  IDistributedCache distributedCache) {
+		// Kiểm tra nếu URL yêu cầu là một hình ảnh
+		var requestPath = context.Request.Path.Value;
+
+		if (requestPath != null && requestPath.StartsWith("/Images/", StringComparison.OrdinalIgnoreCase)) {
+			// Bỏ qua xác thực cho yêu cầu này
+			await _next(context);
+			return;
+		}
+		
 		var currentKyKiemKeId = context.GetKyKiemKeId();
 
 		var endpoint = context.GetEndpoint();

@@ -27,6 +27,11 @@ public class MuaSamVatTuController : ApiControllerBase
     {
         return await _muaSamVatTuService.ListVatTuAsync(request);
     }
-    
+
+    // [HttpGet("{vatTuId:int}/chi-tiet-vat-tu")]
+    // public async Task<SupplyS> GetSupplyDetailAsync(int vatTuId)
+    // {
+    //     return await _muaSamVatTuService.GetAsync(int vatTuId);
+    // }
     
 }

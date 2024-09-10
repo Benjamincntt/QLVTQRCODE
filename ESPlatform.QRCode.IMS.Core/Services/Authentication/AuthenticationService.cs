@@ -52,13 +52,13 @@ public class AuthenticationService : IAuthenticationService
         var nguoiDung = await GetEligibleAccountAsync(request.Username, true);
         if (nguoiDung is null)
         {
-            throw new BadRequestException(Constants.Authentication.Messages.InvalidUsernameOrPassword);
+            throw new BadRequestException(Constants.Authentication.Messages.InvalidLoginName);
         }
         
         var inputPasswordHash = GetPassword.GetMD5(nguoiDung.Salt + request.Password);
         if (inputPasswordHash != nguoiDung.MatKhau)
         {
-            throw new BadRequestException(Constants.Authentication.Messages.InvalidUsernameOrPassword);
+            throw new BadRequestException(Constants.Authentication.Messages.InvalidPassword);
         }
         
         return await AcceptLogin(nguoiDung);

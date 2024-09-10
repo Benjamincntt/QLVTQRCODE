@@ -19,6 +19,7 @@ public class KiemKeService : IKiemKeService
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IKyKiemKeChiTietDffRepository _kyKiemKeChiTietDffRepository;
     private readonly IKyKiemKeChiTietRepository _kyKiemKeChiTietRepository;
+    private readonly IKyKiemKeRepository _kyKiemKeRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IKhoRepository _khoRepository;
     private readonly IMapper _mapper;
@@ -28,6 +29,7 @@ public class KiemKeService : IKiemKeService
         IKyKiemKeChiTietDffRepository kyKiemKeChiTietDffRepository,
         IKhoRepository khoRepository,
         IKyKiemKeChiTietRepository kyKiemKeChiTietRepository,
+        IKyKiemKeRepository kyKiemKeRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IMapper mapper)
     {
@@ -35,6 +37,7 @@ public class KiemKeService : IKiemKeService
         _kyKiemKeChiTietDffRepository = kyKiemKeChiTietDffRepository;
         _khoRepository = khoRepository;
         _kyKiemKeChiTietRepository = kyKiemKeChiTietRepository;
+        _kyKiemKeRepository = kyKiemKeRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _mapper = mapper;
     }
@@ -191,5 +194,11 @@ public class KiemKeService : IKiemKeService
         kyKiemKeChiTiet.SoLuongChenhLech = soLuongKiemKe - kyKiemKeChiTiet.SoLuongSoSach;
         kyKiemKeChiTiet.NgayKiemKe = DateTime.Now;
         return await _kyKiemKeChiTietRepository.UpdateAsync(kyKiemKeChiTiet);
+    }
+
+    public async Task<IEnumerable<InventoryCheckListResponseItem>> ListAsync()
+    {
+        var response = (await _kyKiemKeRepository.ListInputAsync()).Adapt<List<InventoryCheckListResponseItem>>();
+        return response;
     }
 }

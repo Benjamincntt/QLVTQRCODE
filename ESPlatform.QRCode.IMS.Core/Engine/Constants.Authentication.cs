@@ -14,6 +14,8 @@ public static partial class Constants {
 			public const string RefreshTokenRevoked = "Refresh Token đã thu hồi";
 			//public const string Unauthorized = "Truy cập chưa được xác thực"; // 401 Unauthorized
 			public const string InvalidCurrentPassword = "Mật khẩu hiện tại không đúng";
+			public const string InvalidPassword = "Mật khẩu không đúng";
+			public const string InvalidLoginName = "Tên đăng nhập không đúng";
 		}
 
 		public static class RevokeReasons {

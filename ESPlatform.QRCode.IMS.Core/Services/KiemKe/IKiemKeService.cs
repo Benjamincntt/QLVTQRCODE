@@ -9,4 +9,5 @@ public interface IKiemKeService
 
     Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId, int soLuongKiemKe, ModifiedSuppliesDffRequest request);
     Task<int> ModifySuppliesQtyAsync(int vatTuId, int soLuongKiemKe);
+    Task<IEnumerable<InventoryCheckListResponseItem>> ListAsync();
 }
