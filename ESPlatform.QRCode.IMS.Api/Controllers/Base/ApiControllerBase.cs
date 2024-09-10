@@ -14,10 +14,13 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers.Base;
 public class ApiControllerBase : ControllerBase {
 	private int _currentAccountId = 0;
 	private string _currentIpAddress = string.Empty;
-	private Guid _currentSiteId = Guid.Empty;
+	//private Guid _currentSiteId = Guid.Empty;
+	private int _currentKiKiemKeId = 0;
 	private string _currentUsername = string.Empty;
 
 	protected int CurrentAccountId => _currentAccountId == 0 ? _currentAccountId = HttpContext.GetAccountId() : _currentAccountId;
+	
+	protected int CurrentKiKiemKeId => _currentKiKiemKeId == 0 ? _currentKiKiemKeId = HttpContext.GetKyKiemKeId() : _currentKiKiemKeId;
 
 	protected string CurrentUsername => string.IsNullOrEmpty(_currentUsername) ? _currentUsername = HttpContext.GetUsername() : _currentUsername;
 
