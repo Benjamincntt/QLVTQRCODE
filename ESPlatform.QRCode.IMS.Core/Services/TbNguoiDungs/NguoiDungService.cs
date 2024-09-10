@@ -28,7 +28,7 @@ public class NguoiDungService : INguoiDungService
         _donviDungRepository = donviDungRepository;
     }
 
-    public async Task<int> ModifyAsync(int maNguoiDung, NguoiDungModifyRequest request)
+    public async Task<int> ModifyAsync(int maNguoiDung, ModifiedUserRequest request)
     {
         var nguoiDung = await _nguoiDungRepository.GetAsync(maNguoiDung);
         if (nguoiDung == null)
@@ -62,7 +62,7 @@ public class NguoiDungService : INguoiDungService
         return await _nguoiDungRepository.UpdateAsync(nguoiDung);
     }
 
-    public async Task<int> UpdatePassWordAsync(AccountUpdatePasswordRequest request)
+    public async Task<int> UpdatePassWordAsync(ModifiedUserPasswordRequest request)
     {
         var maNguoiDung = _authorizedContextFacade.AccountId;
         var nguoiDung = await _nguoiDungRepository.GetAsync(maNguoiDung);
@@ -82,17 +82,17 @@ public class NguoiDungService : INguoiDungService
         return await _nguoiDungRepository.UpdateAsync(nguoiDung);
     }
 
-    public async Task<int> CreateAsync(NguoiDungCreatedRequest request)
+    public async Task<int> CreateAsync(CreatedUserRequest userRequest)
     {
-        await ValidationHelper.ValidateAsync(request, new NguoiDungCreatedRequestValidation());
-        var currentAccount = await _nguoiDungRepository.GetAsync(a => a.TenDangNhap == request.TenDangNhap);
+        await ValidationHelper.ValidateAsync(userRequest, new NguoiDungCreatedRequestValidation());
+        var currentAccount = await _nguoiDungRepository.GetAsync(a => a.TenDangNhap == userRequest.TenDangNhap);
         if (currentAccount != null)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Login.DuplicatedAccountName);
         }
-        var currentPortal = await _donviDungRepository.GetAsync(x => x.MaDonViSuDung == request.MaDonViSuDung && x.KichHoat == true);
+        var currentPortal = await _donviDungRepository.GetAsync(x => x.MaDonViSuDung == userRequest.MaDonViSuDung && x.KichHoat == true);
 
-        var nguoiDung = request.Adapt<TbNguoiDung>();
+        var nguoiDung = userRequest.Adapt<TbNguoiDung>();
         nguoiDung.Ho = "";
         nguoiDung.Ten = nguoiDung.TenDangNhap;
         nguoiDung.KichHoat = false;

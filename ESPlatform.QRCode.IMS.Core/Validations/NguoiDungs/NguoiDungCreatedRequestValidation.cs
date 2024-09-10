@@ -6,7 +6,7 @@ using static ESPlatform.QRCode.IMS.Core.Engine.Constants.Validation.Messages;
 
 namespace ESPlatform.QRCode.IMS.Core.Validations.NguoiDungs;
 
-public class NguoiDungCreatedRequestValidation: AbstractValidator<NguoiDungCreatedRequest> {
+public class NguoiDungCreatedRequestValidation: AbstractValidator<CreatedUserRequest> {
     public NguoiDungCreatedRequestValidation() {
         RuleFor(x => x.MatKhau).ValidateStringDefault(false);
         RuleFor(o => o.TenDangNhap).ValidateStringDefault(false);

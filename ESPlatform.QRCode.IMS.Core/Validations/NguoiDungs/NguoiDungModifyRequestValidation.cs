@@ -6,7 +6,7 @@ using static ESPlatform.QRCode.IMS.Core.Engine.Constants.Validation.Messages;
 
 namespace ESPlatform.QRCode.IMS.Core.Validations.NguoiDungs;
 
-public class NguoiDungModifyRequestValidation : AbstractValidator<NguoiDungModifyRequest> {
+public class NguoiDungModifyRequestValidation : AbstractValidator<ModifiedUserRequest> {
 	public NguoiDungModifyRequestValidation() {
 		RuleFor(o => o.FullName).ValidateStringDefault(false);
 		RuleFor(x => x.Email)

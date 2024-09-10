@@ -3,11 +3,13 @@ using ESPlatform.QRCode.IMS.Core.DTOs.NguoiDungs.Requests;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
 
-public interface INguoiDungService {
-	Task<int> ModifyAsync(int maNguoiDung, NguoiDungModifyRequest request);
+public interface INguoiDungService
+{
+    Task<int> ModifyAsync(int maNguoiDung, ModifiedUserRequest request);
 
-	Task<int> ResetPasswordAsync(int maNguoiDung, string password);
+    Task<int> ResetPasswordAsync(int maNguoiDung, string password);
 
-	Task<int> UpdatePassWordAsync(AccountUpdatePasswordRequest request);
-	Task<int> CreateAsync(NguoiDungCreatedRequest request);
+    Task<int> UpdatePassWordAsync(ModifiedUserPasswordRequest request);
+    
+    Task<int> CreateAsync(CreatedUserRequest userRequest);
 }

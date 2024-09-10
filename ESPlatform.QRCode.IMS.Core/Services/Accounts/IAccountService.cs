@@ -18,7 +18,7 @@ public interface IAccountService {
 
 	//Task<PagedList<AccountListResponseItem>> ListPagedAsync(AccountListRequest request);
 
-	Task<int> UpdatePassWordAsync(AccountUpdatePasswordRequest request);
+	Task<int> UpdatePassWordAsync(ModifiedUserPasswordRequest request);
 
 	//Task<IEnumerable<AccountAuthorizedResponseItem>> GetAuthorizedAccountsAsync(Guid categoryId, Guid roleId);
 

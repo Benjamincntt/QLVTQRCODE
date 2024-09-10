@@ -1,6 +1,6 @@
 ﻿namespace ESPlatform.QRCode.IMS.Core.DTOs.NguoiDungs.Requests;
 
-public class NguoiDungCreatedRequest : NguoiDungDto
+public class CreatedUserRequest : NguoiDungDto
 {
     public string MatKhau { get; set; } = string.Empty;
     

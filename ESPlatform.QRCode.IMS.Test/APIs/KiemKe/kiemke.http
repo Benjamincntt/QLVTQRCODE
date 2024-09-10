@@ -22,8 +22,14 @@ Authorization: Bearer {{accessToken}}
   "tsKemPcMatPc": 8
 }
 
-### Cập nhật DFF vật tư
+### Cập nhật QTY vật tư
 PATCH {{host}}/{{kiemkePath}}/{{vatTuId}}/update-supplies-qty?soLuongKiemKe=100
+Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
+Authorization: Bearer {{accessToken}}
+
+### Danh sách kỳ kiểm kê
+GET {{host}}/{{kiemkePath}}
 Content-Type: application/json
 kikiemke-id: {{kikiemkeId}}
 Authorization: Bearer {{accessToken}}

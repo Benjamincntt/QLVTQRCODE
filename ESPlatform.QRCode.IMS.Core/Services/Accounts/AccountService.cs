@@ -103,7 +103,7 @@ public class AccountService : IAccountService {
 	// 	return response;
 	// }
 
-	public async Task<int> UpdatePassWordAsync(AccountUpdatePasswordRequest request) {
+	public async Task<int> UpdatePassWordAsync(ModifiedUserPasswordRequest request) {
 		var accountId = _authorizedContextFacade.AccountId;
 		var account = await _accountRepository.GetAsync(accountId);
 		if (account == null) {

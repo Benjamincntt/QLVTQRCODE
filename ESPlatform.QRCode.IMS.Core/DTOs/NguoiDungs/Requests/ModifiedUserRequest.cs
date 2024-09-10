@@ -2,7 +2,7 @@ using ESPlatform.QRCode.IMS.Domain.Enums;
 
 namespace ESPlatform.QRCode.IMS.Core.DTOs.NguoiDungs.Requests;
 
-public class NguoiDungModifyRequest : NguoiDungDto {
+public class ModifiedUserRequest : NguoiDungDto {
 	// public string MaDinhDanh { get; set; } = string.Empty;
 
 	// public string MatKhau { get; set; } = string.Empty;

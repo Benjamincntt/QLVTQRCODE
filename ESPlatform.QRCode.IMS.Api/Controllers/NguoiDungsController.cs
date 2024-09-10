@@ -14,11 +14,11 @@ public class NguoiDungsController : ApiControllerBase {
 	}
 	
 	/// <summary>Thêm mới tài khoản</summary>
-	/// <param name="request"></param>
+	/// <param name="userRequest"></param>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<int> CreateAsync(NguoiDungCreatedRequest request) {
-		return await _nguoiDungService.CreateAsync(request);
+	public async Task<int> CreateAsync(CreatedUserRequest userRequest) {
+		return await _nguoiDungService.CreateAsync(userRequest);
 	}
 
 	/// <summary>
@@ -28,7 +28,7 @@ public class NguoiDungsController : ApiControllerBase {
 	/// <param name="request"></param>
 	/// <returns></returns>
 	[HttpPatch("{maNguoiDung:int}")]
-	public async Task<int> ModifyAsync(int maNguoiDung, [FromBody] NguoiDungModifyRequest request) {
+	public async Task<int> ModifyAsync(int maNguoiDung, [FromBody] ModifiedUserRequest request) {
 		return await _nguoiDungService.ModifyAsync(maNguoiDung, request);
 	}
 
@@ -53,7 +53,7 @@ public class NguoiDungsController : ApiControllerBase {
 	/// <param name="request"></param>
 	/// <returns></returns>
 	[HttpPatch]
-	public async Task<int> UpdatePassWordAsync([FromBody] AccountUpdatePasswordRequest request) {
+	public async Task<int> UpdatePassWordAsync([FromBody] ModifiedUserPasswordRequest request) {
 		return await _nguoiDungService.UpdatePassWordAsync(request);
 	}
 }

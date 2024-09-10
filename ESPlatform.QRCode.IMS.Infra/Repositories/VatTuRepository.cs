@@ -69,21 +69,34 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
      public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri, int pageIndex, int pageSize)
      {
          var query = DbContext.QlvtVatTus
-             .Join(DbContext.QlvtKhos,
-                 x => x.KhoId,
-                 y => y.OrganizationId,
-                 (x, y) => new { QlvtVatTu = x, QlvtKho = y })
-             .Join(DbContext.QlvtVatTuViTris,
+             .GroupJoin(DbContext.QlvtKhos,
+              			x => x.KhoId,
+              			y => y.OrganizationId,
+              			(x, y) => new { QlvtVatTu = x, QlvtKho = y })
+             .SelectMany(x => x.QlvtKho.DefaultIfEmpty(),
+              			(x, y) => new { x.QlvtVatTu, QlvtKho = y })
+             .GroupJoin(DbContext.QlvtVatTuViTris,
                  x => x.QlvtVatTu.VatTuId,
                  y => y.IdVatTu,
                  (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
+             .SelectMany(x => x.QlvtVatTuViTri.DefaultIfEmpty(),
+                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
+             // .Join(DbContext.QlvtKhos,
+             //     x => x.KhoId,
+             //     y => y.OrganizationId,
+             //     (x, y) => new { QlvtVatTu = x, QlvtKho = y })
+             // .Join(DbContext.QlvtVatTuViTris,
+             //     x => x.QlvtVatTu.VatTuId,
+             //     y => y.IdVatTu,
+             //     (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
              .Where(x => tenVatTu == string.Empty || x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
-             .Where(x => tenVatTu == string.Empty || x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
+             .Where(x => maVatTu == string.Empty || x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
              .Where(x => idKho == 0 || x.QlvtVatTu.KhoId == idKho)
-             .Where(x => idViTri == 0 || x.QlvtVatTuViTri.IdToMay == idViTri
+             .Where(x => idViTri == 0 || x.QlvtVatTuViTri != null &&
+                                      (x.QlvtVatTuViTri.IdToMay == idViTri
                                       || x.QlvtVatTuViTri.IdGiaKe == idViTri
                                       || x.QlvtVatTuViTri.IdNgan == idViTri
-                                      || x.QlvtVatTuViTri.IdHop == idViTri)
+                                      || x.QlvtVatTuViTri.IdHop == idViTri))
              .OrderBy(x => x.QlvtVatTu.TenVatTu)
              .Select(x => new
              {

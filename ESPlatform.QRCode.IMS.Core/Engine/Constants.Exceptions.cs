@@ -18,8 +18,11 @@ public static partial class Constants {
 			}
 			
 			public static class Supplies {
-				public const string InvalidId = "Mã vật tư không hợp lệ";
+				public const string InvalidId = "Id vật tư không hợp lệ";
 				public const string InvalidFileType = "Loại file không được phép";
+				public const string NotExistSupply = "Vật tư không tồn tại";
+				public const string ExistedSupplyName = "Tên vật tư đã tồn tại";
+				public const string ExistedSupplyCode = "Mã vật tư đã tồn tại";
 			}
 
 			public static class Login {

@@ -52,6 +52,10 @@ public class KiemKeController : ApiControllerBase
         return await _kiemKeService.ModifySuppliesQtyAsync(vatTuId, soLuongKiemKe);
     }
 
+    /// <summary>
+    /// Danh sách kỳ kiểm kê
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IEnumerable<InventoryCheckListResponseItem>> ListAsync()
     {

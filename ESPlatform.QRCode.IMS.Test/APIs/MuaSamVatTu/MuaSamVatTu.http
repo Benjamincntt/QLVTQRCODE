@@ -1,4 +1,25 @@
-### Hiển thị chi tiết kiểm kê: Quét QR Code kiểm kê/ Nhập mã tay
+### Danh sách vật tư
 GET {{host}}/{{muaSamVatTuPath}}
 Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
 Authorization: Bearer {{accessToken}}
+
+### Chi tiết vật tư mua sắm
+GET {{host}}/{{muaSamVatTuPath}}/{{vatTuId}}/chi-tiet-vat-tu
+Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
+Authorization: Bearer {{accessToken}}
+
+### Thêm mới vật tư 
+POST {{host}}/{{muaSamVatTuPath}}/them-moi-vat-tu
+Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "maVatTu": "CapTron18",
+  "tenVatTu": "Cáp điện tròn phi 18",
+  "donViTinh": "mét",
+  "ghiChu": "200 mét, có bọc xốp",
+  "moTa": "hàng loại 1"
+}

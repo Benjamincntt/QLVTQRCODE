@@ -1,9 +1,11 @@
-﻿namespace ESPlatform.QRCode.IMS.Domain.Entities;
+﻿using System.ComponentModel;
 
+namespace ESPlatform.QRCode.IMS.Domain.Entities;
+[DisplayName("Vật tư")]
 public class QlvtVatTu
 {
     public int KhoId { get; set; }
-
+    [DisplayName("Mã vật tư")]
     public string MaVatTu { get; set; } = string.Empty;
 
     public string TenVatTu { get; set; } = string.Empty;
