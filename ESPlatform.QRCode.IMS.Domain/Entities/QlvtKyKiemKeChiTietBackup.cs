@@ -1,8 +1,8 @@
 ﻿namespace ESPlatform.QRCode.IMS.Domain.Entities;
 
-public partial class QlvtTheKiemKe
+public partial class QlvtKyKiemKeChiTietBackup
 {
-    public int TheId { get; set; }
+    public int KyKiemKeChiTietId { get; set; }
 
     public int? KyKiemKeId { get; set; }
 
@@ -17,4 +17,14 @@ public partial class QlvtTheKiemKe
     public decimal? SoLuongKiemKe { get; set; }
 
     public decimal? SoLuongChenhLech { get; set; }
+
+    public string? SoThe { get; set; }
+
+    public int? TrangThai { get; set; }
+
+    public DateTime? NgayKiemKe { get; set; }
+
+    public int? NguoiKiemKeId { get; set; }
+
+    public string? NguoiKiemKeTen { get; set; }
 }

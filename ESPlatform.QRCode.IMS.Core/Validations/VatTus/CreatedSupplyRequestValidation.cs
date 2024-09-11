@@ -8,11 +8,9 @@ public class CreatedSupplyRequestValidation: AbstractValidator<CreatedSupplyRequ
 {
     public CreatedSupplyRequestValidation()
     {
-        RuleFor(x => x.MaVatTu).ValidateStringDefault(false);
         RuleFor(x => x.TenVatTu).ValidateStringDefault(false);
-        RuleFor(x => x.DonViTinh).ValidateStringDefault(false);
+        RuleFor(x => x.DonViTinh).ValidateStringDefault();
         RuleFor(x => x.GhiChu).ValidateStringDefault();
         RuleFor(x => x.MoTa).ValidateStringDefault();
-        
     }
 }

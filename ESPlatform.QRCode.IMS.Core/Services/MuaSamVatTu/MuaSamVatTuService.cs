@@ -1,5 +1,6 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.LapPhieu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
@@ -19,14 +20,17 @@ namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 public class MuaSamVatTuService : IMuaSamVatTuService
 {
     private readonly IVatTuRepository _vatTuRepository;
+    private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
 
     public MuaSamVatTuService(
         IVatTuRepository vatTuRepository,
+        IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
         IAuthorizedContextFacade authorizedContextFacade)
     {
         _vatTuRepository = vatTuRepository;
         _authorizedContextFacade = authorizedContextFacade;
+        _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
     }
 
     public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync(SupplyListRequest request)
@@ -78,27 +82,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 
     public async Task<int> CreateSupplyAsync(CreatedSupplyRequest request)
     {   
-        #region validate
-
         await ValidationHelper.ValidateAsync(request, new CreatedSupplyRequestValidation());
-        var existSupplyName = await _vatTuRepository.ExistsAsync(x => x.TenVatTu == request.TenVatTu);
-        if (existSupplyName)
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.ExistedSupplyName);
-        }
-        var existSupplyCode = await _vatTuRepository.ExistsAsync(x => x.MaVatTu == request.MaVatTu);
-        if (existSupplyCode)
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.ExistedSupplyCode);
-        }
-        
-        #endregion 
-        var vatTu = request.Adapt<QlvtVatTu>();
-        vatTu.NguoiTaoId = _authorizedContextFacade.AccountId;
-        vatTu.NguoiTao = _authorizedContextFacade.Username;
-        vatTu.NgayTao = DateTime.Now;
-        return await _vatTuRepository.InsertAsync(vatTu);
+        var vatTu = request.Adapt<QlvtMuaSamVatTuNew>();
+        return await _muaSamVatTuNewRepository.InsertAsync(vatTu);  
     }
-    
-    
+
+    public Task<int> CreatePurchaseOrderAsync(CreatedPurchaseOrderRequest request)
+    {
+        return default;
+        // throw new NotImplementedException();
+    }
 }

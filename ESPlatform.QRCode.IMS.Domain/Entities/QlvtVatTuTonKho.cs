@@ -1,6 +1,6 @@
 ﻿namespace ESPlatform.QRCode.IMS.Domain.Entities;
 
-public partial class QlvtVatTuKho
+public partial class QlvtVatTuTonKho
 {
     /// <summary>
     /// Id vật tư

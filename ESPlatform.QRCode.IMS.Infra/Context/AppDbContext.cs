@@ -20,9 +20,15 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<QlvtKyKiemKe> QlvtKyKiemKes { get; set; }
 
+    public virtual DbSet<QlvtKyKiemKeBackup> QlvtKyKiemKeBackups { get; set; }
+
     public virtual DbSet<QlvtKyKiemKeChiTiet> QlvtKyKiemKeChiTiets { get; set; }
-    
+
+    public virtual DbSet<QlvtKyKiemKeChiTietBackup> QlvtKyKiemKeChiTietBackups { get; set; }
+
     public virtual DbSet<QlvtKyKiemKeChiTietDff> QlvtKyKiemKeChiTietDffs { get; set; }
+
+    public virtual DbSet<QlvtKyKiemKeChiTietDffBackup> QlvtKyKiemKeChiTietDffBackups { get; set; }
 
     public virtual DbSet<QlvtMuaSamPhieuDeXuat> QlvtMuaSamPhieuDeXuats { get; set; }
 
@@ -30,8 +36,12 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<QlvtMuaSamPhieuDeXuatLichSu> QlvtMuaSamPhieuDeXuatLichSus { get; set; }
 
+    public virtual DbSet<QlvtMuaSamVatTuNew> QlvtMuaSamVatTuNews { get; set; }
+
     public virtual DbSet<QlvtVatTu> QlvtVatTus { get; set; }
-    public virtual DbSet<QlvtVatTuKho> QlvtVatTuKhos { get; set; }
+
+    public virtual DbSet<QlvtVatTuTonKho> QlvtVatTuTonKhos { get; set; }
+
     public virtual DbSet<QlvtVatTuViTri> QlvtVatTuViTris { get; set; }
 
     public virtual DbSet<QlvtViTri> QlvtViTris { get; set; }
@@ -164,14 +174,16 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.TrangThai).HasComment("=1:(tồn tại);=10(đã xóa)");
             entity.Property(e => e.TuNgay).HasColumnType("datetime");
         });
-        
+
         modelBuilder.Entity<QlvtKho>(entity =>
         {
             entity.HasKey(e => e.OrganizationId);
 
             entity.ToTable("QLVT_Kho");
 
-            entity.Property(e => e.OrganizationId).HasColumnName("Organization_Id");
+            entity.Property(e => e.OrganizationId)
+                .ValueGeneratedNever()
+                .HasColumnName("Organization_Id");
             entity.Property(e => e.CreatedBy)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -262,6 +274,40 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("user_name");
         });
 
+        modelBuilder.Entity<QlvtKyKiemKeBackup>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__QLVT_KyK__3214EC0782418870");
+
+            entity.ToTable("QLVT_KyKiemKe_Backup");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(1000)
+                .HasColumnName("description");
+            entity.Property(e => e.EndTag)
+                .HasMaxLength(255)
+                .HasColumnName("end_tag");
+            entity.Property(e => e.FreezeDate)
+                .HasColumnType("datetime")
+                .HasColumnName("freeze_date");
+            entity.Property(e => e.OrganizationCode)
+                .HasMaxLength(255)
+                .HasColumnName("organization_code");
+            entity.Property(e => e.OrganizationId).HasColumnName("organization_id");
+            entity.Property(e => e.PhysicalInventoryDate)
+                .HasColumnType("datetime")
+                .HasColumnName("physical_inventory_date");
+            entity.Property(e => e.PhysicalInventoryId).HasColumnName("physical_inventory_id");
+            entity.Property(e => e.PhysicalInventoryName)
+                .HasMaxLength(255)
+                .HasColumnName("physical_inventory_name");
+            entity.Property(e => e.StartTag)
+                .HasMaxLength(255)
+                .HasColumnName("start_tag");
+            entity.Property(e => e.UserName)
+                .HasMaxLength(255)
+                .HasColumnName("user_name");
+        });
+
         modelBuilder.Entity<QlvtKyKiemKeChiTiet>(entity =>
         {
             entity.HasKey(e => e.KyKiemKeChiTietId).HasName("PK_QLVT_TheKiemKe");
@@ -286,6 +332,28 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
         });
 
+        modelBuilder.Entity<QlvtKyKiemKeChiTietBackup>(entity =>
+        {
+            entity.HasKey(e => e.KyKiemKeChiTietId).HasName("PK__QLVT_KyK__8C6FDB4E70940C27");
+
+            entity.ToTable("QLVT_KyKiemKe_ChiTiet_Backup");
+
+            entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
+            entity.Property(e => e.KhoChinhId).HasColumnName("KhoChinh_Id");
+            entity.Property(e => e.KhoPhuId).HasColumnName("KhoPhu_Id");
+            entity.Property(e => e.KyKiemKeId).HasColumnName("KyKiemKe_Id");
+            entity.Property(e => e.NgayKiemKe).HasColumnType("datetime");
+            entity.Property(e => e.NguoiKiemKeId).HasColumnName("NguoiKiemKe_Id");
+            entity.Property(e => e.NguoiKiemKeTen)
+                .HasMaxLength(255)
+                .HasColumnName("NguoiKiemKe_Ten");
+            entity.Property(e => e.SoLuongChenhLech).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongKiemKe).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongSoSach).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoThe).HasMaxLength(255);
+            entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+        });
+
         modelBuilder.Entity<QlvtKyKiemKeChiTietDff>(entity =>
         {
             entity.HasKey(e => e.ChiTietDffId);
@@ -307,7 +375,27 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
         });
 
-        
+        modelBuilder.Entity<QlvtKyKiemKeChiTietDffBackup>(entity =>
+        {
+            entity.HasKey(e => e.ChiTietDffId).HasName("PK__QLVT_KyK__687F0FA9523F00C7");
+
+            entity.ToTable("QLVT_KyKiemKe_ChiTiet_DFF_Backup");
+
+            entity.Property(e => e.ChiTietDffId).HasColumnName("ChiTiet_DFF_Id");
+            entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
+            entity.Property(e => e.PhanTramDong).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.PhanTramKemPhamChat).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.PhanTramMatPhamChat).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.SoLuongDeNghiThanhLy).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongDong).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongKemPhamChat).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongMatPhamChat).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.TsKemPcMatPc)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("TS_KemPc_MatPc");
+            entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+        });
+
         modelBuilder.Entity<QlvtMuaSamPhieuDeXuat>(entity =>
         {
             entity.ToTable("QLVT_MuaSam_PhieuDeXuat");
@@ -359,6 +447,18 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.TrangThai).HasComment("=0: Nháp; =1: tạo và gửi duyệt; =2: duyệt; =4 Hủy duyệt");
         });
 
+        modelBuilder.Entity<QlvtMuaSamVatTuNew>(entity =>
+        {
+            entity.HasKey(e => e.VatTuNewId);
+
+            entity.ToTable("QLVT_MuaSam_VatTu_New");
+
+            entity.Property(e => e.DonViTinh).HasMaxLength(50);
+            entity.Property(e => e.GhiChu).HasColumnType("text");
+            entity.Property(e => e.MoTa).HasColumnType("text");
+            entity.Property(e => e.TenVatTu).HasMaxLength(500);
+        });
+
         modelBuilder.Entity<QlvtVatTu>(entity =>
         {
             entity.HasKey(e => e.VatTuId).HasName("PK_QL_VatTu");
@@ -378,16 +478,15 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NgayTao).HasColumnType("datetime");
             entity.Property(e => e.NguoiTao).HasMaxLength(100);
             entity.Property(e => e.NguoiTaoId).HasColumnName("NguoiTao_Id");
-            entity.Property(e => e.MoTa).HasColumnName("MoTa");
             entity.Property(e => e.TenVatTu).HasMaxLength(100);
             entity.Property(e => e.TrangThaiInQr).HasColumnName("TrangThai_InQr");
         });
 
-        modelBuilder.Entity<QlvtVatTuKho>(entity =>
+        modelBuilder.Entity<QlvtVatTuTonKho>(entity =>
         {
-            entity.HasKey(e => new { e.InventoryItemId, e.OrganizationId });
+            entity.HasKey(e => new { e.InventoryItemId, e.OrganizationId }).HasName("PK_QLVT_VatTu_Kho");
 
-            entity.ToTable("QLVT_VatTu_Kho");
+            entity.ToTable("QLVT_VatTu_TonKho");
 
             entity.Property(e => e.InventoryItemId)
                 .HasComment("Id vật tư")
@@ -427,9 +526,7 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("QLVT_VatTu_ViTri");
 
-            entity.Property(e => e.IdViTri)
-                .ValueGeneratedNever()
-                .HasColumnName("IDViTri");
+            entity.Property(e => e.IdViTri).HasColumnName("IDViTri");
             entity.Property(e => e.IdGiaKe).HasColumnName("IDGiaKe");
             entity.Property(e => e.IdHop).HasColumnName("IDHop");
             entity.Property(e => e.IdKhoErp).HasColumnName("IDKhoERP");

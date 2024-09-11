@@ -54,7 +54,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
 
     public async Task<dynamic?> GetInventoryAsync(int vatTuId, int khoId)
     {
-        var response = await DbContext.QlvtVatTuKhos
+        var response = await DbContext.QlvtVatTuTonKhos
 
             .Where(x => x.InventoryItemId == vatTuId)
             .Where(x => x.OrganizationId == khoId)

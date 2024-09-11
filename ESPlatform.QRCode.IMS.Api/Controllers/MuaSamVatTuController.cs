@@ -42,7 +42,7 @@ public class MuaSamVatTuController : ApiControllerBase
     }
     
     /// <summary>
-    /// Thêm mới vật tư 
+    /// Thêm mới vật tư không có trong hệ thống 
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
@@ -51,4 +51,10 @@ public class MuaSamVatTuController : ApiControllerBase
     {
         return await _muaSamVatTuService.CreateSupplyAsync(request);
     }
+    
+    // [HttpPost()]
+    // public async Task<int> CreatePurchaseOrderAsync([FromBody]CreatedPurchaseOrderRequest request)
+    // {
+    //     return await _lapPhieuService.CreatePurchaseOrderAsync(request);
+    // }
 }
