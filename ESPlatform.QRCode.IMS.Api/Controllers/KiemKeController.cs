@@ -30,26 +30,28 @@ public class KiemKeController : ApiControllerBase
     /// Cập nhật DFF vật tư
     /// </summary>
     /// <param name="vatTuId"></param>
+    /// <param name="kyKiemKeId"></param>
     /// <param name="kyKiemKeChiTietId"></param>
     /// <param name="soLuongKiemKe"></param>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPatch("{vatTuId:int}/{kyKiemKeChiTietId:int}/update-supplies-dff")]
-    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId, int soLuongKiemKe, [FromBody] ModifiedSuppliesDffRequest request)
+    [HttpPatch("{vatTuId:int}/{kyKiemKeId:int}/{kyKiemKeChiTietId:int}/update-supplies-dff")]
+    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, int soLuongKiemKe, [FromBody] ModifiedSuppliesDffRequest request)
     {
-        return await _kiemKeService.ModifySuppliesDffAsync(vatTuId,kyKiemKeChiTietId, soLuongKiemKe, request);
+        return await _kiemKeService.ModifySuppliesDffAsync(vatTuId, kyKiemKeId, kyKiemKeChiTietId, soLuongKiemKe, request);
     }
 
     /// <summary>
     /// Cập nhật QTY vật tư
     /// </summary>
     /// <param name="vatTuId"></param>
+    /// <param name="kyKiemKeId"></param>
     /// <param name="soLuongKiemKe"></param>
     /// <returns></returns>
-    [HttpPatch("{vatTuId:int}/update-supplies-qty")]
-    public async Task<int> ModifySuppliesQtyAsync(int vatTuId, int soLuongKiemKe)
+    [HttpPatch("{vatTuId:int}/{kyKiemKeId:int}/update-supplies-qty")]
+    public async Task<int> ModifySuppliesQtyAsync(int vatTuId, int kyKiemKeId, int soLuongKiemKe)
     {
-        return await _kiemKeService.ModifySuppliesQtyAsync(vatTuId, soLuongKiemKe);
+        return await _kiemKeService.ModifySuppliesQtyAsync(vatTuId, kyKiemKeId, soLuongKiemKe);
     }
 
     /// <summary>

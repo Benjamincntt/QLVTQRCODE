@@ -14,8 +14,6 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<GetNewId> GetNewIds { get; set; }
 
-    public virtual DbSet<NguoiDungViTriCongViec> NguoiDungViTriCongViecs { get; set; }
-
     public virtual DbSet<QlvtKho> QlvtKhos { get; set; }
 
     public virtual DbSet<QlvtKyKiemKe> QlvtKyKiemKes { get; set; }
@@ -161,18 +159,6 @@ public partial class AppDbContext : DbContext
                 .ToView("Get_NewID");
 
             entity.Property(e => e.MyNewId).HasColumnName("MyNewID");
-        });
-
-        modelBuilder.Entity<NguoiDungViTriCongViec>(entity =>
-        {
-            entity.HasKey(e => e.MaNguoiDungViTriCongViec).HasName("PK_EDM_NguoiDung_ViTriCongViec");
-
-            entity.ToTable("NguoiDung_ViTriCongViec");
-
-            entity.Property(e => e.MaNguoiDungViTriCongViec).HasColumnName("MaNguoiDung_ViTriCongViec");
-            entity.Property(e => e.DenNgay).HasColumnType("datetime");
-            entity.Property(e => e.TrangThai).HasComment("=1:(tồn tại);=10(đã xóa)");
-            entity.Property(e => e.TuNgay).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<QlvtKho>(entity =>
@@ -1202,9 +1188,6 @@ public partial class AppDbContext : DbContext
                 .IsRequired()
                 .HasDefaultValueSql("((1))");
             entity.Property(e => e.DiaChi).HasMaxLength(255);
-            entity.Property(e => e.ViTri)
-                .HasDefaultValueSql("((0))")
-                .HasComment("1: Cán bộ; 2: Công chức; 3: Viên chức");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.Ho).HasMaxLength(50);
             entity.Property(e => e.HocHam).HasMaxLength(50);
@@ -1242,6 +1225,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ThoiGianMatKhau).HasColumnType("datetime");
             entity.Property(e => e.TienTrongTaiKhoan).HasDefaultValueSql("((0))");
             entity.Property(e => e.TieuSu).HasMaxLength(3000);
+            entity.Property(e => e.ViTri)
+                .HasDefaultValueSql("((0))")
+                .HasComment("Lưu giá trị theo bảng Tb_ViTriCongViec");
 
             entity.HasOne(d => d.MaDonViSuDungNavigation).WithMany(p => p.TbNguoiDungs)
                 .HasForeignKey(d => d.MaDonViSuDung)

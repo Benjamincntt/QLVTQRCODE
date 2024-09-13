@@ -48,10 +48,11 @@ public class KiemKeService : IKiemKeService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
         }
-
-        var kyKiemkeId = _authorizedContextFacade.KyKiemKeId;
         var response = new InventoryCheckResponse();
-
+        
+        // KyKiemKeId
+        var kiKiemKeChinh = await _kyKiemKeRepository.GetAsync(x => x.KyKiemKeChinh == 1);
+        if (kiKiemKeChinh != null) response.KyKiemKeId = kiKiemKeChinh.Id;
         // vật tư 
         var vatTu = await _vatTuRepository.GetAsync(x => x.MaVatTu == maVatTu);
         if (vatTu == null)
@@ -89,7 +90,7 @@ public class KiemKeService : IKiemKeService
 
 
         // kỳ kiểm kê
-        var inventoryCheckInformation = await _vatTuRepository.GetInventoryCheckInformationAsync(vatTuId, kyKiemkeId);
+        var inventoryCheckInformation = await _vatTuRepository.GetInventoryCheckInformationAsync(vatTuId, response.KyKiemKeId);
         if (inventoryCheckInformation != null)
         {
             var inventoryCheckInformationMapper =
@@ -130,11 +131,25 @@ public class KiemKeService : IKiemKeService
     }
 
     
-    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeChiTietId, int soLuongKiemKe, ModifiedSuppliesDffRequest request)
+    public async Task<int> ModifySuppliesDffAsync(int vatTuId,int kyKiemKeId, int kyKiemKeChiTietId, int soLuongKiemKe, ModifiedSuppliesDffRequest request)
     {
-        if (vatTuId < 1 || kyKiemKeChiTietId < 1 || soLuongKiemKe < 0)
+        if (vatTuId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
+        }
+        if (kyKiemKeId < 1)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidKyKiemKeId);
+        }
+
+        if ( kyKiemKeChiTietId < 1 )
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidKyKiemKeChiTietId);
+        }
+
+        if (soLuongKiemKe < 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidSoLuongKiemKe);
         }
         await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesDffRequestValidation());
         
@@ -169,20 +184,28 @@ public class KiemKeService : IKiemKeService
         return await _kyKiemKeChiTietDffRepository.UpdateAsync(dffToUpdate);
     }
 
-    public async Task<int> ModifySuppliesQtyAsync(int vatTuId, int soLuongKiemKe)
+    public async Task<int> ModifySuppliesQtyAsync(int vatTuId,int kyKiemKeId, int soLuongKiemKe)
     {
-        if (vatTuId < 1 || soLuongKiemKe < 0)
+        if (vatTuId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
         }
-        var kyKiemkeId = _authorizedContextFacade.KyKiemKeId;
-        var kyKiemKeChiTiet = await _kyKiemKeChiTietRepository.GetAsync(x => x.KyKiemKeId == kyKiemkeId && x.VatTuId == vatTuId);
+        if (kyKiemKeId < 1)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidKyKiemKeId);
+        }
+        if (soLuongKiemKe < 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidSoLuongKiemKe);
+        }
+        //var kyKiemkeId = _authorizedContextFacade.KyKiemKeId;
+        var kyKiemKeChiTiet = await _kyKiemKeChiTietRepository.GetAsync(x => x.KyKiemKeId == kyKiemKeId && x.VatTuId == vatTuId);
         // has no QTY => create new 
         if (kyKiemKeChiTiet == null)
         {
             var qtyToCreate = new QlvtKyKiemKeChiTiet();
             qtyToCreate.VatTuId = vatTuId;
-            qtyToCreate.KyKiemKeId = kyKiemkeId;
+            qtyToCreate.KyKiemKeId = kyKiemKeId;
             qtyToCreate.SoLuongKiemKe = soLuongKiemKe;
             qtyToCreate.SoLuongChenhLech = soLuongKiemKe;
             qtyToCreate.SoLuongSoSach = 0;

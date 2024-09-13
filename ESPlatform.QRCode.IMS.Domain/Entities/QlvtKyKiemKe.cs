@@ -53,4 +53,6 @@ public partial class QlvtKyKiemKe
     /// Người tạo
     /// </summary>
     public string? UserName { get; set; }
+    
+    public short? KyKiemKeChinh { get; set; }
 }

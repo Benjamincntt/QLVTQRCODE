@@ -6,6 +6,7 @@ public class InventoryCheckResponse
 {
     public int Tag { get; set; }
     
+    public int KyKiemKeId { get; set; }
     public int KyKiemKeChiTietId { get; set; }
 
     public int VatTuId { get; set; }

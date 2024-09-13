@@ -28,6 +28,13 @@ public static partial class Constants {
 			public static class Login {
 				public const string DuplicatedAccountName = "Tên đăng nhập này đã tồn tại";
 			}
+			
+			public static class KyKiemKe {
+				public const string InvalidKyKiemKeId = "Id kỳ kiểm kê không hợp lệ";
+				public const string InvalidKyKiemKeChiTietId = "Id kỳ kiểm kê chi tiết không hợp lệ";
+				public const string InvalidSoLuongKiemKe = "Số lượng kiểm kê không hợp lệ";
+
+			}
 		}
 	}
 }
