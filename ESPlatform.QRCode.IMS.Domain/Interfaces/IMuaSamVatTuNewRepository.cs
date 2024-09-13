@@ -5,5 +5,4 @@ namespace ESPlatform.QRCode.IMS.Domain.Interfaces;
 
 public interface IMuaSamVatTuNewRepository : IRepositoryBase<QlvtMuaSamVatTuNew>
 {
-    
 }

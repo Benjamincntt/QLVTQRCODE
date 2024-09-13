@@ -453,10 +453,10 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("QLVT_MuaSam_VatTu_New");
 
-            entity.Property(e => e.DonViTinh).HasMaxLength(50);
+            entity.Property(e => e.DonViTinh).HasMaxLength(100);
             entity.Property(e => e.GhiChu).HasColumnType("text");
             entity.Property(e => e.MoTa).HasColumnType("text");
-            entity.Property(e => e.TenVatTu).HasMaxLength(500);
+            entity.Property(e => e.TenVatTu).HasMaxLength(100);
         });
 
         modelBuilder.Entity<QlvtVatTu>(entity =>
@@ -1202,7 +1202,7 @@ public partial class AppDbContext : DbContext
                 .IsRequired()
                 .HasDefaultValueSql("((1))");
             entity.Property(e => e.DiaChi).HasMaxLength(255);
-            entity.Property(e => e.DoiTuong)
+            entity.Property(e => e.ViTri)
                 .HasDefaultValueSql("((0))")
                 .HasComment("1: Cán bộ; 2: Công chức; 3: Viên chức");
             entity.Property(e => e.Email).HasMaxLength(100);

@@ -36,7 +36,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync(SupplyListRequest request)
     {
         await ValidationHelper.ValidateAsync(request, new SupplyListRequestValidation());
-        var response = (await _vatTuRepository.ListAsync(
+        var listVatTu = (await _vatTuRepository.ListAsync(
                 string.IsNullOrWhiteSpace(request.TenVatTu) ? string.Empty : request.TenVatTu.ToLower(),
                 string.IsNullOrWhiteSpace(request.MaVatTu) ? string.Empty : request.MaVatTu.ToLower(),
                 request.IdKho,
@@ -44,7 +44,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 request.GetPageIndex(),
                 request.GetPageSize()))
             .Adapt<PagedList<SupplyListResponseItem>>();
-        return response;
+        return listVatTu;
     }
 
     public async Task<PurchaseSupplyResponse> GetPurchaseSupplyAsync(int vatTuId)

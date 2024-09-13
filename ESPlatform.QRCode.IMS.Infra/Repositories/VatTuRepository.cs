@@ -23,10 +23,10 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 (x, y) => new { QlvtKyKiemKeChiTiet = x, QlvtKyKiemKe = y })
             .Where(x => x.QlvtKyKiemKeChiTiet.VatTuId == vatTuId)
             .Where(x => x.QlvtKyKiemKeChiTiet.KyKiemKeId == kykiemkeId)
-            .Select(x => new 
+            .Select(x => new
             {
                 x.QlvtKyKiemKeChiTiet.KyKiemKeChiTietId,
-                x.QlvtKyKiemKe.PhysicalInventoryName,// ten ky kiem ke
+                x.QlvtKyKiemKe.PhysicalInventoryName, // ten ky kiem ke
                 x.QlvtKyKiemKeChiTiet.SoLuongSoSach,
                 x.QlvtKyKiemKeChiTiet.SoLuongKiemKe,
                 x.QlvtKyKiemKeChiTiet.SoLuongChenhLech
@@ -39,8 +39,8 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
     {
         var response = await DbContext.QlvtVatTuViTris
             .Where(x => x.IdVatTu == vatTuId)
-            .Select(x => new 
-            {   
+            .Select(x => new
+            {
                 x.IdViTri,
                 x.IdToMay,
                 x.IdGiaKe,
@@ -55,10 +55,9 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
     public async Task<dynamic?> GetInventoryAsync(int vatTuId, int khoId)
     {
         var response = await DbContext.QlvtVatTuTonKhos
-
             .Where(x => x.InventoryItemId == vatTuId)
             .Where(x => x.OrganizationId == khoId)
-            .Select(x => new 
+            .Select(x => new
             {
                 x.LotNumber
             })
@@ -66,44 +65,58 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         return response;
     }
 
-     public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri, int pageIndex, int pageSize)
-     {
-         var query = DbContext.QlvtVatTus
-             .GroupJoin(DbContext.QlvtKhos,
-              			x => x.KhoId,
-              			y => y.OrganizationId,
-              			(x, y) => new { QlvtVatTu = x, QlvtKho = y })
-             .SelectMany(x => x.QlvtKho.DefaultIfEmpty(),
-              			(x, y) => new { x.QlvtVatTu, QlvtKho = y })
-             .GroupJoin(DbContext.QlvtVatTuViTris,
-                 x => x.QlvtVatTu.VatTuId,
-                 y => y.IdVatTu,
-                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
-             .SelectMany(x => x.QlvtVatTuViTri.DefaultIfEmpty(),
-                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
-             // .Join(DbContext.QlvtKhos,
-             //     x => x.KhoId,
-             //     y => y.OrganizationId,
-             //     (x, y) => new { QlvtVatTu = x, QlvtKho = y })
-             // .Join(DbContext.QlvtVatTuViTris,
-             //     x => x.QlvtVatTu.VatTuId,
-             //     y => y.IdVatTu,
-             //     (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
-             .Where(x => tenVatTu == string.Empty || x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
-             .Where(x => maVatTu == string.Empty || x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
-             .Where(x => idKho == 0 || x.QlvtVatTu.KhoId == idKho)
-             .Where(x => idViTri == 0 || x.QlvtVatTuViTri != null &&
-                                      (x.QlvtVatTuViTri.IdToMay == idViTri
-                                      || x.QlvtVatTuViTri.IdGiaKe == idViTri
-                                      || x.QlvtVatTuViTri.IdNgan == idViTri
-                                      || x.QlvtVatTuViTri.IdHop == idViTri))
-             .OrderBy(x => x.QlvtVatTu.TenVatTu)
-             .Select(x => new
-             {
-                 x.QlvtVatTu.VatTuId,
-                 x.QlvtVatTu.TenVatTu,
-                 x.QlvtVatTu.DonViTinh,
-             });
-         return await query.ToPagedListAsync<dynamic>(pageIndex, pageSize);
+    public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri,
+        int pageIndex, int pageSize)
+    {
+        var queryMain = DbContext.QlvtVatTus
+            .GroupJoin(DbContext.QlvtKhos,
+                x => x.KhoId,
+                y => y.OrganizationId,
+                (x, y) => new { QlvtVatTu = x, QlvtKho = y })
+            .SelectMany(x => x.QlvtKho.DefaultIfEmpty(),
+                (x, y) => new { x.QlvtVatTu, QlvtKho = y })
+            .GroupJoin(DbContext.QlvtVatTuViTris,
+                x => x.QlvtVatTu.VatTuId,
+                y => y.IdVatTu,
+                (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
+            .SelectMany(x => x.QlvtVatTuViTri.DefaultIfEmpty(),
+                (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
+            .Where(x => tenVatTu == string.Empty || x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
+            .Where(x => maVatTu == string.Empty || x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
+            .Where(x => idKho == 0 || x.QlvtVatTu.KhoId == idKho)
+            .Where(x => idViTri == 0 || x.QlvtVatTuViTri != null &&
+                (x.QlvtVatTuViTri.IdToMay == idViTri
+                 || x.QlvtVatTuViTri.IdGiaKe == idViTri
+                 || x.QlvtVatTuViTri.IdNgan == idViTri
+                 || x.QlvtVatTuViTri.IdHop == idViTri))
+            .Select(x => new 
+            {
+                VatTuId = x.QlvtVatTu.VatTuId,
+                VatTuNewId = 0,
+                TenVatTu = x.QlvtVatTu.TenVatTu,
+                DonViTinh = x.QlvtVatTu.DonViTinh,
+            });
+        // Query cho dữ liệu mới
+        var queryNew = DbContext.QlvtMuaSamVatTuNews
+            .Where(x => tenVatTu == string.Empty || x.TenVatTu.ToLower().Contains(tenVatTu.ToLower()))
+            .Where(x => maVatTu == string.Empty)
+            .Where(x => idKho == 0)
+            .Where(x => idViTri == 0)
+            .Select(x => new 
+            {
+                VatTuId = 0,
+                VatTuNewId = x.VatTuNewId,
+                TenVatTu = x.TenVatTu,
+                DonViTinh = x.DonViTinh,
+            });
+
+        // Kết hợp cả hai query
+        var combinedQuery = queryMain
+            .Union(queryNew)
+            .OrderBy(x => x.TenVatTu)
+            ;
+
+        // Phân trang kết quả kết hợp
+        return await combinedQuery.ToPagedListAsync<dynamic>(pageIndex, pageSize);
     }
 }

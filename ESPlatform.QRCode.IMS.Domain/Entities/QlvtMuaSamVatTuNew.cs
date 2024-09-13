@@ -6,7 +6,7 @@ public partial class QlvtMuaSamVatTuNew
 
     public string TenVatTu { get; set; } = null!;
 
-    public string? DonViTinh { get; set; }
+    public string DonViTinh { get; set; }
 
     public string? GhiChu { get; set; }
 

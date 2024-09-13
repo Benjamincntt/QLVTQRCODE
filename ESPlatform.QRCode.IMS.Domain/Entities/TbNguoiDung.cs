@@ -2,7 +2,7 @@
 
 namespace ESPlatform.QRCode.IMS.Domain.Entities;
 
-public partial class TbNguoiDung {
+public class TbNguoiDung {
 	public int MaNguoiDung { get; set; }
 
 	public string MaDinhDanh { get; set; } = string.Empty;
@@ -70,7 +70,7 @@ public partial class TbNguoiDung {
 	/// <summary>
 	/// 1: Cán bộ; 2: Công chức; 3: Viên chức
 	/// </summary>
-	public DoiTuongNguoiDung DoiTuong { get; set; }
+	public DoiTuongNguoiDung ViTri { get; set; }
 
 	public int PhienBanSuDung { get; set; }
 
