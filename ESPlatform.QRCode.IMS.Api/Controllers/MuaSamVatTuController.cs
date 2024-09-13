@@ -58,6 +58,14 @@ public class MuaSamVatTuController : ApiControllerBase
     // {
     //     return await _lapPhieuService.CreatePurchaseOrderAsync(request);
     // }
-    // [HttpGet("list-phieu-cung-ung-vttb")]
-    // public async Task<>
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("list-phieu-cung-ung")]
+    public async Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync()
+    {
+        return await _muaSamVatTuService.ListSupplyTicketAsync();
+    }
 }

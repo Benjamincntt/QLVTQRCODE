@@ -21,16 +21,19 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 {
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
+    private readonly IMuaSamPhieuDeXuatRepository _muaSamPhieuDeXuatRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
 
     public MuaSamVatTuService(
         IVatTuRepository vatTuRepository,
         IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
+        IMuaSamPhieuDeXuatRepository muaSamPhieuDeXuatRepository,
         IAuthorizedContextFacade authorizedContextFacade)
     {
         _vatTuRepository = vatTuRepository;
-        _authorizedContextFacade = authorizedContextFacade;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
+        _muaSamPhieuDeXuatRepository = muaSamPhieuDeXuatRepository;
+        _authorizedContextFacade = authorizedContextFacade;
     }
 
     public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync(SupplyListRequest request)
@@ -101,4 +104,12 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return default;
         // throw new NotImplementedException();
     }
+
+    public async Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync()
+    {
+        var listPhieu = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketAsync())
+            .Adapt<IEnumerable<SupplyTicketListResponseItem>>();
+        return listPhieu;
+    }
+
 }
