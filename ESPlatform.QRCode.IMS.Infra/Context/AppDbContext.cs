@@ -351,12 +351,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PhanTramDong).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.PhanTramKemPhamChat).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.PhanTramMatPhamChat).HasColumnType("decimal(5, 2)");
-            entity.Property(e => e.SoLuongDeNghiThanhLy).HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.SoLuongDong).HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.SoLuongKemPhamChat).HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.SoLuongMatPhamChat).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongDeNghiThanhLy).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongDong).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongKemPhamChat).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongMatPhamChat).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.TsKemPcMatPc)
-                .HasColumnType("numeric(18, 0)")
+                .HasColumnType("decimal(18, 2)")
                 .HasColumnName("TS_KemPc_MatPc");
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
         });

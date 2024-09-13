@@ -38,6 +38,10 @@ public class KiemKeController : ApiControllerBase
     [HttpPatch("{vatTuId:int}/{kyKiemKeId:int}/{kyKiemKeChiTietId:int}/update-supplies-dff")]
     public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, int soLuongKiemKe, [FromBody] ModifiedSuppliesDffRequest request)
     {
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
         return await _kiemKeService.ModifySuppliesDffAsync(vatTuId, kyKiemKeId, kyKiemKeChiTietId, soLuongKiemKe, request);
     }
 
