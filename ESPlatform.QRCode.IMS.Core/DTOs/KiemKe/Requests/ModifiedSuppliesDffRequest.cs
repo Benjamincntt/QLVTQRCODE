@@ -2,11 +2,11 @@
 
 public class ModifiedSuppliesDffRequest
 {
-    public decimal? SoLuongMatPhamChat { get; set; }
+    public decimal? SoLuongMatPhamChat { get; set; } = 0;
 
-    public decimal? SoLuongKemPhamChat { get; set; }
+    public decimal? SoLuongKemPhamChat { get; set; } = 0;
 
-    public decimal? SoLuongDong { get; set; }
+    public decimal? SoLuongDong { get; set; } = 0;
 
-    public decimal? SoLuongDeNghiThanhLy { get; set; }
+    public decimal? SoLuongDeNghiThanhLy { get; set; } = 0;
 }

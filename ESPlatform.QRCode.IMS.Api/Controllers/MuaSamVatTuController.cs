@@ -33,12 +33,13 @@ public class MuaSamVatTuController : ApiControllerBase
     /// <summary>
     /// Chi tiết vật tư mua sắm
     /// </summary>
-    /// <param name="vatTuId"></param>
+    /// <param name="id">VatTuId / VatTuNewId</param>
+    /// <param name="isVatTu"></param>
     /// <returns></returns>
-    [HttpGet("{vatTuId:int}/chi-tiet-vat-tu")]
-    public async Task<PurchaseSupplyResponse> GetPurchaseSupplyAsync(int vatTuId)
+    [HttpGet("{id:int}/chi-tiet-vat-tu")]
+    public async Task<PurchasedSupplyResponse> GetPurchaseSupplyAsync(int id, bool isVatTu = true)
     {
-        return await _muaSamVatTuService.GetPurchaseSupplyAsync(vatTuId);
+        return await _muaSamVatTuService.GetPurchaseSupplyAsync(id, isVatTu);
     }
     
     /// <summary>
@@ -57,4 +58,6 @@ public class MuaSamVatTuController : ApiControllerBase
     // {
     //     return await _lapPhieuService.CreatePurchaseOrderAsync(request);
     // }
+    // [HttpGet("list-phieu-cung-ung-vttb")]
+    // public async Task<>
 }

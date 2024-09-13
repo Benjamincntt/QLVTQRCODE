@@ -47,36 +47,45 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return listVatTu;
     }
 
-    public async Task<PurchaseSupplyResponse> GetPurchaseSupplyAsync(int vatTuId)
+    public async Task<PurchasedSupplyResponse> GetPurchaseSupplyAsync(int vatTuId, bool isVatTu)
     {
-        #region validate
-        if (vatTuId <= 0)
+        if (vatTuId <= 0 )
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
         }
-        var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
-        if (vatTu == null)
-        {
-            throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
-        }
-        #endregion
         
-        var response = new PurchaseSupplyResponse();
-        response.TenVatTu = vatTu.TenVatTu;
-        response.MoTa = vatTu.MoTa ?? string.Empty;
-        var folderPath = $@"{AppConfig.Instance.Image.FolderPath}\{vatTuId}";
-        var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
-        if (Directory.Exists(folderPath))
+        var response = new PurchasedSupplyResponse();
+        // if Id is VatTuId => get information from QlvtVatTu table
+        if (isVatTu)
         {
-            var imageFiles = Directory.GetFiles(folderPath);
-            
-            foreach (var file in imageFiles)
+            var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
+            if (vatTu == null)
             {
-                var fileName = Path.GetFileName(file);
-                var fullPath = $"{urlPath}/{fileName}";
-                response.ImagePaths.Add(fullPath);
+                throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
             }
+            
+            response.TenVatTu = vatTu.TenVatTu;
+            response.ThongSoKyThuat = vatTu.MoTa ?? string.Empty;
+            var folderPath = $@"{AppConfig.Instance.Image.FolderPath}\{vatTuId}";
+            var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
+            if (Directory.Exists(folderPath))
+            {
+                var imageFiles = Directory.GetFiles(folderPath);
+
+                foreach (var file in imageFiles)
+                {
+                    var fileName = Path.GetFileName(file);
+                    var fullPath = $"{urlPath}/{fileName}";
+                    response.ImagePaths.Add(fullPath);
+                }
+            }
+            return response;
         }
+        //if Id is VatTuNewId => get information from QlvtMuaSamVatTuNew table
+        var vatTuNew = await _muaSamVatTuNewRepository.GetAsync(vatTuId);
+        if (vatTuNew == null) return response;
+        response.TenVatTu = vatTuNew.TenVatTu;
+        response.ThongSoKyThuat = vatTuNew.MoTa ?? string.Empty;
         return response;
     }
 

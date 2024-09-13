@@ -68,7 +68,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
     public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri,
         int pageIndex, int pageSize)
     {
-        var queryMain = DbContext.QlvtVatTus
+        var vatTu = DbContext.QlvtVatTus
             .GroupJoin(DbContext.QlvtKhos,
                 x => x.KhoId,
                 y => y.OrganizationId,
@@ -92,27 +92,27 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
             .Select(x => new 
             {
                 VatTuId = x.QlvtVatTu.VatTuId,
-                VatTuNewId = 0,
                 TenVatTu = x.QlvtVatTu.TenVatTu,
                 DonViTinh = x.QlvtVatTu.DonViTinh,
+                IsVatTu = true,
             });
         // Query cho dữ liệu mới
-        var queryNew = DbContext.QlvtMuaSamVatTuNews
+        var vatTuNew = DbContext.QlvtMuaSamVatTuNews
             .Where(x => tenVatTu == string.Empty || x.TenVatTu.ToLower().Contains(tenVatTu.ToLower()))
             .Where(x => maVatTu == string.Empty)
             .Where(x => idKho == 0)
             .Where(x => idViTri == 0)
             .Select(x => new 
             {
-                VatTuId = 0,
-                VatTuNewId = x.VatTuNewId,
+                VatTuId = x.VatTuNewId,
                 TenVatTu = x.TenVatTu,
                 DonViTinh = x.DonViTinh,
+                IsVatTu = false,
             });
 
         // Kết hợp cả hai query
-        var combinedQuery = queryMain
-            .Union(queryNew)
+        var combinedQuery = vatTu
+            .Union(vatTuNew)
             .OrderBy(x => x.TenVatTu)
             ;
 

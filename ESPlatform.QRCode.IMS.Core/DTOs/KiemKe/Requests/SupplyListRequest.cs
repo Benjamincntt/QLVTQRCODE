@@ -11,4 +11,6 @@ public class SupplyListRequest : PagingFilter
     public int IdKho { get; set; } = 0;
 
     public int IdViTri { get; set; } = 0;
+    
+    public bool IsVatTu { get; set; } = false;
 }

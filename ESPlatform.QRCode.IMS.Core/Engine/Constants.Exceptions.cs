@@ -23,6 +23,7 @@ public static partial class Constants {
 				public const string NotExistSupply = "Vật tư không tồn tại";
 				public const string ExistedSupplyName = "Tên vật tư đã tồn tại";
 				public const string ExistedSupplyCode = "Mã vật tư đã tồn tại";
+				public const string InvalidNewId = "Id vật tư mới không hợp lệ";
 			}
 
 			public static class Login {

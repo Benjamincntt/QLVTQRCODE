@@ -4,10 +4,9 @@ public class SupplyListResponseItem
 {
     public int VatTuId { get; set; }
     
-    public int VatTuNewId { get; set; }
-    
     public string TenVatTu { get; set; } = string.Empty;
     
     public string DonViTinh { get; set; } = string.Empty;
     
+    public bool IsVatTu { get; set; }
 }
