@@ -23,7 +23,7 @@ public class CommonController: ApiControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPatch("{vatTuId:int}/{idViTri:int}")]
-    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, int idViTri, [FromBody]ModifiedSuppliesLocationRequest request) {
+    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, [FromBody]ModifiedSuppliesLocationRequest request, int idViTri = 0) {
         return await _commonService.ModifySuppliesLocationAsync(vatTuId, idViTri, request);
     }
 

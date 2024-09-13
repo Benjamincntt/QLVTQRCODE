@@ -33,7 +33,9 @@ public static partial class Constants {
 				public const string InvalidKyKiemKeId = "Id kỳ kiểm kê không hợp lệ";
 				public const string InvalidKyKiemKeChiTietId = "Id kỳ kiểm kê chi tiết không hợp lệ";
 				public const string InvalidSoLuongKiemKe = "Số lượng kiểm kê không hợp lệ";
-
+				public const string InvalidToTalMatVaKemPhamChat = "Tổng số lượng mất và kém phẩm chất không được vượt quá số lượng kiểm kê";
+				public const string InvalidSoLuongUDong = "Số lượng ứ đọng không được vượt quá số lượng kiểm kê";
+				public const string InvalidSoLuongDeNghiThanhLy = "Số lượng đề nghị thanh lý không được vượt quá số lượng kiểm kê";
 			}
 		}
 	}

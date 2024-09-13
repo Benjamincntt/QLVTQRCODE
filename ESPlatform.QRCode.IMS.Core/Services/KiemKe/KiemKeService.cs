@@ -133,6 +133,9 @@ public class KiemKeService : IKiemKeService
     
     public async Task<int> ModifySuppliesDffAsync(int vatTuId,int kyKiemKeId, int kyKiemKeChiTietId, int soLuongKiemKe, ModifiedSuppliesDffRequest request)
     {
+        #region Validate
+        
+        await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesDffRequestValidation());
         if (vatTuId < 1)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
@@ -151,7 +154,21 @@ public class KiemKeService : IKiemKeService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidSoLuongKiemKe);
         }
-        await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesDffRequestValidation());
+
+        if (soLuongKiemKe < request.SoLuongMatPhamChat + request.SoLuongKemPhamChat  )
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidToTalMatVaKemPhamChat);
+        }
+        if (soLuongKiemKe < request.SoLuongDong )
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidSoLuongUDong);
+        }
+
+        if (soLuongKiemKe < request.SoLuongDeNghiThanhLy )
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidSoLuongDeNghiThanhLy);
+        }
+        #endregion
         
         var currentSuppliesDff = await _kyKiemKeChiTietDffRepository.GetAsync(x => x.VatTuId == vatTuId && x.KyKiemKeChiTietId == kyKiemKeChiTietId);
         // if has no DFF => create
@@ -175,7 +192,7 @@ public class KiemKeService : IKiemKeService
         // has DFF => update
         var dffToUpdate = _mapper.Map(request, currentSuppliesDff);
         if (soLuongKiemKe > 0)
-        {
+        {   
             dffToUpdate.PhanTramMatPhamChat = request.SoLuongMatPhamChat / soLuongKiemKe * 100;
             dffToUpdate.PhanTramKemPhamChat = request.SoLuongKemPhamChat / soLuongKiemKe * 100;
             dffToUpdate.PhanTramDong = request.SoLuongDong / soLuongKiemKe * 100;

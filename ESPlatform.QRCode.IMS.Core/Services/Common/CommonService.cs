@@ -29,7 +29,7 @@ public class CommonService : ICommonService
     {
         #region validate
         
-        if (vatTuId < 1 || idViTri < 1)
+        if (vatTuId < 1 || idViTri < 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
         }
@@ -43,17 +43,35 @@ public class CommonService : ICommonService
         await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesLocationRequestValidation());
         
         #endregion
+        
         // check existed location in db
         var vitri = await _vatTuViTriRepository.GetAsync(x => x.IdVatTu == vatTuId && x.IdViTri == idViTri);
         if (vitri == null)
         {
             throw new NotFoundException(vitri.GetTypeEx(), idViTri.ToString()); 
         }
+        if (idViTri == 0) 
+        {
+            vitri.IdToMay = request.IdToMay;
+            vitri.IdGiaKe = request.IdGiaKe;
+            vitri.IdNgan = request.IdNgan;
+            vitri.IdHop = request.IdHop;
+            var chuoiToAdd = new[] 
+            { 
+                string.IsNullOrEmpty(request.TenToMay) ? null : $"{request.TenToMay}",
+                string.IsNullOrEmpty(request.TenGiaKe) ? null : $"{request.TenGiaKe}",
+                string.IsNullOrEmpty(request.TenNgan) ? null : $"{request.TenNgan}",
+                string.IsNullOrEmpty(request.TenHop) ? null : $"{request.TenHop}"
+            };
+        
+            vitri.ViTri = string.Join(" -> ", chuoiToAdd.Where(c => !string.IsNullOrEmpty(c)));
+            return await _vatTuViTriRepository.UpdateAsync(vitri);
+        }
         vitri.IdToMay = request.IdToMay;
         vitri.IdGiaKe = request.IdGiaKe;
         vitri.IdNgan = request.IdNgan;
         vitri.IdHop = request.IdHop;
-        var chuoiKetHop = new[] 
+        var chuoiToUpdate = new[] 
         { 
             string.IsNullOrEmpty(request.TenToMay) ? null : $"{request.TenToMay}",
             string.IsNullOrEmpty(request.TenGiaKe) ? null : $"{request.TenGiaKe}",
@@ -61,7 +79,7 @@ public class CommonService : ICommonService
             string.IsNullOrEmpty(request.TenHop) ? null : $"{request.TenHop}"
         };
         
-        vitri.ViTri = string.Join(" -> ", chuoiKetHop.Where(c => !string.IsNullOrEmpty(c)));
+        vitri.ViTri = string.Join(" -> ", chuoiToUpdate.Where(c => !string.IsNullOrEmpty(c)));
         return await _vatTuViTriRepository.UpdateAsync(vitri);
     }
 
