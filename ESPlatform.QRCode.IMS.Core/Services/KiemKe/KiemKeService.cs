@@ -48,8 +48,9 @@ public class KiemKeService : IKiemKeService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
         }
+
         var response = new InventoryCheckResponse();
-        
+
         // KyKiemKeId
         var kiKiemKeChinh = await _kyKiemKeRepository.GetAsync(x => x.KyKiemKeChinh == 1);
         if (kiKiemKeChinh != null) response.KyKiemKeId = kiKiemKeChinh.Id;
@@ -90,7 +91,8 @@ public class KiemKeService : IKiemKeService
 
 
         // kỳ kiểm kê
-        var inventoryCheckInformation = await _vatTuRepository.GetInventoryCheckInformationAsync(vatTuId, response.KyKiemKeId);
+        var inventoryCheckInformation =
+            await _vatTuRepository.GetInventoryCheckInformationAsync(vatTuId, response.KyKiemKeId);
         if (inventoryCheckInformation != null)
         {
             var inventoryCheckInformationMapper =
@@ -101,8 +103,12 @@ public class KiemKeService : IKiemKeService
             response.SoLuongKiemKe = inventoryCheckInformationMapper.SoLuongKiemKe;
             response.SoLuongChenhLech = inventoryCheckInformationMapper.SoLuongChenhLech;
         }
+
         // DFF
-        response.SupplyDff = (await _kyKiemKeChiTietDffRepository.GetAsync(x => x.VatTuId == vatTu.VatTuId && x.KyKiemKeChiTietId == response.KyKiemKeChiTietId)).Adapt<SupplyDffResponse>();
+        response.SupplyDff =
+            (await _kyKiemKeChiTietDffRepository.GetAsync(x =>
+                x.VatTuId == vatTu.VatTuId && x.KyKiemKeChiTietId == response.KyKiemKeChiTietId))
+            .Adapt<SupplyDffResponse>();
 
         // vị trí kho chính và phụ
         var warehouse = await _khoRepository.GetAsync(x => x.OrganizationId == vatTu.KhoId);
@@ -112,7 +118,7 @@ public class KiemKeService : IKiemKeService
             if (warehouse.SubInventoryCode != null) response.SubInventoryCode = warehouse.SubInventoryCode;
             if (warehouse.SubInventoryName != null) response.SubInventoryName = warehouse.SubInventoryName;
         }
-        
+
         // vị trí chi tiết trong kho
         var positions = (await _vatTuRepository.GetPositionAsync(vatTuId)).Adapt<IEnumerable<SuppliesLocation>>()
             .ToList();
@@ -130,52 +136,58 @@ public class KiemKeService : IKiemKeService
         return response;
     }
 
-    
-    public async Task<int> ModifySuppliesDffAsync(int vatTuId,int kyKiemKeId, int kyKiemKeChiTietId, int soLuongKiemKe, ModifiedSuppliesDffRequest request)
+
+    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, int soLuongKiemKe,
+        ModifiedSuppliesDffRequest request)
     {
         #region Validate
-        
+
         await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesDffRequestValidation());
         if (vatTuId < 1)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
         }
+
         if (kyKiemKeId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidKyKiemKeId);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKeId);
         }
 
-        if ( kyKiemKeChiTietId < 1 )
+        if (kyKiemKeChiTietId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidKyKiemKeChiTietId);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKeChiTietId);
         }
 
         if (soLuongKiemKe < 0)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidSoLuongKiemKe);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidSoLuongKiemKe);
         }
 
-        if (soLuongKiemKe < request.SoLuongMatPhamChat + request.SoLuongKemPhamChat  )
+        if (soLuongKiemKe < request.SoLuongMatPhamChat + request.SoLuongKemPhamChat)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidToTalMatVaKemPhamChat);
-        }
-        if (soLuongKiemKe < request.SoLuongDong )
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidSoLuongUDong);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidToTalMatVaKemPhamChat);
         }
 
-        if (soLuongKiemKe < request.SoLuongDeNghiThanhLy )
+        if (soLuongKiemKe < request.SoLuongDong)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidSoLuongDeNghiThanhLy);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidSoLuongUDong);
         }
+
+        if (soLuongKiemKe < request.SoLuongDeNghiThanhLy)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidSoLuongDeNghiThanhLy);
+        }
+
         #endregion
-        
-        var currentSuppliesDff = await _kyKiemKeChiTietDffRepository.GetAsync(x => x.VatTuId == vatTuId && x.KyKiemKeChiTietId == kyKiemKeChiTietId);
+
+        var currentSuppliesDff =
+            await _kyKiemKeChiTietDffRepository.GetAsync(x =>
+                x.VatTuId == vatTuId && x.KyKiemKeChiTietId == kyKiemKeChiTietId);
         // if has no DFF => create
         if (currentSuppliesDff == null)
         {
             var dffToCreate = new QlvtKyKiemKeChiTietDff();
-            
+
             dffToCreate.VatTuId = vatTuId;
             dffToCreate.KyKiemKeChiTietId = kyKiemKeChiTietId;
             if (soLuongKiemKe > 0)
@@ -185,38 +197,44 @@ public class KiemKeService : IKiemKeService
                 dffToCreate.PhanTramDong = request.SoLuongDong / soLuongKiemKe * 100;
                 dffToCreate.TsKemPcMatPc = request.SoLuongMatPhamChat + request.SoLuongKemPhamChat;
             }
-            
+
             var responseToCreate = _mapper.Map(request, dffToCreate);
             return await _kyKiemKeChiTietDffRepository.InsertAsync(responseToCreate);
         }
+
         // has DFF => update
         var dffToUpdate = _mapper.Map(request, currentSuppliesDff);
         if (soLuongKiemKe > 0)
-        {   
+        {
             dffToUpdate.PhanTramMatPhamChat = request.SoLuongMatPhamChat / soLuongKiemKe * 100;
             dffToUpdate.PhanTramKemPhamChat = request.SoLuongKemPhamChat / soLuongKiemKe * 100;
             dffToUpdate.PhanTramDong = request.SoLuongDong / soLuongKiemKe * 100;
             dffToUpdate.TsKemPcMatPc = request.SoLuongMatPhamChat + request.SoLuongKemPhamChat;
         }
+
         return await _kyKiemKeChiTietDffRepository.UpdateAsync(dffToUpdate);
     }
 
-    public async Task<int> ModifySuppliesQtyAsync(int vatTuId,int kyKiemKeId, int soLuongKiemKe)
+    public async Task<int> ModifySuppliesQtyAsync(int vatTuId, int kyKiemKeId, int soLuongKiemKe)
     {
         if (vatTuId < 1)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
         }
+
         if (kyKiemKeId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidKyKiemKeId);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKeId);
         }
+
         if (soLuongKiemKe < 0)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.KyKiemKe.InvalidSoLuongKiemKe);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidSoLuongKiemKe);
         }
+
         //var kyKiemkeId = _authorizedContextFacade.KyKiemKeId;
-        var kyKiemKeChiTiet = await _kyKiemKeChiTietRepository.GetAsync(x => x.KyKiemKeId == kyKiemKeId && x.VatTuId == vatTuId);
+        var kyKiemKeChiTiet =
+            await _kyKiemKeChiTietRepository.GetAsync(x => x.KyKiemKeId == kyKiemKeId && x.VatTuId == vatTuId);
         // has no QTY => create new 
         if (kyKiemKeChiTiet == null)
         {
@@ -227,8 +245,9 @@ public class KiemKeService : IKiemKeService
             qtyToCreate.SoLuongChenhLech = soLuongKiemKe;
             qtyToCreate.SoLuongSoSach = 0;
             qtyToCreate.NgayKiemKe = DateTime.Now;
-            return await _kyKiemKeChiTietRepository.InsertAsync(qtyToCreate);   
+            return await _kyKiemKeChiTietRepository.InsertAsync(qtyToCreate);
         }
+
         // has QTY => update
         kyKiemKeChiTiet.SoLuongKiemKe = soLuongKiemKe;
         kyKiemKeChiTiet.SoLuongChenhLech = soLuongKiemKe - kyKiemKeChiTiet.SoLuongSoSach;
@@ -240,5 +259,16 @@ public class KiemKeService : IKiemKeService
     {
         var response = (await _kyKiemKeRepository.ListInputAsync()).Adapt<List<InventoryCheckListResponseItem>>();
         return response;
+    }
+
+    public async Task<QlvtKyKiemKe> GetCurrentInventoryCheckAsync()
+    {
+        var currentInventoryCheck = await _kyKiemKeRepository.GetAsync(x => x.KyKiemKeChinh == 1);
+        if (currentInventoryCheck == null)
+        {
+            throw new NotFoundException(Constants.Exceptions.Messages.InventoryCheck.NotFoundKyKiemKeChinh);
+        }
+
+        return currentInventoryCheck;
     }
 }

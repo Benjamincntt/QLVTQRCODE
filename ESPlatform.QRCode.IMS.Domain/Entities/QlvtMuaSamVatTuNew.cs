@@ -10,5 +10,5 @@ public partial class QlvtMuaSamVatTuNew
 
     public string? GhiChu { get; set; }
 
-    public string? MoTa { get; set; }
+    public string? ThongSoKyThuat { get; set; }
 }

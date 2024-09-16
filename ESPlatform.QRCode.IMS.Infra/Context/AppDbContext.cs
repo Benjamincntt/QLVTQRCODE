@@ -1,4 +1,5 @@
 ﻿using ESPlatform.QRCode.IMS.Domain.Entities;
+using ESPlatform.QRCode.IMS.Test._Scaffold;
 using Microsoft.EntityFrameworkCore;
 
 namespace ESPlatform.QRCode.IMS.Infra.Context;
@@ -27,6 +28,10 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<QlvtKyKiemKeChiTietDff> QlvtKyKiemKeChiTietDffs { get; set; }
 
     public virtual DbSet<QlvtKyKiemKeChiTietDffBackup> QlvtKyKiemKeChiTietDffBackups { get; set; }
+
+    public virtual DbSet<QlvtKyKiemKeChiTietErpDemo> QlvtKyKiemKeChiTietErpDemos { get; set; }
+
+    public virtual DbSet<QlvtKyKiemKeErpDemo> QlvtKyKiemKeErpDemos { get; set; }
 
     public virtual DbSet<QlvtMuaSamPhieuDeXuat> QlvtMuaSamPhieuDeXuats { get; set; }
 
@@ -382,6 +387,64 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
         });
 
+        modelBuilder.Entity<QlvtKyKiemKeChiTietErpDemo>(entity =>
+        {
+            entity.HasKey(e => e.KyKiemKeChiTietId);
+
+            entity.ToTable("QLVT_KyKiemKe_ChiTiet_ERP_Demo");
+
+            entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
+            entity.Property(e => e.KhoChinhId).HasColumnName("KhoChinh_Id");
+            entity.Property(e => e.KhoPhuId).HasColumnName("KhoPhu_Id");
+            entity.Property(e => e.KyKiemKeId).HasColumnName("KyKiemKe_Id");
+            entity.Property(e => e.NgayKiemKe).HasColumnType("datetime");
+            entity.Property(e => e.NguoiKiemKeId).HasColumnName("NguoiKiemKe_Id");
+            entity.Property(e => e.NguoiKiemKeTen)
+                .HasMaxLength(50)
+                .HasColumnName("NguoiKiemKe_Ten");
+            entity.Property(e => e.SoLuongChenhLech).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongKiemKe).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongSoSach).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoThe)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+        });
+
+        modelBuilder.Entity<QlvtKyKiemKeErpDemo>(entity =>
+        {
+            entity.HasKey(e => e.KyKiemKeId);
+
+            entity.ToTable("QLVT_KyKiemKe_ERP_Demo");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(250)
+                .HasColumnName("description");
+            entity.Property(e => e.EndTag)
+                .HasMaxLength(50)
+                .HasColumnName("end_tag");
+            entity.Property(e => e.FreezeDate)
+                .HasColumnType("datetime")
+                .HasColumnName("freeze_date");
+            entity.Property(e => e.OrganizationCode)
+                .HasMaxLength(50)
+                .HasColumnName("organization_code");
+            entity.Property(e => e.OrganizationId).HasColumnName("organization_id");
+            entity.Property(e => e.PhysicalInventoryDate)
+                .HasColumnType("datetime")
+                .HasColumnName("physical_inventory_date");
+            entity.Property(e => e.PhysicalInventoryId).HasColumnName("physical_inventory_id");
+            entity.Property(e => e.PhysicalInventoryName)
+                .HasMaxLength(250)
+                .HasColumnName("physical_inventory_name");
+            entity.Property(e => e.StartTag)
+                .HasMaxLength(50)
+                .HasColumnName("start_tag");
+            entity.Property(e => e.UserName)
+                .HasMaxLength(50)
+                .HasColumnName("user_name");
+        });
+
         modelBuilder.Entity<QlvtMuaSamPhieuDeXuat>(entity =>
         {
             entity.ToTable("QLVT_MuaSam_PhieuDeXuat");
@@ -401,9 +464,7 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(10)
                 .IsFixedLength();
             entity.Property(e => e.MoTa).HasMaxLength(2000);
-            entity.Property(e => e.TenPhieu)
-                .HasMaxLength(10)
-                .IsFixedLength();
+            entity.Property(e => e.TenPhieu).HasMaxLength(500);
         });
 
         modelBuilder.Entity<QlvtMuaSamPhieuDeXuatDetail>(entity =>
@@ -412,11 +473,14 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.DonViTinh).HasMaxLength(50);
+            entity.Property(e => e.GhiChu).HasMaxLength(1000);
             entity.Property(e => e.IdVatTu)
                 .HasComment("Nếu IDVatTu tồn tại thì vật tư được lấy từ hệ thông ERP, nếu không tồn tại thì Vật tư đc thêm mới vào phiếu đề xuất")
                 .HasColumnName("IDVatTu");
-            entity.Property(e => e.MaVatTu).HasMaxLength(50);
-            entity.Property(e => e.MoTa).HasMaxLength(1000);
+            entity.Property(e => e.IsSystemSupply)
+                .HasDefaultValueSql("((1))")
+                .HasComment("0: Vật tư chưa có trong hệ thống, 1: vật tư đã có trong hệ thống");
+            entity.Property(e => e.PhieuDeXuatId).HasComment("Id phiếu đề xuất");
             entity.Property(e => e.TenVatTu).HasMaxLength(250);
             entity.Property(e => e.XuatXu).HasMaxLength(50);
         });
@@ -441,8 +505,8 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.DonViTinh).HasMaxLength(100);
             entity.Property(e => e.GhiChu).HasColumnType("text");
-            entity.Property(e => e.MoTa).HasColumnType("text");
             entity.Property(e => e.TenVatTu).HasMaxLength(100);
+            entity.Property(e => e.ThongSoKyThuat).HasColumnType("text");
         });
 
         modelBuilder.Entity<QlvtVatTu>(entity =>
@@ -461,6 +525,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.MaVatTu)
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.MoTa).HasComment("Thông số kỹ thuật");
             entity.Property(e => e.NgayTao).HasColumnType("datetime");
             entity.Property(e => e.NguoiTao).HasMaxLength(100);
             entity.Property(e => e.NguoiTaoId).HasColumnName("NguoiTao_Id");

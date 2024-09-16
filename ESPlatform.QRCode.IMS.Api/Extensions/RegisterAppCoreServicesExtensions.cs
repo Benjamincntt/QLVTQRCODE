@@ -50,6 +50,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IKyKiemKeRepository, KyKiemKeRepository>()
             .AddScoped<IMuaSamPhieuDeXuatRepository, MuaSamPhieuDeXuatRepository>()
             .AddScoped<IMuaSamVatTuNewRepository, MuaSamVatTuNewRepository>()
+            .AddScoped<IMuaSamPhieuDeXuatDetailRepository, MuaSamPhieuDeXuatDetailRepository>()
 
             // Facades
             .AddScoped<IAuthorizedContextFacade, AuthorizedContextFacade>()

@@ -11,6 +11,6 @@ public class CreatedSupplyRequestValidation: AbstractValidator<CreatedSupplyRequ
         RuleFor(x => x.TenVatTu).ValidateStringDefault(false);
         RuleFor(x => x.DonViTinh).ValidateStringDefault();
         RuleFor(x => x.GhiChu).ValidateStringDefault();
-        RuleFor(x => x.MoTa).ValidateStringDefault();
+        RuleFor(x => x.ThongSoKyThuat).ValidateStringDefault();
     }
 }

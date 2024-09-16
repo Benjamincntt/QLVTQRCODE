@@ -8,5 +8,5 @@ public class SupplyListResponseItem
     
     public string DonViTinh { get; set; } = string.Empty;
     
-    public bool IsVatTu { get; set; }
+    public bool IsSystemSupply { get; set; }
 }

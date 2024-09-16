@@ -1,7 +1,6 @@
 ### Danh sách vật tư
 GET {{host}}/{{muaSamVatTuPath}}
 Content-Type: application/json
-kikiemke-id: {{kikiemkeId}}
 Authorization: Bearer {{accessToken}}
 
 ### Chi tiết vật tư mua sắm
@@ -13,7 +12,6 @@ Authorization: Bearer {{accessToken}}
 ### Thêm mới vật tư k có trong hệ thống
 POST {{host}}/{{muaSamVatTuPath}}/them-moi-vat-tu
 Content-Type: application/json
-kikiemke-id: {{kikiemkeId}}
 Authorization: Bearer {{accessToken}}
 
 {
@@ -22,3 +20,59 @@ Authorization: Bearer {{accessToken}}
   "ghiChu": "200 mét, có bọc xốp",
   "moTa": "hàng loại 1"
 }
+
+
+### Danh sách Phiếu cung ứng
+GET {{host}}/{{muaSamVatTuPath}}/list-phieu-cung-ung
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+
+### Thêm mới phiếu cung ứng
+POST {{host}}/{{muaSamVatTuPath}}/them-phieu-cung-ung
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Thêm nhiều vật tư vào phiếu đề xuất
+POST {{host}}/{{muaSamVatTuPath}}/{{supplyTicketId}}/them-nhieu-vat-tu
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+[
+  {
+    "idVatTu": 4,
+    "tenVatTu": "fuchsyloken",
+    "donViTinh": "CHai",
+    "isSystemSupply": true,
+    "soLuong": 10,
+    "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
+    "ghiChu": ""
+  },
+  {
+    "idVatTu": 4,
+    "tenVatTu": "fuchsyloken",
+    "donViTinh": "CHai",
+    "isSystemSupply": true,
+    "soLuong": 10,
+    "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
+    "ghiChu": ""
+  },
+  {
+    "idVatTu": 1006,
+    "tenVatTu": "Cáp điện tròn phi 18",
+    "donViTinh": "mét",
+    "isSystemSupply": true,
+    "soLuong": 1000,
+    "thongSoKyThuat": "hàng loại 1",
+    "ghiChu": "200 mét, có bọc xốp"
+  },
+  {
+    "idVatTu": 2,
+    "tenVatTu": "Ống nhựa HDPE Toàn Thắng",
+    "donViTinh": "mét",
+    "isSystemSupply": false,
+    "soLuong": 1000,
+    "thongSoKyThuat": "màu xanh",
+    "ghiChu": "1000 mét phi 20"
+  }
+]

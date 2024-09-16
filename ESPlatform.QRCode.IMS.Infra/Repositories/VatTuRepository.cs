@@ -94,7 +94,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 VatTuId = x.QlvtVatTu.VatTuId,
                 TenVatTu = x.QlvtVatTu.TenVatTu,
                 DonViTinh = x.QlvtVatTu.DonViTinh,
-                IsVatTu = true,
+                IsSystemSupply = true,
             });
         // Query cho dữ liệu mới
         var vatTuNew = DbContext.QlvtMuaSamVatTuNews
@@ -107,7 +107,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 VatTuId = x.VatTuNewId,
                 TenVatTu = x.TenVatTu,
                 DonViTinh = x.DonViTinh,
-                IsVatTu = false,
+                IsSystemSupply = false,
             });
 
         // Kết hợp cả hai query

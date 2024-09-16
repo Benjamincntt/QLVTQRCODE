@@ -12,5 +12,5 @@ public class SupplyListRequest : PagingFilter
 
     public int IdViTri { get; set; } = 0;
     
-    public bool IsVatTu { get; set; } = false;
+    public bool IsSystemSupply { get; set; } = false;
 }

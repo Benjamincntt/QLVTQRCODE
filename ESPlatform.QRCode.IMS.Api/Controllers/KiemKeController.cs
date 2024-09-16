@@ -2,6 +2,7 @@
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 using ESPlatform.QRCode.IMS.Core.Services.KiemKe;
+using ESPlatform.QRCode.IMS.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ESPlatform.QRCode.IMS.Api.Controllers;
@@ -62,5 +63,15 @@ public class KiemKeController : ApiControllerBase
     public async Task<IEnumerable<InventoryCheckListResponseItem>> ListAsync()
     {
         return await _kiemKeService.ListAsync();
+    }
+    
+    /// <summary>
+    /// Hiển thị kỳ kiểm kê hiện tại
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("current-inventory-check")]
+    public async Task<QlvtKyKiemKe> GetCurrentInventoryCheckAsync()
+    {
+        return await _kiemKeService.GetCurrentInventoryCheckAsync();
     }
 }

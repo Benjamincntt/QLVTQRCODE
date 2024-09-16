@@ -34,12 +34,12 @@ public class MuaSamVatTuController : ApiControllerBase
     /// Chi tiết vật tư mua sắm
     /// </summary>
     /// <param name="id">VatTuId / VatTuNewId</param>
-    /// <param name="isVatTu"></param>
+    /// <param name="isSystemSupply"></param>
     /// <returns></returns>
     [HttpGet("{id:int}/chi-tiet-vat-tu")]
-    public async Task<PurchasedSupplyResponse> GetPurchaseSupplyAsync(int id, bool isVatTu = true)
+    public async Task<PurchasedSupplyResponse> GetPurchaseSupplyAsync(int id, bool isSystemSupply = true)
     {
-        return await _muaSamVatTuService.GetPurchaseSupplyAsync(id, isVatTu);
+        return await _muaSamVatTuService.GetPurchaseSupplyAsync(id, isSystemSupply);
     }
     
     /// <summary>
@@ -53,14 +53,18 @@ public class MuaSamVatTuController : ApiControllerBase
         return await _muaSamVatTuService.CreateSupplyAsync(request);
     }
     
-    // [HttpPost()]
-    // public async Task<int> CreatePurchaseOrderAsync([FromBody]CreatedPurchaseOrderRequest request)
-    // {
-    //     return await _lapPhieuService.CreatePurchaseOrderAsync(request);
-    // }
+    /// <summary>
+    /// Thêm mới phiếu cung ứng
+    /// </summary>
+    /// <returns>Id phiếu cung ứng</returns>
+    [HttpPost("them-phieu-cung-ung")]
+    public async Task<int> CreateSupplyTicketAsync()
+    {
+        return await _muaSamVatTuService.CreateSupplyTicketAsync();
+    }
     
     /// <summary>
-    /// 
+    /// Danh sách Phiếu cung ứng
     /// </summary>
     /// <returns></returns>
     [HttpGet("list-phieu-cung-ung")]
@@ -68,4 +72,17 @@ public class MuaSamVatTuController : ApiControllerBase
     {
         return await _muaSamVatTuService.ListSupplyTicketAsync();
     }
+    
+    /// <summary>
+    /// Thêm nhiều vật tư vào phiếu đề xuất
+    /// </summary>
+    /// <param name="supplyTicketId"> Id phiếu đề xuất </param>
+    /// <param name="requests"> danh sách các vật tư được chọn </param>
+    /// <returns> Số bản ghi được thêm </returns>
+    [HttpPost("{supplyTicketId:int}/them-nhieu-vat-tu")]
+    public async Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests)
+    {
+        return await _muaSamVatTuService.CreateManySupplyTicketDetailAsync(supplyTicketId, requests);
+    }
+    
 }

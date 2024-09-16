@@ -34,6 +34,12 @@ Content-Type: application/json
 kikiemke-id: {{kikiemkeId}}
 Authorization: Bearer {{accessToken}}
 
+### Hiển thị kỳ kiểm kê hiện tại
+GET {{host}}/{{kiemkePath}}/current-inventory-check
+Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
+Authorization: Bearer {{accessToken}}
+
 
 
 

@@ -1,7 +1,10 @@
-﻿namespace ESPlatform.QRCode.IMS.Domain.Entities;
+﻿using System.ComponentModel;
 
+namespace ESPlatform.QRCode.IMS.Domain.Entities;
+[DisplayName("Phiếu đề xuất")]
 public partial class QlvtMuaSamPhieuDeXuat
-{
+{   
+    [DisplayName("Id Phiếu đề xuất")]
     public int Id { get; set; }
 
     public string? MaPhieu { get; set; }
