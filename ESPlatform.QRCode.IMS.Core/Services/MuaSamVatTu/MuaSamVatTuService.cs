@@ -119,8 +119,16 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return addedSupplyTicket.Id;
     }
 
-    public async Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync()
+    public async Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync(DateTime? date)
     {
+        if (date != null)
+        {
+            var startTime = date.Value.Date;
+            var endTime = startTime.AddDays(1).AddTicks(-1);
+            var listPhieuByTime = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketByTimeAsync(startTime, endTime))
+                .Adapt<IEnumerable<SupplyTicketListResponseItem>>();
+            return listPhieuByTime;
+        }
         var listPhieu = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketAsync())
             .Adapt<IEnumerable<SupplyTicketListResponseItem>>();
         return listPhieu;
@@ -160,6 +168,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             .ToList();
         foreach (var vatTu in groupedRequests)
         {   
+            await ValidationHelper.ValidateAsync(vatTu, new SupplyTicketDetailRequestValidation());
             var supplyTicketDetail = vatTu.Adapt<QlvtMuaSamPhieuDeXuatDetail>();
             supplyTicketDetail.PhieuDeXuatId = supplyTicketId;
             listSupplyTicketDetail.Add(supplyTicketDetail);

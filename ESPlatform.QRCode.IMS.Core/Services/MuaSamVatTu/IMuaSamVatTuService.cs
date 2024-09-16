@@ -12,6 +12,6 @@ public interface IMuaSamVatTuService
     Task<PurchasedSupplyResponse> GetPurchaseSupplyAsync(int id, bool isSystemSupply);
     Task<int> CreateSupplyAsync(CreatedSupplyRequest request);
     Task<int> CreateSupplyTicketAsync();
-    Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync();
+    Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync(DateTime? date);
     Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests);
 }

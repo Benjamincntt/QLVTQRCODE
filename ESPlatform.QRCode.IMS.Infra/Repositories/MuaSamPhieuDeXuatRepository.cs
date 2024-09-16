@@ -26,4 +26,20 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
             });
         return await query.ToListAsync();
     }
+
+    public async Task<IEnumerable<dynamic>> ListSupplyTicketByTimeAsync(DateTime startTime, DateTime endTime)
+    {
+        var query = DbContext.QlvtMuaSamPhieuDeXuats
+            .Where(x => x.NgayThem >= startTime && x.NgayThem <= endTime)
+            .OrderByDescending(x => x.NgayThem)
+            .ThenBy(x => x.TrangThai)
+            .Select(x => new
+            {
+                x.NgayThem,
+                x.TenPhieu,
+                x.MoTa,
+                x.TrangThai,
+            });
+        return await query.ToListAsync();
+    }
 }
