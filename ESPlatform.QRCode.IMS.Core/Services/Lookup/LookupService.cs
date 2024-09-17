@@ -1,5 +1,5 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
-using ESPlatform.QRCode.IMS.Core.DTOs.Lookup.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.TraCuu.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;

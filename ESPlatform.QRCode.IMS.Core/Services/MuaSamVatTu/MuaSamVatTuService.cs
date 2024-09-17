@@ -1,5 +1,6 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
@@ -53,14 +54,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return listVatTu;
     }
 
-    public async Task<PurchasedSupplyResponse> GetPurchaseSupplyAsync(int vatTuId, bool isSystemSupply)
+    public async Task<SupplyOrderDetailResponse> GetPurchaseSupplyAsync(int vatTuId, bool isSystemSupply)
     {
         if (vatTuId <= 0 )
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
         }
         
-        var response = new PurchasedSupplyResponse();
+        var response = new SupplyOrderDetailResponse();
         // if Id is VatTuId => get information from QlvtVatTu table
         if (isSystemSupply)
         {
@@ -70,8 +71,9 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
             }
             
-            response.TenVatTu = vatTu.TenVatTu;
+            response.TenVatTu = vatTu.TenVatTu ?? string.Empty;
             response.ThongSoKyThuat = vatTu.MoTa ?? string.Empty;
+            response.GhiChu = vatTu.GhiChu ?? string.Empty;
             var folderPath = $@"{AppConfig.Instance.Image.FolderPath}\{vatTuId}";
             var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
             if (Directory.Exists(folderPath))
@@ -102,10 +104,11 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return await _muaSamVatTuNewRepository.InsertAsync(vatTu);  
     }
 
-    public async Task<int> CreateSupplyTicketAsync()
+    public async Task<int> CreateSupplyTicketAsync(string moTa)
     {
         var supplyTicket = new QlvtMuaSamPhieuDeXuat();
         supplyTicket.TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
+        supplyTicket.MoTa = moTa;
         supplyTicket.TrangThai = (byte?)PurchaseOrderStatus.Unsigned;
         supplyTicket.NgayThem = DateTime.Now;
         supplyTicket.MaNguoiThem = _authorizedContextFacade.AccountId;
@@ -174,5 +177,45 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             listSupplyTicketDetail.Add(supplyTicketDetail);
         }
         return await _muaSamPhieuDeXuatDetailRepository.InsertManyAsync(listSupplyTicketDetail);
+    }
+
+    public async Task<SupplyTicketDetailResponse> GetSupplyTicketDetailAsync(int supplyTicketId)
+    {
+        var response = new SupplyTicketDetailResponse();
+        if (supplyTicketId <= 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.SupplyTicket.InvalidId);
+        }
+        var supplyTicket = await _muaSamPhieuDeXuatRepository.GetAsync(x => x.Id == supplyTicketId);
+        if (supplyTicket == null)
+        {
+            throw new NotFoundException(supplyTicket.GetTypeEx(), supplyTicketId.ToString());
+        }
+        response.TenPhieu = supplyTicket.TenPhieu ?? string.Empty;
+        response.MoTa = supplyTicket.MoTa ?? string.Empty;
+        var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId))
+            .Adapt<IEnumerable<SupplyResponse>>();
+        response.DanhSachVatTu = listSupplies.ToList();
+        response.Tong = response.DanhSachVatTu.Count();
+        return response;
+    }
+
+    public async Task<int> DeleteSupplyTicketAsync(int supplyTicketId)
+    {
+        if (supplyTicketId <= 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.SupplyTicket.InvalidId);
+        }
+        var currentSupplyTicket = await _muaSamPhieuDeXuatRepository.GetAsync(supplyTicketId);
+        if (currentSupplyTicket == null)
+        {
+            throw new NotFoundException(currentSupplyTicket.GetTypeEx(), supplyTicketId.ToString());
+        }
+        var currentSupplyTicketDetails = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => x.PhieuDeXuatId == supplyTicketId)).ToList();
+        if (currentSupplyTicketDetails.Any())
+        {
+            await _muaSamPhieuDeXuatDetailRepository.DeleteManyAsync(currentSupplyTicketDetails);
+        }
+        return await _muaSamPhieuDeXuatRepository.DeleteAsync(currentSupplyTicket);
     }
 }

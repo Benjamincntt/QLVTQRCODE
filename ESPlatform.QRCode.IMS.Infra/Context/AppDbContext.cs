@@ -1,5 +1,4 @@
 ﻿using ESPlatform.QRCode.IMS.Domain.Entities;
-using ESPlatform.QRCode.IMS.Test._Scaffold;
 using Microsoft.EntityFrameworkCore;
 
 namespace ESPlatform.QRCode.IMS.Infra.Context;
@@ -505,6 +504,7 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.DonViTinh).HasMaxLength(100);
             entity.Property(e => e.GhiChu).HasColumnType("text");
+            entity.Property(e => e.Image).HasMaxLength(200);
             entity.Property(e => e.TenVatTu).HasMaxLength(100);
             entity.Property(e => e.ThongSoKyThuat).HasColumnType("text");
         });

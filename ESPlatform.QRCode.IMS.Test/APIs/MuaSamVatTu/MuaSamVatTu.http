@@ -76,3 +76,13 @@ Authorization: Bearer {{accessToken}}
     "ghiChu": "1000 mét phi 20"
   }
 ]
+
+### Hiển thị thông tin chi tiết phiếu cung ứng
+GET {{host}}/{{muaSamVatTuPath}}/{{supplyTicketId}}/chi-tiet-phieu-cung-ung
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Xóa một phiếu cung ứng
+DELETE {{host}}/{{muaSamVatTuPath}}/{{supplyTicketId}}/xoa-phieu-cung-ung
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

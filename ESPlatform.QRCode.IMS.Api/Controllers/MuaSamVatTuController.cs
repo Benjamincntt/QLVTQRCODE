@@ -33,11 +33,11 @@ public class MuaSamVatTuController : ApiControllerBase
     /// <summary>
     /// Chi tiết vật tư mua sắm
     /// </summary>
-    /// <param name="id">VatTuId / VatTuNewId</param>
+    /// <param name="id"> VatTuId / VatTuNewId </param>
     /// <param name="isSystemSupply"></param>
     /// <returns></returns>
     [HttpGet("{id:int}/chi-tiet-vat-tu")]
-    public async Task<PurchasedSupplyResponse> GetPurchaseSupplyAsync(int id, bool isSystemSupply = true)
+    public async Task<SupplyOrderDetailResponse> GetPurchaseSupplyAsync(int id, bool isSystemSupply = true)
     {
         return await _muaSamVatTuService.GetPurchaseSupplyAsync(id, isSystemSupply);
     }
@@ -58,9 +58,9 @@ public class MuaSamVatTuController : ApiControllerBase
     /// </summary>
     /// <returns>Id phiếu cung ứng</returns>
     [HttpPost("them-phieu-cung-ung")]
-    public async Task<int> CreateSupplyTicketAsync()
+    public async Task<int> CreateSupplyTicketAsync([FromQuery]string moTa)
     {
-        return await _muaSamVatTuService.CreateSupplyTicketAsync();
+        return await _muaSamVatTuService.CreateSupplyTicketAsync(moTa);
     }
     
     /// <summary>
@@ -83,6 +83,28 @@ public class MuaSamVatTuController : ApiControllerBase
     public async Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests)
     {
         return await _muaSamVatTuService.CreateManySupplyTicketDetailAsync(supplyTicketId, requests);
+    }
+    
+    /// <summary>
+    /// Hiển thị thông tin chi tiết phiếu cung ứng
+    /// </summary>
+    /// <param name="supplyTicketId"></param>
+    /// <returns></returns>
+    [HttpGet("{supplyTicketId:int}/chi-tiet-phieu-cung-ung")]
+    public async Task<SupplyTicketDetailResponse> GetSupplyTicketDetailAsync(int supplyTicketId)
+    {
+        return await _muaSamVatTuService.GetSupplyTicketDetailAsync(supplyTicketId);
+    }
+
+    /// <summary>
+    /// Xóa một phiếu cung ứng
+    /// </summary>
+    /// <param name="supplyTicketId"></param>
+    /// <returns></returns>
+    [HttpDelete("{supplyTicketId:int}/xoa-phieu-cung-ung")]
+    public async Task<int> DeleteSupplyTicketAsync(int supplyTicketId)
+    {
+        return await _muaSamVatTuService.DeleteSupplyTicketAsync( supplyTicketId);
     }
     
 }

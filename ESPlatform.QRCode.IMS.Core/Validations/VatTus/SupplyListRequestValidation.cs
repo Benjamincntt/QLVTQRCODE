@@ -14,7 +14,7 @@ public class SupplyListRequestValidation: AbstractValidator<SupplyListRequest>
         RuleFor(o => o.PageSize).GreaterThanOrEqualTo(0).WithMessage(MustGreaterThanOrEqual);
         RuleFor(o => o.IdViTri).GreaterThanOrEqualTo(0).WithMessage(MustGreaterThanOrEqual);
         RuleFor(o => o.IdKho).GreaterThanOrEqualTo(0).WithMessage(MustGreaterThanOrEqual);
-        RuleFor(x => x.TenVatTu).ValidateStringDefault(false);
+        RuleFor(x => x.TenVatTu).ValidateStringDefault();
         RuleFor(x => x.MaVatTu).ValidateStringDefault();
     }
 }

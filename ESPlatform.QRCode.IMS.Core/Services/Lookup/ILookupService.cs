@@ -1,4 +1,4 @@
-﻿using ESPlatform.QRCode.IMS.Core.DTOs.Lookup.Responses;
+﻿using ESPlatform.QRCode.IMS.Core.DTOs.TraCuu.Responses;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.Lookup;
 

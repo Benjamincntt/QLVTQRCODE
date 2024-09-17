@@ -1,5 +1,5 @@
 ﻿using ESPlatform.QRCode.IMS.Api.Controllers.Base;
-using ESPlatform.QRCode.IMS.Core.DTOs.Lookup.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.TraCuu.Responses;
 using ESPlatform.QRCode.IMS.Core.Services.Lookup;
 using Microsoft.AspNetCore.Mvc;
 

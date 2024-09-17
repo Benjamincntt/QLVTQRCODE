@@ -11,4 +11,6 @@ public partial class QlvtMuaSamVatTuNew
     public string? GhiChu { get; set; }
 
     public string? ThongSoKyThuat { get; set; }
+    
+    public string? Image { get; set; }
 }

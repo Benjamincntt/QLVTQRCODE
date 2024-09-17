@@ -35,7 +35,7 @@
 
     <ItemGroup>
       <Folder Include="DTOs\ViTris\Requests\" />
-      <Folder Include="DTOs\Lookup\Requests\" />
+      <Folder Include="DTOs\TraCuu\Requests\" />
       <Folder Include="DTOs\NguoiDungs\Responses\" />
     </ItemGroup>
 

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 
-namespace ESPlatform.QRCode.IMS.Core.DTOs.Lookup.Responses;
+namespace ESPlatform.QRCode.IMS.Core.DTOs.TraCuu.Responses;
 
 public class LookupSuppliesResponse
 {

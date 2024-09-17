@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ESPlatform.QRCode.IMS.Test._Scaffold;
+﻿namespace ESPlatform.QRCode.IMS.Domain.Entities;
 
 public partial class QlvtKyKiemKeErpDemo
 {

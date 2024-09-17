@@ -14,5 +14,5 @@ public class SupplyListRequest : PagingFilter
     [DisplayName("Id vị trí")]
     public int IdViTri { get; set; } = 0;
     
-    public bool IsSystemSupply { get; set; } = false;
+    //public bool IsSystemSupply { get; set; } = false;
 }

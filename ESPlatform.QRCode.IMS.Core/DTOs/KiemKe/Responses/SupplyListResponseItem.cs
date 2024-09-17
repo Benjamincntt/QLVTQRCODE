@@ -9,4 +9,7 @@ public class SupplyListResponseItem
     public string DonViTinh { get; set; } = string.Empty;
     
     public bool IsSystemSupply { get; set; }
+    
+    public string Image { get; set; } = string.Empty;
+    
 }

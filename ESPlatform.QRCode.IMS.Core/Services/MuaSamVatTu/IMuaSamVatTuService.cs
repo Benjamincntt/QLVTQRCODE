@@ -9,9 +9,11 @@ namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 public interface IMuaSamVatTuService
 {
     Task<PagedList<SupplyListResponseItem>> ListVatTuAsync(SupplyListRequest request);
-    Task<PurchasedSupplyResponse> GetPurchaseSupplyAsync(int id, bool isSystemSupply);
+    Task<SupplyOrderDetailResponse> GetPurchaseSupplyAsync(int id, bool isSystemSupply);
     Task<int> CreateSupplyAsync(CreatedSupplyRequest request);
-    Task<int> CreateSupplyTicketAsync();
+    Task<int> CreateSupplyTicketAsync(string mota);
     Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync(DateTime? date);
     Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests);
+    Task<SupplyTicketDetailResponse> GetSupplyTicketDetailAsync(int supplyTicketId);
+    Task<int> DeleteSupplyTicketAsync(int supplyTicketId);
 }
