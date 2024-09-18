@@ -36,7 +36,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\ESPlatform.QRCode.IMS.Library\ESPlatform.QRCode.IMS.Library.csproj" />
-		<ProjectReference Include="..\ESPlatform.QRCode.IMS.Contracts\ESPlatform.QRCode.IMS.Contracts.csproj" />
 		<ProjectReference Include="..\ESPlatform.QRCode.IMS.Domain\ESPlatform.QRCode.IMS.Domain.csproj" />
 	</ItemGroup>
 

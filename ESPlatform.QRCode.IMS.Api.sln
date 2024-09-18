@@ -20,8 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Api",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Test", "ESPlatform.QRCode.IMS.Test\ESPlatform.QRCode.IMS.Test.csproj", "{BDE9530F-D9AD-4D06-9AA8-FC511ABD43A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESPlatform.QRCode.IMS.Contracts", "ESPlatform.QRCode.IMS.Contracts\ESPlatform.QRCode.IMS.Contracts.csproj", "{23B63FEF-0D4B-470D-ACED-9F596B6C1581}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,10 +50,6 @@ Global
 		{BDE9530F-D9AD-4D06-9AA8-FC511ABD43A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDE9530F-D9AD-4D06-9AA8-FC511ABD43A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDE9530F-D9AD-4D06-9AA8-FC511ABD43A7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{23B63FEF-0D4B-470D-ACED-9F596B6C1581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{23B63FEF-0D4B-470D-ACED-9F596B6C1581}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{23B63FEF-0D4B-470D-ACED-9F596B6C1581}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{23B63FEF-0D4B-470D-ACED-9F596B6C1581}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F4EC3BB2-2426-4BCE-BE83-1D475B89F6D7} = {839E56FB-F1AF-47F5-A549-5CDAD195E7BA}
