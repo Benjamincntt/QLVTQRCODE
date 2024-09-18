@@ -20,7 +20,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 
 public class MuaSamVatTuService : IMuaSamVatTuService
 {
-    private readonly AppDbContext _dbContext;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
     private readonly IMuaSamPhieuDeXuatRepository _muaSamPhieuDeXuatRepository;
@@ -33,14 +33,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IMuaSamPhieuDeXuatRepository muaSamPhieuDeXuatRepository,
         IMuaSamPhieuDeXuatDetailRepository muaSamPhieuDeXuatDetailRepository,
         IAuthorizedContextFacade authorizedContextFacade,
-        AppDbContext dbContext)
+        IUnitOfWork unitOfWork)
     {
         _vatTuRepository = vatTuRepository;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
         _muaSamPhieuDeXuatRepository = muaSamPhieuDeXuatRepository;
         _muaSamPhieuDeXuatDetailRepository = muaSamPhieuDeXuatDetailRepository;
         _authorizedContextFacade = authorizedContextFacade;
-        _dbContext = dbContext;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync(SupplyListRequest request)
@@ -114,7 +114,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplies);
         }
         // Bắt đầu transaction
-        using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+        using (var transaction = _unitOfWork.BeginTransactionAsync())
         {
             try
             {
@@ -137,12 +137,12 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 
                 var supplyTicketId = addedSupplyTicket.Id;
                 await CreateManySupplyTicketDetailAsync(supplyTicketId, requests);
-                await transaction.CommitAsync();
+                await _unitOfWork.CommitAsync();
                 return supplyTicketId;
             }
             catch
             {
-                await transaction.RollbackAsync();
+                await _unitOfWork.RollbackAsync();
                 throw;
             }
         }

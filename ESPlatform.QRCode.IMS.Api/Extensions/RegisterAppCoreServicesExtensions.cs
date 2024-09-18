@@ -51,6 +51,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IMuaSamPhieuDeXuatRepository, MuaSamPhieuDeXuatRepository>()
             .AddScoped<IMuaSamVatTuNewRepository, MuaSamVatTuNewRepository>()
             .AddScoped<IMuaSamPhieuDeXuatDetailRepository, MuaSamPhieuDeXuatDetailRepository>()
+            .AddScoped<IUnitOfWork, UnitOfWork>()
 
             // Facades
             .AddScoped<IAuthorizedContextFacade, AuthorizedContextFacade>()
