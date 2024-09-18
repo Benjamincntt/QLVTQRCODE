@@ -44,6 +44,7 @@ public static partial class Constants {
 			public static class SupplyTicket
 			{
 				public const string InvalidId = "Id phiếu cung ứng không hợp lệ";
+				public const string InsertSupplyFailed = "Thêm vật tư không thành công";
 			}
 		}
 	}

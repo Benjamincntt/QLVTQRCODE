@@ -142,14 +142,17 @@ public class CommonService : ICommonService
         #endregion 
         // create new image
         var folderPath = AppConfig.Instance.Image.FolderPath;
+        var urlPath = AppConfig.Instance.Image.UrlPath;
+        var fileName = $"{Path.GetFileName(file.FileName)}";
         // check if server don't have path => create a new directory by path
-        var pathUpload =  Path.Combine(AppConfig.Instance.Image.FolderPath,vatTuId.ToString());
+        var pathUpload =  Path.Combine(folderPath, vatTuId.ToString());
         if (!Directory.Exists(pathUpload))
         {
             Directory.CreateDirectory(pathUpload);
+            var pathToSave = Path.Combine(urlPath, vatTuId.ToString());
+            vatTu.Image = Path.Combine(pathToSave, fileName).Replace("\\", "/");
+            await _vatTuRepository.UpdateAsync(vatTu);
         }
-        
-        var fileName = $"{Path.GetFileName(file.FileName)}";
         var fullPath = Path.Combine(pathUpload, fileName);
 
         // save file
@@ -157,6 +160,7 @@ public class CommonService : ICommonService
         {
             await file.CopyToAsync(stream);
         }
+        // create path 
         return 1;
     }
 

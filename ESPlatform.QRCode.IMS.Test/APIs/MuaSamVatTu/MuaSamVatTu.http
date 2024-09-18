@@ -29,25 +29,11 @@ Authorization: Bearer {{accessToken}}
 
 
 ### Thêm mới phiếu cung ứng
-POST {{host}}/{{muaSamVatTuPath}}/them-phieu-cung-ung
-Content-Type: application/json
-Authorization: Bearer {{accessToken}}
-
-### Thêm nhiều vật tư vào phiếu đề xuất
-POST {{host}}/{{muaSamVatTuPath}}/{{supplyTicketId}}/them-nhieu-vat-tu
+POST {{host}}/{{muaSamVatTuPath}}/them-phieu-cung-ung?moTa=phiếu cung ứng vật tư số 19
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 [
-  {
-    "idVatTu": 4,
-    "tenVatTu": "fuchsyloken",
-    "donViTinh": "CHai",
-    "isSystemSupply": true,
-    "soLuong": 10,
-    "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
-    "ghiChu": ""
-  },
   {
     "idVatTu": 4,
     "tenVatTu": "fuchsyloken",

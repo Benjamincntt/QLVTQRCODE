@@ -1,6 +1,5 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
-using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
@@ -10,6 +9,7 @@ using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
+using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
@@ -20,6 +20,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 
 public class MuaSamVatTuService : IMuaSamVatTuService
 {
+    private readonly AppDbContext _dbContext;
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
     private readonly IMuaSamPhieuDeXuatRepository _muaSamPhieuDeXuatRepository;
@@ -31,13 +32,15 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
         IMuaSamPhieuDeXuatRepository muaSamPhieuDeXuatRepository,
         IMuaSamPhieuDeXuatDetailRepository muaSamPhieuDeXuatDetailRepository,
-        IAuthorizedContextFacade authorizedContextFacade)
+        IAuthorizedContextFacade authorizedContextFacade,
+        AppDbContext dbContext)
     {
         _vatTuRepository = vatTuRepository;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
         _muaSamPhieuDeXuatRepository = muaSamPhieuDeXuatRepository;
         _muaSamPhieuDeXuatDetailRepository = muaSamPhieuDeXuatDetailRepository;
         _authorizedContextFacade = authorizedContextFacade;
+        _dbContext = dbContext;
     }
 
     public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync(SupplyListRequest request)
@@ -104,22 +107,45 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return await _muaSamVatTuNewRepository.InsertAsync(vatTu);  
     }
 
-    public async Task<int> CreateSupplyTicketAsync(string moTa)
+    public async Task<int> CreateSupplyTicketAsync(string moTa, List<SupplyTicketDetailRequest> requests)
     {
-        var supplyTicket = new QlvtMuaSamPhieuDeXuat();
-        supplyTicket.TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
-        supplyTicket.MoTa = moTa;
-        supplyTicket.TrangThai = (byte?)PurchaseOrderStatus.Unsigned;
-        supplyTicket.NgayThem = DateTime.Now;
-        supplyTicket.MaNguoiThem = _authorizedContextFacade.AccountId;
-        await _muaSamPhieuDeXuatRepository.InsertAsync(supplyTicket);
-        
-        var addedSupplyTicket = await _muaSamPhieuDeXuatRepository.GetAsync(x => x.TenPhieu == supplyTicket.TenPhieu);
-        if (addedSupplyTicket == null)
+        if (!requests.Any())
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Common.InsertFailed);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplies);
         }
-        return addedSupplyTicket.Id;
+        // Bắt đầu transaction
+        using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+        {
+            try
+            {
+                var supplyTicket = new QlvtMuaSamPhieuDeXuat
+                {
+                    TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
+                    MoTa = moTa,
+                    TrangThai = (byte?)PurchaseOrderStatus.Unsigned,
+                    NgayThem = DateTime.Now,
+                    MaNguoiThem = _authorizedContextFacade.AccountId
+                };
+                await _muaSamPhieuDeXuatRepository.InsertAsync(supplyTicket);
+
+                var addedSupplyTicket =
+                    await _muaSamPhieuDeXuatRepository.GetAsync(x => x.TenPhieu == supplyTicket.TenPhieu);
+                if (addedSupplyTicket == null)
+                {
+                    throw new BadRequestException(Constants.Exceptions.Messages.Common.InsertFailed);
+                }
+
+                var supplyTicketId = addedSupplyTicket.Id;
+                await CreateManySupplyTicketDetailAsync(supplyTicketId, requests);
+                await transaction.CommitAsync();
+                return supplyTicketId;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 
     public async Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync(DateTime? date)
@@ -139,37 +165,12 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 
     public async Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests)
      {
-        #region Validate
-        if (supplyTicketId <=0 )
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.SupplyTicket.InvalidId);
-        }
         if (!requests.Any())
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplies);
         }
-        var supplyTicket = await _muaSamPhieuDeXuatRepository.GetAsync(x => x.Id == supplyTicketId);
-        if (supplyTicket == null)
-        {
-            throw new NotFoundException(supplyTicket.GetTypeEx(), supplyTicketId.ToString());
-        }
-        #endregion
-        //var supplyTicketDetail = new QlvtMuaSamPhieuDeXuat();
         var listSupplyTicketDetail = new List<QlvtMuaSamPhieuDeXuatDetail>();
-        var groupedRequests = requests
-            .GroupBy(x => new { x.IdVatTu, x.IsSystemSupply })
-            .Select(x => new SupplyTicketDetailRequest
-            {
-                IdVatTu = x.Key.IdVatTu,
-                IsSystemSupply = x.Key.IsSystemSupply,
-                SoLuong = x.Sum(r => r.SoLuong), 
-                TenVatTu = x.First().TenVatTu,
-                ThongSoKyThuat =  x.First().ThongSoKyThuat,
-                GhiChu = x.First().GhiChu,
-                DonViTinh = x.First().DonViTinh,
-            })
-            .ToList();
-        foreach (var vatTu in groupedRequests)
+        foreach (var vatTu in requests)
         {   
             await ValidationHelper.ValidateAsync(vatTu, new SupplyTicketDetailRequestValidation());
             var supplyTicketDetail = vatTu.Adapt<QlvtMuaSamPhieuDeXuatDetail>();

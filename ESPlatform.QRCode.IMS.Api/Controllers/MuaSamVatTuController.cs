@@ -58,9 +58,9 @@ public class MuaSamVatTuController : ApiControllerBase
     /// </summary>
     /// <returns>Id phiếu cung ứng</returns>
     [HttpPost("them-phieu-cung-ung")]
-    public async Task<int> CreateSupplyTicketAsync([FromQuery]string moTa)
+    public async Task<int> CreateSupplyTicketAsync(string moTa, List<SupplyTicketDetailRequest> requests)
     {
-        return await _muaSamVatTuService.CreateSupplyTicketAsync(moTa);
+        return await _muaSamVatTuService.CreateSupplyTicketAsync(moTa, requests);
     }
     
     /// <summary>
@@ -71,18 +71,6 @@ public class MuaSamVatTuController : ApiControllerBase
     public async Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync([FromQuery] DateTime? date)
     {
         return await _muaSamVatTuService.ListSupplyTicketAsync(date);
-    }
-    
-    /// <summary>
-    /// Thêm nhiều vật tư vào phiếu đề xuất
-    /// </summary>
-    /// <param name="supplyTicketId"> Id phiếu đề xuất </param>
-    /// <param name="requests"> danh sách các vật tư được chọn </param>
-    /// <returns> Số bản ghi được thêm </returns>
-    [HttpPost("{supplyTicketId:int}/them-nhieu-vat-tu")]
-    public async Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests)
-    {
-        return await _muaSamVatTuService.CreateManySupplyTicketDetailAsync(supplyTicketId, requests);
     }
     
     /// <summary>
