@@ -35,7 +35,7 @@ public class CommonController: ApiControllerBase
     /// <param name="file"></param>
     /// <returns></returns>
     [HttpPatch("{vatTuId:int}/update-supplies-image")]
-    public async Task<int> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
+    public async Task<string> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
     {
         return await _commonService.ModifySuppliesImageAsync(vatTuId, currentImagePath, file);
     }
@@ -47,7 +47,7 @@ public class CommonController: ApiControllerBase
     /// <param name="file"></param>
     /// <returns></returns>
     [HttpPost("{vatTuId:int}/create-supplies-image")]
-    public async Task<int> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
+    public async Task<string> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
     {
         return await _commonService.CreateSuppliesImageAsync(vatTuId, file);
     }

@@ -83,7 +83,7 @@ public class CommonService : ICommonService
         return await _vatTuViTriRepository.UpdateAsync(vitri);
     }
 
-    public async Task<int> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
+    public async Task<string> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
     {
         #region validate
         if (vatTuId < 1 || file == null || file.Length <= 0)
@@ -109,19 +109,19 @@ public class CommonService : ICommonService
         }
         
         // create new image
-        var pathUpload =  Path.Combine(AppConfig.Instance.Image.FolderPath,vatTuId.ToString());
         var fileName = $"{Path.GetFileName(file.FileName)}";
-        var fullPath = Path.Combine(pathUpload, fileName);
+        var fullPath = Path.Combine(AppConfig.Instance.Image.FolderPath, vatTuId.ToString(), fileName);
 
         // save file
         using (var stream = new FileStream(fullPath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
-        return 1;
+        var urlResult = vatTu.Image = Path.Combine(AppConfig.Instance.Image.UrlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
+        return urlResult;
     }
 
-    public async Task<int> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
+    public async Task<string> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
     {
         #region validate
         if (vatTuId < 1 || file == null || file.Length <= 0)
@@ -144,13 +144,13 @@ public class CommonService : ICommonService
         var folderPath = AppConfig.Instance.Image.FolderPath;
         var urlPath = AppConfig.Instance.Image.UrlPath;
         var fileName = $"{Path.GetFileName(file.FileName)}";
+        
         // check if server don't have path => create a new directory by path
         var pathUpload =  Path.Combine(folderPath, vatTuId.ToString());
         if (!Directory.Exists(pathUpload))
         {
             Directory.CreateDirectory(pathUpload);
-            var pathToSave = Path.Combine(urlPath, vatTuId.ToString());
-            vatTu.Image = Path.Combine(pathToSave, fileName).Replace("\\", "/");
+            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
             await _vatTuRepository.UpdateAsync(vatTu);
         }
         var fullPath = Path.Combine(pathUpload, fileName);
@@ -160,8 +160,8 @@ public class CommonService : ICommonService
         {
             await file.CopyToAsync(stream);
         }
-        // create path 
-        return 1;
+        var urlResult = vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
+        return urlResult;
     }
 
     public async Task<int> DeleteSuppliesImageAsync(int vatTuId, string currentImagePath)
