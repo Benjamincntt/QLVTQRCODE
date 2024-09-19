@@ -147,17 +147,17 @@ public class KiemKeService : IKiemKeService
         await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesDffRequestValidation());
         if (vatTuId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
         }
 
         if (kyKiemKeId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKeId);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKe);
         }
 
         if (kyKiemKeChiTietId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKeChiTietId);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKeChiTiet);
         }
 
         if (soLuongKiemKe < 0)
@@ -221,12 +221,12 @@ public class KiemKeService : IKiemKeService
     {
         if (vatTuId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
         }
 
         if (kyKiemKeId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKeId);
+            throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKe);
         }
 
         if (soLuongKiemKe < 0)

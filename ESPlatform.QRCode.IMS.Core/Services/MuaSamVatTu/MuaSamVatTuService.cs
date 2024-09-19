@@ -9,7 +9,6 @@ using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
-using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
@@ -61,7 +60,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     {
         if (vatTuId <= 0 )
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidId);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
         }
         
         var response = new SupplyOrderDetailResponse();
@@ -71,7 +70,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
             if (vatTu == null)
             {
-                throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
+                throw new NotFoundException(vatTu.GetTypeEx(), null);
             }
             
             response.TenVatTu = vatTu.TenVatTu ?? string.Empty;
@@ -166,7 +165,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return listPhieu;
     }
 
-    public async Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests)
+    private async Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests)
      {
         if (!requests.Any())
         {
@@ -188,12 +187,13 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         var response = new SupplyTicketDetailResponse();
         if (supplyTicketId <= 0)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.SupplyTicket.InvalidId);
+            throw new BadRequestException(Constants.Exceptions.Messages.SupplyTicket.InvalidSupplyTicket,
+                new List<string> { nameof(supplyTicketId) + " is invalid" });
         }
         var supplyTicket = await _muaSamPhieuDeXuatRepository.GetAsync(x => x.Id == supplyTicketId);
         if (supplyTicket == null)
         {
-            throw new NotFoundException(supplyTicket.GetTypeEx(), supplyTicketId.ToString());
+            throw new NotFoundException(supplyTicket.GetTypeEx(), null);
         }
         response.TenPhieu = supplyTicket.TenPhieu ?? string.Empty;
         response.MoTa = supplyTicket.MoTa ?? string.Empty;
@@ -208,12 +208,12 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     {
         if (supplyTicketId <= 0)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.SupplyTicket.InvalidId);
+            throw new BadRequestException(Constants.Exceptions.Messages.SupplyTicket.InvalidSupplyTicket);
         }
         var currentSupplyTicket = await _muaSamPhieuDeXuatRepository.GetAsync(supplyTicketId);
         if (currentSupplyTicket == null)
         {
-            throw new NotFoundException(currentSupplyTicket.GetTypeEx(), supplyTicketId.ToString());
+            throw new NotFoundException(currentSupplyTicket.GetTypeEx(), null);
         }
         var currentSupplyTicketDetails = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => x.PhieuDeXuatId == supplyTicketId)).ToList();
         if (currentSupplyTicketDetails.Any())

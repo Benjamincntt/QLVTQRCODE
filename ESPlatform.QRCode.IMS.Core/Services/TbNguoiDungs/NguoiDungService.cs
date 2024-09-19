@@ -33,7 +33,7 @@ public class NguoiDungService : INguoiDungService
         var nguoiDung = await _nguoiDungRepository.GetAsync(maNguoiDung);
         if (nguoiDung == null)
         {
-            throw new NotFoundException(nguoiDung.GetTypeEx(), maNguoiDung.ToString());
+            throw new NotFoundException(nguoiDung.GetTypeEx(), null);
         }
 
         await ValidationHelper.ValidateAsync(request, new NguoiDungModifyRequestValidation());
@@ -54,7 +54,7 @@ public class NguoiDungService : INguoiDungService
         var nguoiDung = await _nguoiDungRepository.GetAsync(maNguoiDung);
         if (nguoiDung == null)
         {
-            throw new NotFoundException(nguoiDung.GetTypeEx(), maNguoiDung.ToString());
+            throw new NotFoundException(nguoiDung.GetTypeEx(), null);
         }
 
         // account.MatKhau = BCrypt.Net.BCrypt.HashPassword(password);
@@ -68,7 +68,7 @@ public class NguoiDungService : INguoiDungService
         var nguoiDung = await _nguoiDungRepository.GetAsync(maNguoiDung);
         if (nguoiDung == null)
         {
-            throw new NotFoundException(nguoiDung.GetTypeEx(), maNguoiDung.ToString());
+            throw new NotFoundException(nguoiDung.GetTypeEx(), null);
         }
 
         var inputPasswordHash = GetPassword.GetMD5(nguoiDung.Salt + request.CurrentPassword);

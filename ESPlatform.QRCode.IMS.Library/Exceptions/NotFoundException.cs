@@ -7,10 +7,10 @@ public class NotFoundException : ApplicationException {
 		if (objectId != null) {
 			Message = objectName != null
 				? $"Không tìm thấy {objectName} có mã là {objectId}"
-				: $"Không tìm thấy đối tượng: {objectId}";
+				: $"Không tìm thấy: {objectId}";
 		}
 		else if (objectName != null) {
-			Message = $"Không tìm thấy đối tượng {objectName}";
+			Message = $"Không tìm thấy {objectName}";
 		}
 		else {
 			Message = "Không tìm thấy tài nguyên yêu cầu";

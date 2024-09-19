@@ -22,7 +22,6 @@ public static partial class Constants {
 				public const string InvalidSupplyCode = "Mã vật tư không hợp lệ";
 				public const string InvalidSupplyLocation = "Vị trí của vật tư không đúng";
 				public const string NoSupplyLocationSelected = "Bạn chưa chọn vị trí vật tư";
-				public const string InvalidId = "Id vật tư không hợp lệ";
 				public const string InvalidFileType = "Loại file không được phép";
 				public const string EmptySupplies = "Danh sách vật tư trống";
 				public const string NoSupplyImageSelected = "Bạn chưa chọn ảnh vật tư";
@@ -33,8 +32,8 @@ public static partial class Constants {
 			}
 			//Kỳ kiểm kê
 			public static class InventoryCheck {
-				public const string InvalidKyKiemKeId = "Id kỳ kiểm kê không hợp lệ";
-				public const string InvalidKyKiemKeChiTietId = "Id kỳ kiểm kê chi tiết không hợp lệ";
+				public const string InvalidKyKiemKe = "Kỳ kiểm kê không hợp lệ";
+				public const string InvalidKyKiemKeChiTiet = "Kỳ kiểm kê chi tiết không hợp lệ";
 				public const string InvalidSoLuongKiemKe = "Số lượng kiểm kê không hợp lệ";
 				public const string InvalidToTalMatVaKemPhamChat = "Tổng số lượng mất và kém phẩm chất không được vượt quá số lượng kiểm kê";
 				public const string InvalidSoLuongUDong = "Số lượng ứ đọng không được vượt quá số lượng kiểm kê";
@@ -45,7 +44,7 @@ public static partial class Constants {
 			public static class SupplyTicket
 			{
 				public const string InvalidId = "Id phiếu cung ứng không hợp lệ";
-				public const string InsertSupplyFailed = "Thêm vật tư không thành công";
+				public const string InvalidSupplyTicket = "Bạn chưa chọn phiếu cung ứng";
 			}
 		}
 	}

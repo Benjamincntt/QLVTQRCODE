@@ -222,13 +222,13 @@ public class CommonService : ICommonService
     {
         if (vatTuId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
         }
 
         var vatTu = await _vatTuRepository.GetAsync(vatTuId);
         if (vatTu == null)
         {
-            throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
+            throw new NotFoundException(vatTu.GetTypeEx(), null);
         }
 
         var folderPath = AppConfig.Instance.Image.FolderPath; //   "D:"
