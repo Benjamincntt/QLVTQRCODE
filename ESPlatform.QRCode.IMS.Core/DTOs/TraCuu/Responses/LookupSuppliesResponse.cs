@@ -5,6 +5,7 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.TraCuu.Responses;
 
 public class LookupSuppliesResponse
 {
+    public int VatTuId { get; set; }
     public string MaVatTu { get; set; } = string.Empty;
 
     public string TenVatTu { get; set; } = string.Empty;

@@ -42,13 +42,14 @@ public class LookupService : ILookupService
         }
         
         var vatTuId = vatTu.VatTuId;
+        response.VatTuId = vatTuId;
         response.MaVatTu = maVatTu;
         response.TenVatTu = !string.IsNullOrWhiteSpace(vatTu.TenVatTu) ? vatTu.TenVatTu : string.Empty;
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
         // ảnh đại diện
         response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
         var folderPath = AppConfig.Instance.Image.FolderPath;           //   "D:"
-    var urlPath = AppConfig.Instance.Image.UrlPath;                     //   "/Images"
+         var urlPath = AppConfig.Instance.Image.UrlPath;                //   "/Images"
         var localBasePath =  (folderPath + urlPath).Replace("/", "\\"); //   "D:\Images"
         var folderImagePath = $@"{localBasePath}\{vatTuId}";
         // list ảnh
