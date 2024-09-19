@@ -68,28 +68,30 @@ public class KiemKeService : IKiemKeService
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
         // ảnh đại diện
         response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
-        var folderPath = $@"{AppConfig.Instance.Image.FolderPath}\{vatTuId}";
-        var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
+        var folderPath = AppConfig.Instance.Image.FolderPath;//   "D:"
+        var urlPath = AppConfig.Instance.Image.UrlPath;//         "/Images"
+        var localBasePath =  (folderPath + urlPath).Replace("/", "\\");
+        var folderImagePath = $@"{localBasePath}\{vatTuId}";
+        //var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
 
-        if (Directory.Exists(folderPath))
+        if (Directory.Exists(folderImagePath))
         {
-            var imageFiles = Directory.GetFiles(folderPath);
+            var imageFiles = Directory.GetFiles(folderImagePath);
 
             // Xây dựng đường dẫn hoàn chỉnh cho mỗi ảnh
             foreach (var file in imageFiles)
             {
                 // Lấy tên file (không bao gồm đường dẫn)
                 var fileName = Path.GetFileName(file);
-
+                
                 // Tạo URL hoàn chỉnh từ urlPath và tên file
-                var fullPath = $"{urlPath}/{fileName}";
+                var fullPath = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
 
                 // Thêm vào danh sách đường dẫn
                 response.ImagePaths.Add(fullPath);
             }
         }
-
-
+        
         // kỳ kiểm kê
         var inventoryCheckInformation =
             await _vatTuRepository.GetInventoryCheckInformationAsync(vatTuId, response.KyKiemKeId);

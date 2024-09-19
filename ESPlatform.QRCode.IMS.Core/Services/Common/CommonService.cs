@@ -83,7 +83,7 @@ public class CommonService : ICommonService
         return await _vatTuViTriRepository.UpdateAsync(vitri);
     }
 
-    public async Task<string> ModifySuppliesImageAsync(int vatTuId, string currentImagePath, IFormFile file)
+    public async Task<string> ModifySuppliesImageAsync(int vatTuId, string inputPath, IFormFile file)
     {
         #region validate
         if (vatTuId < 1 || file == null || file.Length <= 0)
@@ -101,16 +101,21 @@ public class CommonService : ICommonService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidFileType);
         }
-        #endregion 
+        #endregion
+
+        var folderPath = AppConfig.Instance.Image.FolderPath;//   "D:"
+        var urlPath = AppConfig.Instance.Image.UrlPath;//         "/Images"
+        var localBasePath =  (folderPath + urlPath).Replace("/", "\\");
+        var localPath = (folderPath + inputPath).Replace("/", "\\");
         // delete old image
-        if (File.Exists(currentImagePath))
+        if (File.Exists(localPath))
         {
-            File.Delete(currentImagePath);
+            File.Delete(localPath);
         }
         
         // create new image
         var fileName = $"{Path.GetFileName(file.FileName)}";
-        var fullPath = Path.Combine(AppConfig.Instance.Image.FolderPath, vatTuId.ToString(), fileName);
+        var fullPath = Path.Combine(localBasePath, vatTuId.ToString(), fileName);
 
         // save file
         using (var stream = new FileStream(fullPath, FileMode.Create))
@@ -143,14 +148,15 @@ public class CommonService : ICommonService
         // create new image
         var folderPath = AppConfig.Instance.Image.FolderPath;
         var urlPath = AppConfig.Instance.Image.UrlPath;
+        var localBasePath =  (folderPath + urlPath).Replace("/", "\\");
         var fileName = $"{Path.GetFileName(file.FileName)}";
         
         // check if server don't have path => create a new directory by path
-        var pathUpload =  Path.Combine(folderPath, vatTuId.ToString());
+        var pathUpload =  Path.Combine(localBasePath, vatTuId.ToString());
         if (!Directory.Exists(pathUpload))
         {
             Directory.CreateDirectory(pathUpload);
-            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
+            vatTu.Image = Path.Combine(localBasePath, vatTuId.ToString(), fileName).Replace("\\", "/");
             await _vatTuRepository.UpdateAsync(vatTu);
         }
         var fullPath = Path.Combine(pathUpload, fileName);
@@ -164,7 +170,7 @@ public class CommonService : ICommonService
         return urlResult;
     }
 
-    public async Task<int> DeleteSuppliesImageAsync(int vatTuId, string currentImagePath)
+    public async Task<int> DeleteSuppliesImageAsync(int vatTuId, string inputPath)
     {
         if (vatTuId < 1)
         {
@@ -175,9 +181,11 @@ public class CommonService : ICommonService
         {
             throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
         }
+        var folderPath = AppConfig.Instance.Image.FolderPath;//   "D:"
         // delete old image
-        if (!File.Exists(currentImagePath)) return default;
-        File.Delete(currentImagePath);
+        var localPath = (folderPath + inputPath).Replace("/", "\\");
+        if (!File.Exists(localPath)) return default;
+        File.Delete(localPath);
         return 1;
     }
 

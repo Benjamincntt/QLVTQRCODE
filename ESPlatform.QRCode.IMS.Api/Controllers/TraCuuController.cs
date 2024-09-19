@@ -17,11 +17,11 @@ public class TraCuuController: ApiControllerBase
     /// <summary>
     /// Tra cứu vật tư
     /// </summary>
-    /// <param name="maVatu"></param>
+    /// <param name="maVatTu"></param>
     /// <returns></returns>
-    [HttpGet("{maVatu}")]
-    public async Task<LookupSuppliesResponse> GetAsync(string maVatu)
+    [HttpGet("{maVatTu}")]
+    public async Task<LookupSuppliesResponse> GetAsync(string maVatTu)
     {
-        return await _lookupService.GetAsync(maVatu);
+        return await _lookupService.GetAsync(maVatTu);
     }
 }

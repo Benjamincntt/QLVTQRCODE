@@ -77,16 +77,19 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             response.TenVatTu = vatTu.TenVatTu ?? string.Empty;
             response.ThongSoKyThuat = vatTu.MoTa ?? string.Empty;
             response.GhiChu = vatTu.GhiChu ?? string.Empty;
-            var folderPath = $@"{AppConfig.Instance.Image.FolderPath}\{vatTuId}";
-            var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
-            if (Directory.Exists(folderPath))
+            var folderPath = AppConfig.Instance.Image.FolderPath;               // "D:"
+            var urlPath = AppConfig.Instance.Image.UrlPath;                     // "/Images"
+            var localBasePath =  (folderPath + urlPath).Replace("/", "\\");     // "D:\Images"
+            var folderImagePath = $@"{localBasePath}\{vatTuId}";
+            //var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
+            if (Directory.Exists(folderImagePath))
             {
-                var imageFiles = Directory.GetFiles(folderPath);
+                var imageFiles = Directory.GetFiles(folderImagePath);
 
                 foreach (var file in imageFiles)
                 {
                     var fileName = Path.GetFileName(file);
-                    var fullPath = $"{urlPath}/{fileName}";
+                    var fullPath = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
                     response.ImagePaths.Add(fullPath);
                 }
             }

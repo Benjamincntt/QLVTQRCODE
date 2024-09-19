@@ -20,7 +20,7 @@ public class MuaSamVatTuController : ApiControllerBase
     }
 
     /// <summary>
-    /// Danh sách vật tư
+    /// Danh sách vật tư để chọn mua
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>

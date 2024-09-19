@@ -47,18 +47,20 @@ public class LookupService : ILookupService
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
         // ảnh đại diện
         response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
-        var folderPath = $@"{AppConfig.Instance.Image.FolderPath}\{vatTuId}";
-        var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
+        var folderPath = AppConfig.Instance.Image.FolderPath;           //   "D:"
+    var urlPath = AppConfig.Instance.Image.UrlPath;                     //   "/Images"
+        var localBasePath =  (folderPath + urlPath).Replace("/", "\\"); //   "D:\Images"
+        var folderImagePath = $@"{localBasePath}\{vatTuId}";
         // list ảnh
-        if (Directory.Exists(folderPath))
+        if (Directory.Exists(folderImagePath))
         {
-            var imageFiles = Directory.GetFiles(folderPath);
+            var imageFiles = Directory.GetFiles(folderImagePath);
 
             // Xây dựng đường dẫn hoàn chỉnh cho mỗi ảnh
             foreach (var file in imageFiles)
             {
                 var fileName = Path.GetFileName(file);
-                var fullPath = $"{urlPath}/{fileName}";
+                var fullPath = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
                 response.ImagePaths.Add(fullPath);
             }
         }
