@@ -131,11 +131,19 @@ public class CommonService : ICommonService
         {
             File.Delete(localPath);
         }
-
         // create new image
         var fileName = $"{Path.GetFileName(file.FileName)}";
+        
+        // case not exist folder
+        var localFolder = Path.Combine(localBasePath, vatTuId.ToString());
+        if (!Directory.Exists(localFolder))
+        {
+            Directory.CreateDirectory(localFolder);
+            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
+            await _vatTuRepository.UpdateAsync(vatTu);
+        }
         var fullPath = Path.Combine(localBasePath, vatTuId.ToString(), fileName);
-
+        
         // save file
         using (var stream = new FileStream(fullPath, FileMode.Create))
         {
@@ -182,7 +190,7 @@ public class CommonService : ICommonService
         if (!Directory.Exists(pathUpload))
         {
             Directory.CreateDirectory(pathUpload);
-            vatTu.Image = Path.Combine(localBasePath, vatTuId.ToString(), fileName).Replace("\\", "/");
+            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
             await _vatTuRepository.UpdateAsync(vatTu);
         }
 
@@ -194,7 +202,7 @@ public class CommonService : ICommonService
             await file.CopyToAsync(stream);
         }
 
-        var urlResult = vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
+        var urlResult = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
         return urlResult;
     }
 
