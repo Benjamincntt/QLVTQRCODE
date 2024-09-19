@@ -163,15 +163,19 @@ public class CommonService : ICommonService
     {
         #region validate
 
-        if (vatTuId < 1 || file == null || file.Length <= 0)
+        if (vatTuId < 1)
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
+        }
+        if(file.Length <= 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.NoSupplyImageSelected);
         }
 
         var vatTu = await _vatTuRepository.GetAsync(vatTuId);
         if (vatTu == null)
         {
-            throw new NotFoundException(vatTu.GetTypeEx(), vatTuId.ToString());
+            throw new NotFoundException(vatTu.GetTypeEx(), null);
         }
 
         string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
@@ -194,6 +198,10 @@ public class CommonService : ICommonService
         if (!Directory.Exists(pathUpload))
         {
             Directory.CreateDirectory(pathUpload);
+        }
+
+        if (vatTu.Image == null)
+        {
             vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
             await _vatTuRepository.UpdateAsync(vatTu);
         }
