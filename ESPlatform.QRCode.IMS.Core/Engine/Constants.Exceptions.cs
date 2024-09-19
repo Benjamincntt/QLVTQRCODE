@@ -28,6 +28,7 @@ public static partial class Constants {
 				public const string ExistedSupplyCode = "Mã vật tư đã tồn tại";
 				public const string InvalidNewId = "Id vật tư mới không hợp lệ";
 				public const string EmptySupplies = "Danh sách vật tư trống";
+				public const string NoSupplyImageSelected = "Bạn chưa chọn ảnh vật tư";
 			}
 
 			public static class Login {
