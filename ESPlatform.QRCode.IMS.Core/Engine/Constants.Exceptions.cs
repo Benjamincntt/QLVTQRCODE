@@ -18,6 +18,9 @@ public static partial class Constants {
 			}
 			
 			public static class Supplies {
+				public const string InvalidSupply = "Bạn chưa chọn vật tư";
+				public const string InvalidSupplyLocation = "Vị trí của vật tư không đúng";
+				public const string NoSupplyLocationSelected = "Bạn chưa chọn vị trí vật tư";
 				public const string InvalidId = "Id vật tư không hợp lệ";
 				public const string InvalidFileType = "Loại file không được phép";
 				public const string NotExistSupply = "Vật tư không tồn tại";

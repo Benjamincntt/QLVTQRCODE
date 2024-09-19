@@ -17,7 +17,7 @@ public class NotFoundException : ApplicationException {
 		}
 	}
 
-	public NotFoundException(Type objectType, string objectId) : this(objectType.GetDisplayName(), objectId) { }
+	public NotFoundException(Type objectType, string? objectId) : this(objectType.GetDisplayName(), objectId) { }
 
 	public NotFoundException(string message) {
 		Message = message;
