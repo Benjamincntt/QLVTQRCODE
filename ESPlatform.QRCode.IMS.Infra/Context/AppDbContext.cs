@@ -560,8 +560,6 @@ public partial class AppDbContext : DbContext
                 .HasComment("Số lô vật tư")
                 .HasColumnName("Lot_Number");
             entity.Property(e => e.OnhandQuantity)
-                .HasMaxLength(50)
-                .IsUnicode(false)
                 .HasComment("Số lượng tồn")
                 .HasColumnName("Onhand_Quantity");
             entity.Property(e => e.SubinventoryCode)
