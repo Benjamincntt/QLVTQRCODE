@@ -5,7 +5,6 @@ using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Authentication;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
-using ESPlatform.QRCode.IMS.Core.Services.TbDonViSuDungs;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Domain.ValueObjects;
@@ -23,14 +22,12 @@ public class AuthenticationService : IAuthenticationService
     private readonly IDonViSuDungRepository _donViSuDungRepository;
     private readonly INguoiDungRepository _nguoiDungRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
-    private readonly IDonViSuDungService _donViSuDungService;
     private readonly JwtFacade _jwtFacade;
     private readonly OtpFacade _otpFacade;
     private readonly IDistributedCache _distributedCache;
 
     public AuthenticationService(IAccountRepository accountRepository,
         IAuthorizedContextFacade authorizedContextFacade,
-        IDonViSuDungService donViSuDungService,
         IDonViSuDungRepository donViSuDungRepository,
         INguoiDungRepository nguoiDungRepository,
         JwtFacade jwtFacade,
@@ -41,7 +38,6 @@ public class AuthenticationService : IAuthenticationService
         _authorizedContextFacade = authorizedContextFacade;
         _donViSuDungRepository = donViSuDungRepository;
         _nguoiDungRepository = nguoiDungRepository;
-        _donViSuDungService = donViSuDungService;
         _jwtFacade = jwtFacade;
         _otpFacade = otpFacade;
         _distributedCache = distributedCache;
