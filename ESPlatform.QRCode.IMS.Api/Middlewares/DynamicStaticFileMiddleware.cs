@@ -1,4 +1,6 @@
-﻿namespace ESPlatform.QRCode.IMS.Api.Middlewares;
+﻿using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
+
+namespace ESPlatform.QRCode.IMS.Api.Middlewares;
 
 public class DynamicStaticFileMiddleware
 {
@@ -13,15 +15,16 @@ public class DynamicStaticFileMiddleware
     {
         // Xác định đường dẫn yêu cầu
         var requestPath = context.Request.Path.Value;
-
+        var folderPath = AppConfig.Instance.Image.FolderPath;//   "D:"
+        var urlPath = AppConfig.Instance.Image.UrlPath;      //   "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin/IMGVatTu"
+        var localBasePath =  (folderPath + urlPath).Replace("/", "\\");
         // Kiểm tra nếu đường dẫn yêu cầu bắt đầu bằng /images
-        if (requestPath.StartsWith("/images", StringComparison.OrdinalIgnoreCase))
+        if (requestPath.StartsWith(urlPath, StringComparison.OrdinalIgnoreCase))
         {
-            // Loại bỏ phần /images từ đường dẫn yêu cầu
-            var relativePath = requestPath.Substring(8).TrimStart('/');
 
+            var relativePath = requestPath.Substring(urlPath.Length).Replace("/", "\\");
             // Xác định đường dẫn đầy đủ đến tệp
-            var filePath = Path.Combine(@"D:\Images", relativePath);
+            var filePath = localBasePath + relativePath;
 
             // Kiểm tra nếu tệp tồn tại
             if (File.Exists(filePath))
