@@ -19,9 +19,9 @@ public static partial class Constants {
 			
 			public static class Supplies {
 				public const string InvalidSupply = "Bạn chưa chọn vật tư";
-				public const string InvalidSupplyCode = "Mã vật tư không hợp lệ";
-				public const string InvalidSupplyLocation = "Vị trí của vật tư không đúng";
-				public const string NoSupplyLocationSelected = "Bạn chưa chọn vị trí vật tư";
+				public const string EmptySupplyCode = "Mã vật tư không hợp lệ";
+				public const string InvalidSupplyLocation = "Vị trí hiện tại của vật tư không đúng";
+				public const string NoSupplyLocationSelected = "Bạn chưa chọn vị trí chi tiết vật tư";
 				public const string InvalidFileType = "Loại file không được phép";
 				public const string EmptySupplies = "Danh sách vật tư trống";
 				public const string NoSupplyImageSelected = "Bạn chưa chọn ảnh vật tư";

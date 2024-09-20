@@ -49,6 +49,15 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<LoginSuccessInfo> LoginAsync(LoginRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Username))
+        {
+            throw new BadRequestException(Constants.Authentication.Messages.EmptyLoginName);
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Password))
+        {
+            throw new BadRequestException(Constants.Authentication.Messages.EmptyKeyword);
+        }
         var nguoiDung = await GetEligibleAccountAsync(request.Username, true);
         if (nguoiDung is null)
         {

@@ -30,7 +30,7 @@ public class LookupService : ILookupService
     {
         if (string.IsNullOrWhiteSpace(maVatTu))
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupplyCode);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplyCode);
         }
         var response = new LookupSuppliesResponse();
 

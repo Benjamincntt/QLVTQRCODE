@@ -96,16 +96,16 @@ public class AuthenticationController : ApiControllerBase {
 		return Ok(new { Message = Constants.Authentication.Messages.RefreshTokenRevoked });
 	}
 	
-	/// <summary>
-	/// Kích hoạt tài khoản
-	/// </summary>
-	/// <param name="request"></param>
-	/// <returns></returns>
-	[HttpPost("activate-account")]
-	[AllowAnonymous]
-	public async Task<bool> ActivateAccountAsync([FromBody] ActivateAccountRequest request) {
-		return await _authenticationService.ActivateAccountAsync(request);
-	}
+	// /// <summary>
+	// /// Kích hoạt tài khoản
+	// /// </summary>
+	// /// <param name="request"></param>
+	// /// <returns></returns>
+	// [HttpPost("activate-account")]
+	// [AllowAnonymous]
+	// public async Task<bool> ActivateAccountAsync([FromBody] ActivateAccountRequest request) {
+	// 	return await _authenticationService.ActivateAccountAsync(request);
+	// }
 	//
 	// [HttpDelete("clear-cache")]
 	// [AllowAnonymous]

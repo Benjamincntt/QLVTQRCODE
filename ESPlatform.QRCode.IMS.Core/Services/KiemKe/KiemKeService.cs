@@ -46,7 +46,7 @@ public class KiemKeService : IKiemKeService
     {
         if (string.IsNullOrWhiteSpace(maVatTu))
         {
-            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupplyCode);
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplyCode);
         }
 
         var response = new InventoryCheckResponse();

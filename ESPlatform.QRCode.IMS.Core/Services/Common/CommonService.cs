@@ -59,8 +59,10 @@ public class CommonService : ICommonService
 
         #endregion
 
+        // lấy vị trí hiện tai
         var vitri = await _vatTuViTriRepository.GetAsync(x => x.IdVatTu == vatTuId && x.IdViTri == idViTri);
-
+        // nếu chưa có vị trí => tạo vị trí mới 
+        // trong case này nếu vị trí không được tìm thấy và có IdViTri => vẫn phải thêm mới vì trong db, bảng QLVT_VatTu_ViTri có IdViTri là key và là duy nhất
         if (idViTri == 0 || vitri == null)
         {
             var viTriVatTuNew = new QlvtVatTuViTri();
@@ -83,6 +85,7 @@ public class CommonService : ICommonService
             return await _vatTuViTriRepository.UpdateAsync(viTriVatTuNew);
         }
 
+        // nếu có vị trí => cập nhật lại vị trí
         vitri.IdToMay = request.IdToMay;
         vitri.IdGiaKe = request.IdGiaKe;
         vitri.IdNgan = request.IdNgan;
@@ -106,7 +109,8 @@ public class CommonService : ICommonService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
         }
-        if(file.Length <= 0)
+
+        if (file.Length <= 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.NoSupplyImageSelected);
         }
@@ -126,37 +130,46 @@ public class CommonService : ICommonService
 
         #endregion
 
-        var folderPath = AppConfig.Instance.Image.FolderPath; //   "D:"
-        var urlPath = AppConfig.Instance.Image.UrlPath; //         "/Images"
-        var localBasePath = (folderPath + urlPath).Replace("/", "\\");
-        var localPath = (folderPath + inputPath).Replace("/", "\\");
-        // delete old image
+        var folderPath = AppConfig.Instance.Image.FolderPath; // "D:"
+        var urlPath = AppConfig.Instance.Image.UrlPath; // "/Images"
+        var localBasePath = (folderPath + urlPath).Replace("/", "\\"); // "D:\Images"
+        var localPath = (folderPath + inputPath).Replace("/", "\\"); // "D:/Images/id/name.png"
+        // Xóa ảnh cũ
         if (File.Exists(localPath))
         {
             File.Delete(localPath);
         }
-        // create new image
+
+        // Tạo ảnh mới
         var fileName = $"{Path.GetFileName(file.FileName)}";
-        
-        // case not exist folder
+
+        // nếu thư mục chứa ảnh chưa tồn tại => tạo thư mục theo Id => lưu ảnh
         var localFolder = Path.Combine(localBasePath, vatTuId.ToString());
         if (!Directory.Exists(localFolder))
         {
             Directory.CreateDirectory(localFolder);
-            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
-            await _vatTuRepository.UpdateAsync(vatTu);
         }
-        var fullPath = Path.Combine(localBasePath, vatTuId.ToString(), fileName);
-        
-        // save file
-        using (var stream = new FileStream(fullPath, FileMode.Create))
+
+        var fullPath = Path.Combine(localBasePath, vatTuId.ToString(), fileName); // "D:\Images\{vatTuId}\{fileName}"
+        await using (var stream = new FileStream(fullPath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
 
-        var urlResult = vatTu.Image = Path.Combine(AppConfig.Instance.Image.UrlPath, vatTuId.ToString(), fileName)
-            .Replace("\\", "/");
-        return urlResult;
+        // Lấy ảnh đầu tiên trong thư mục làm ảnh đại diện
+        var imageFiles = Directory.GetFiles(localFolder)
+            .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
+            .ToList();
+        if (imageFiles.Count > 0)
+        {
+            var firstImageFile = imageFiles.First();
+            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), Path.GetFileName(firstImageFile))
+                .Replace("\\", "/"); // "/Images/{vatTuId}/{firstImageFileName}"
+            await _vatTuRepository.UpdateAsync(vatTu);
+        }
+
+        return Path.Combine(AppConfig.Instance.Image.UrlPath, vatTuId.ToString(), fileName)
+            .Replace("\\", "/"); // "/Images/{vatTuId}/{fileName}"                                                                                          
     }
 
     public async Task<string> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
@@ -167,7 +180,8 @@ public class CommonService : ICommonService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
         }
-        if(file.Length <= 0)
+
+        if (file.Length <= 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.NoSupplyImageSelected);
         }
@@ -200,18 +214,23 @@ public class CommonService : ICommonService
             Directory.CreateDirectory(pathUpload);
         }
 
-        if (vatTu.Image == null)
-        {
-            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
-            await _vatTuRepository.UpdateAsync(vatTu);
-        }
-
         var fullPath = Path.Combine(pathUpload, fileName);
 
         // save file
-        using (var stream = new FileStream(fullPath, FileMode.Create))
+        await using (var stream = new FileStream(fullPath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
+        }
+        // Lấy ảnh đầu tiên trong thư mục làm ảnh đại diện
+        var imageFiles = Directory.GetFiles(pathUpload)
+            .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
+            .ToList();
+        if (imageFiles.Count > 0)
+        {
+            var firstImageFile = imageFiles.First();
+            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), Path.GetFileName(firstImageFile))
+                .Replace("\\", "/"); // "/Images/{vatTuId}/{firstImageFileName}"
+            await _vatTuRepository.UpdateAsync(vatTu);
         }
 
         var urlResult = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
@@ -231,11 +250,32 @@ public class CommonService : ICommonService
             throw new NotFoundException(vatTu.GetTypeEx(), null);
         }
 
-        var folderPath = AppConfig.Instance.Image.FolderPath; //   "D:"
-        // delete old image
+        var folderPath = AppConfig.Instance.Image.FolderPath; 
+        var urlPath = AppConfig.Instance.Image.UrlPath;
+        var localBasePath = (folderPath + urlPath).Replace("/", "\\"); // "D:\Images"
         var localPath = (folderPath + inputPath).Replace("/", "\\");
-        if (!File.Exists(localPath)) return default;
+        string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" }; // Các loại file được phép
+        // nếu không tồn tại ảnh => xóa không thành công 
+        if (!File.Exists(localPath))
+        {
+            return default;
+        }
         File.Delete(localPath);
+        // Lấy ảnh đầu tiên trong thư mục làm ảnh đại diện
+        var localFolder = Path.Combine(localBasePath, vatTuId.ToString()); 
+        var imageFiles = Directory.GetFiles(localFolder)
+            .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
+            .ToList();
+        if (imageFiles.Count <= 0)
+        {
+            vatTu.Image = string.Empty;
+            await _vatTuRepository.UpdateAsync(vatTu);
+            return 1;
+        }
+        var firstImageFile = imageFiles.First();
+        vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), Path.GetFileName(firstImageFile))
+            .Replace("\\", "/"); 
+        await _vatTuRepository.UpdateAsync(vatTu);
         return 1;
     }
 
