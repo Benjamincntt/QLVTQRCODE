@@ -7,6 +7,7 @@ namespace ESPlatform.QRCode.IMS.Domain.Interfaces;
 public interface IVatTuRepository : IRepositoryBase<QlvtVatTu> {
     Task<dynamic?> GetInventoryCheckInformationAsync(int vatTuId, int kyKiemKeId);
     Task<IEnumerable<dynamic>> GetPositionAsync(int vatTuId);
-    Task<dynamic?> GetInventoryAsync(int vatTuId, int khoId);
+    Task<dynamic?> GetLotNumberAsync(int vatTuId, int khoId);
     Task<PagedList<dynamic>> ListAsync( string tenVatTu, string maVatTu, int idKho, int idViTri, int pageIndex, int pageSize);
+    Task<dynamic?> GetWarehouseIdAsync(int vatTuId);
 }

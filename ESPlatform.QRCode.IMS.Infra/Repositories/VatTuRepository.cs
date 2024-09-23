@@ -52,7 +52,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         return response;
     }
 
-    public async Task<dynamic?> GetInventoryAsync(int vatTuId, int khoId)
+    public async Task<dynamic?> GetLotNumberAsync(int vatTuId, int khoId)
     {
         var response = await DbContext.QlvtVatTuTonKhos
             .Where(x => x.InventoryItemId == vatTuId)
@@ -120,5 +120,32 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
 
         // Phân trang kết quả kết hợp
         return await combinedQuery.ToPagedListAsync<dynamic>(pageIndex, pageSize);
+    }
+
+    public async Task<dynamic?> GetWarehouseIdAsync(int vatTuId)
+    {
+        var query = DbContext.QlvtKhos
+            .Join(DbContext.QlvtVatTus,
+                x => x.OrganizationId,
+                y => y.KhoId,
+                (x, y) => new { QlvtKho = x, QlvtVatTu = y })
+            .GroupJoin(DbContext.QlvtKhos,
+                x => x.QlvtKho.SubInventoryCode,
+                y => y.OrganizationCode,
+                (x, y) => new { x.QlvtKho, x.QlvtVatTu, KhoPhu = y })
+            .SelectMany(x => x.KhoPhu.DefaultIfEmpty(),
+                (x, y) => new
+                {
+                    x.QlvtKho,
+                    x.QlvtVatTu,
+                    KhoPhu = y
+                })
+            .Where(x => x.QlvtVatTu.VatTuId == vatTuId)
+            .Select(x => new
+            {
+                KhoChinhId = x.QlvtKho.OrganizationId,
+                KhoPhuId = x.KhoPhu != null ? x.KhoPhu.OrganizationId : 0
+            });
+        return await query.FirstOrDefaultAsync();
     }
 }

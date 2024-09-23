@@ -13,13 +13,9 @@ Authorization: Bearer {{accessToken}}
 
 {
   "soLuongMatPhamChat": 2,
-  "phanTramMatPhamChat": 2,
   "soLuongKemPhamChat": 3,
-  "phanTramKemPhamChat": 4,
   "soLuongDong": 5,
-  "soLuongDeNghiThanhLy": 6,
-  "phanTramDong": 7,
-  "tsKemPcMatPc": 8
+  "soLuongDeNghiThanhLy": 6
 }
 
 ### Cập nhật QTY vật tư

@@ -5,6 +5,7 @@ using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
+using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
@@ -131,7 +132,7 @@ public class KiemKeService : IKiemKeService
         }
 
         // LOT
-        var inventory = await _vatTuRepository.GetInventoryAsync(vatTuId, vatTu.KhoId);
+        var inventory = await _vatTuRepository.GetLotNumberAsync(vatTuId, vatTu.KhoId);
         if (inventory == null) return response;
         var inventoryMapper = _mapper.Map<InventoryCheckResponse>(inventory);
         response.LotNumber = inventoryMapper.LotNumber;
@@ -155,7 +156,7 @@ public class KiemKeService : IKiemKeService
             throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKe);
         }
 
-        if (kyKiemKeChiTietId < 1)
+        if (kyKiemKeChiTietId < 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKeChiTiet);
         }
@@ -181,11 +182,48 @@ public class KiemKeService : IKiemKeService
         }
 
         #endregion
+        // nếu vật tư chưa kiểm kê bao giờ => thêm mới kì kiểm kê chi tiết cho vật tư => thêm mới DFF
+        if (kyKiemKeChiTietId == 0)
+        {
+            var warehouses = await _vatTuRepository.GetWarehouseIdAsync(vatTuId);
+            if (warehouses != null)
+            {
+                warehouses = _mapper.Map<WarehouseIdResponse>(warehouses);
 
-        var currentSuppliesDff =
-            await _kyKiemKeChiTietDffRepository.GetAsync(x =>
-                x.VatTuId == vatTuId && x.KyKiemKeChiTietId == kyKiemKeChiTietId);
-        // if has no DFF => create
+            }
+            var kyKiemKeChiTiet = new QlvtKyKiemKeChiTiet
+            {
+                VatTuId = vatTuId,
+                KyKiemKeId = kyKiemKeId,
+                NgayKiemKe = DateTime.Now,
+                NguoiKiemKeId = _authorizedContextFacade.AccountId,
+                NguoiKiemKeTen = _authorizedContextFacade.Username,
+                SoLuongKiemKe = soLuongKiemKe,
+                TrangThai = 1,
+                KhoChinhId = warehouses != null? warehouses.KhoChinhId : null,
+                KhoPhuId = warehouses != null? warehouses?.KhoPhuId : null,
+            };
+            await _kyKiemKeChiTietRepository.InsertAsync(kyKiemKeChiTiet);
+            var kyKiemKeChiTietNew = await _kyKiemKeChiTietRepository.GetAsync(x => x.VatTuId == vatTuId && x.KyKiemKeId == kyKiemKeId);
+            var kyKiemKeChiTietIdNew = kyKiemKeChiTietNew != null ? kyKiemKeChiTietNew.KyKiemKeChiTietId : 0;
+            var dffToCreate = new QlvtKyKiemKeChiTietDff();
+
+            dffToCreate.VatTuId = vatTuId;
+            dffToCreate.KyKiemKeChiTietId = kyKiemKeChiTietIdNew;
+            if (soLuongKiemKe > 0)
+            {
+                dffToCreate.PhanTramMatPhamChat = request.SoLuongMatPhamChat / soLuongKiemKe * 100;
+                dffToCreate.PhanTramKemPhamChat = request.SoLuongKemPhamChat / soLuongKiemKe * 100;
+                dffToCreate.PhanTramDong = request.SoLuongDong / soLuongKiemKe * 100;
+                dffToCreate.TsKemPcMatPc = request.SoLuongMatPhamChat + request.SoLuongKemPhamChat;
+            }
+
+            var responseToCreate = _mapper.Map(request, dffToCreate);
+            return await _kyKiemKeChiTietDffRepository.InsertAsync(responseToCreate);
+        }
+
+        var currentSuppliesDff = await _kyKiemKeChiTietDffRepository.GetAsync(x => x.VatTuId == vatTuId && x.KyKiemKeChiTietId == kyKiemKeChiTietId);
+        // Nếu có kỳ kiểm kê chi tiết nhưng chưa có dữ liệu DFF => thêm mới DFF
         if (currentSuppliesDff == null)
         {
             var dffToCreate = new QlvtKyKiemKeChiTietDff();

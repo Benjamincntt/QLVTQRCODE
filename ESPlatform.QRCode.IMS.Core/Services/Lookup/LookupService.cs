@@ -82,7 +82,7 @@ public class LookupService : ILookupService
         }
         
         // LOT
-        var wareHouse = await _vatTuRepository.GetInventoryAsync(vatTuId, vatTu.KhoId);
+        var wareHouse = await _vatTuRepository.GetLotNumberAsync(vatTuId, vatTu.KhoId);
         if (wareHouse == null) return response;
         var wareHouseMapper = _mapper.Map<InventoryCheckResponse>(wareHouse);
         response.LotNumber = wareHouseMapper.LotNumber;
