@@ -185,25 +185,7 @@ public class KiemKeService : IKiemKeService
         // nếu vật tư chưa kiểm kê bao giờ => thêm mới kì kiểm kê chi tiết cho vật tư => thêm mới DFF
         if (kyKiemKeChiTietId == 0)
         {
-            var warehouses = await _vatTuRepository.GetWarehouseIdAsync(vatTuId);
-            if (warehouses != null)
-            {
-                warehouses = _mapper.Map<WarehouseIdResponse>(warehouses);
-
-            }
-            var kyKiemKeChiTiet = new QlvtKyKiemKeChiTiet
-            {
-                VatTuId = vatTuId,
-                KyKiemKeId = kyKiemKeId,
-                NgayKiemKe = DateTime.Now,
-                NguoiKiemKeId = _authorizedContextFacade.AccountId,
-                NguoiKiemKeTen = _authorizedContextFacade.Username,
-                SoLuongKiemKe = soLuongKiemKe,
-                TrangThai = 1,
-                KhoChinhId = warehouses != null? warehouses.KhoChinhId : null,
-                KhoPhuId = warehouses != null? warehouses?.KhoPhuId : null,
-            };
-            await _kyKiemKeChiTietRepository.InsertAsync(kyKiemKeChiTiet);
+            await CreateInventoryCheckDetailAsync(vatTuId, kyKiemKeId, soLuongKiemKe);
             var kyKiemKeChiTietNew = await _kyKiemKeChiTietRepository.GetAsync(x => x.VatTuId == vatTuId && x.KyKiemKeId == kyKiemKeId);
             var kyKiemKeChiTietIdNew = kyKiemKeChiTietNew != null ? kyKiemKeChiTietNew.KyKiemKeChiTietId : 0;
             var dffToCreate = new QlvtKyKiemKeChiTietDff();
@@ -278,14 +260,7 @@ public class KiemKeService : IKiemKeService
         // has no QTY => create new 
         if (kyKiemKeChiTiet == null)
         {
-            var qtyToCreate = new QlvtKyKiemKeChiTiet();
-            qtyToCreate.VatTuId = vatTuId;
-            qtyToCreate.KyKiemKeId = kyKiemKeId;
-            qtyToCreate.SoLuongKiemKe = soLuongKiemKe;
-            qtyToCreate.SoLuongChenhLech = soLuongKiemKe;
-            qtyToCreate.SoLuongSoSach = 0;
-            qtyToCreate.NgayKiemKe = DateTime.Now;
-            return await _kyKiemKeChiTietRepository.InsertAsync(qtyToCreate);
+          return await CreateInventoryCheckDetailAsync(vatTuId, kyKiemKeId, soLuongKiemKe);
         }
 
         // has QTY => update
@@ -310,5 +285,30 @@ public class KiemKeService : IKiemKeService
         }
 
         return currentInventoryCheck;
+    }
+
+    public async Task<int> CreateInventoryCheckDetailAsync(int vatTuId, int kyKiemKeId, int soLuongKiemKe)
+    {
+        var warehouses = await _vatTuRepository.GetWarehouseIdAsync(vatTuId);
+        if (warehouses != null)
+        {
+            warehouses = _mapper.Map<WarehouseIdResponse>(warehouses);
+
+        }
+        var qtyToCreate = new QlvtKyKiemKeChiTiet
+        {
+            VatTuId = vatTuId,
+            KyKiemKeId = kyKiemKeId,
+            SoLuongKiemKe = soLuongKiemKe,
+            SoLuongSoSach = soLuongKiemKe,
+            SoLuongChenhLech = 0,
+            NgayKiemKe = DateTime.Now,
+            NguoiKiemKeId = _authorizedContextFacade.AccountId,
+            NguoiKiemKeTen = _authorizedContextFacade.Username,
+            TrangThai = (short?)TrangThaiKyKiemKeChiTiet.DaKiemKe,
+            KhoChinhId = warehouses != null? warehouses.KhoChinhId : null,
+            KhoPhuId = warehouses != null? warehouses.KhoPhuId : null,
+        };
+        return await _kyKiemKeChiTietRepository.InsertAsync(qtyToCreate);
     }
 }
