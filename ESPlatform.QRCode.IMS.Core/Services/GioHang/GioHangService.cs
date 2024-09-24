@@ -133,7 +133,7 @@ public class GioHangService : IGioHangService
     public async Task<int> CreateSupplyAsync(int vatTuId, CreatedCartSupplyRequest request)
     {
         var userId = _authorizedContextFacade.AccountId;
-        var supplyInCart = await _gioHangRepository.GetAsync(x => x.VatTuId == vatTuId && x.UserId == userId);
+        var supplyInCart = await _gioHangRepository.GetAsync(x => x.VatTuId == vatTuId && x.UserId == userId && x.IsSystemSupply == request.IsSystemSupply);
         if (supplyInCart != null)
         {
             supplyInCart.SoLuong = supplyInCart.SoLuong + request.SoLuong;
