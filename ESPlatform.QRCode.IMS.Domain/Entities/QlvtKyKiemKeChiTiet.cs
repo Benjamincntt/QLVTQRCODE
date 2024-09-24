@@ -19,7 +19,7 @@ public partial class QlvtKyKiemKeChiTiet
     public decimal? SoLuongChenhLech { get; set; }
 
     public string? SoThe { get; set; }
-    
+
     public short? TrangThai { get; set; }
 
     public DateTime? NgayKiemKe { get; set; }
@@ -27,4 +27,8 @@ public partial class QlvtKyKiemKeChiTiet
     public int? NguoiKiemKeId { get; set; }
 
     public string? NguoiKiemKeTen { get; set; }
+
+    public virtual QlvtKyKiemKe? KyKiemKe { get; set; }
+
+    public virtual ICollection<QlvtKyKiemKeChiTietDff> QlvtKyKiemKeChiTietDffs { get; set; } = new List<QlvtKyKiemKeChiTietDff>();
 }

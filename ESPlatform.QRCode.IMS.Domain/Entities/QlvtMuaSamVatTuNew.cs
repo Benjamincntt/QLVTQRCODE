@@ -6,11 +6,15 @@ public partial class QlvtMuaSamVatTuNew
 
     public string TenVatTu { get; set; } = null!;
 
-    public string DonViTinh { get; set; }
+    public string? DonViTinh { get; set; }
 
     public string? GhiChu { get; set; }
 
     public string? ThongSoKyThuat { get; set; }
-    
+
     public string? Image { get; set; }
+
+    public string? MaVatTu { get; set; }
+
+    public string? XuatXu { get; set; }
 }

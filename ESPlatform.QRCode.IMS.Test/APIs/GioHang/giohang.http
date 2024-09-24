@@ -1,0 +1,46 @@
+﻿### Đếm số vật tư trong giỏ hàng
+GET {{host}}/{{gioHangPath}}/count
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Danh sách vật tư trong giỏ hàng
+GET {{host}}/{{gioHangPath}}/danh-sach-vat-tu
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###  Tăng giảm số lượng của một vật tư trong giỏ hàng 
+PATCH {{host}}/{{gioHangPath}}/{{vatTuId}}?quantity=2
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###  Cập nhật thông số kỹ thuật và ghi chú của 1 vật tư trong giỏ hàng
+PATCH {{host}}/{{gioHangPath}}/{{vatTuId}}/thong-tin
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "isSystemSupply": true,
+  "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
+  "ghiChu": "hàng nhập khẩu"
+}
+
+###  Xóa 1 vật tư trong giỏ hàng
+DELETE {{host}}/{{gioHangPath}}/{{vatTuId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###  Thêm mới 1 vật tư vào giỏ hàng
+POST {{host}}/{{gioHangPath}}/{{vatTuId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "image": "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin/IMGVatTu/5/Van 1 chiều cánh bướm.png",
+  "tenVatTu": "seiken",
+  "soLuong": 10,
+  "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
+  "ghiChu": "hàng nhập khẩu",
+  "isSystemSupply": true
+}
+
+

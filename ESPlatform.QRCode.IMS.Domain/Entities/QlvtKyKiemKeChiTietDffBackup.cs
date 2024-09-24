@@ -4,7 +4,7 @@ public partial class QlvtKyKiemKeChiTietDffBackup
 {
     public int ChiTietDffId { get; set; }
 
-    public int? KyKiemKeChiTietId { get; set; }
+    public int? KyKiemKeIdGoc { get; set; }
 
     public int? VatTuId { get; set; }
 
@@ -23,4 +23,9 @@ public partial class QlvtKyKiemKeChiTietDffBackup
     public decimal? PhanTramDong { get; set; }
 
     public decimal? TsKemPcMatPc { get; set; }
+
+    public int? KyKiemKeChiTietBackupId { get; set; }
+
+    public virtual QlvtKyKiemKeChiTietBackup? KyKiemKeChiTietBackup { get; set; }
 }
+

@@ -3,6 +3,7 @@ using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Services.Accounts;
 using ESPlatform.QRCode.IMS.Core.Services.Authentication;
 using ESPlatform.QRCode.IMS.Core.Services.Common;
+using ESPlatform.QRCode.IMS.Core.Services.GioHang;
 using ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 using ESPlatform.QRCode.IMS.Core.Services.Lookup;
 using ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
@@ -50,6 +51,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IMuaSamPhieuDeXuatRepository, MuaSamPhieuDeXuatRepository>()
             .AddScoped<IMuaSamVatTuNewRepository, MuaSamVatTuNewRepository>()
             .AddScoped<IMuaSamPhieuDeXuatDetailRepository, MuaSamPhieuDeXuatDetailRepository>()
+            .AddScoped<IGioHangRepository, GioHangRepository>()
             .AddScoped<IUnitOfWork, UnitOfWork>()
 
             // Facades
@@ -63,6 +65,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<ILookupService, LookupService>()
             .AddScoped<ICommonService, CommonService>()
             .AddScoped<IMuaSamVatTuService, MuaSamVatTuService>()
+            .AddScoped<IGioHangService, GioHangService>()
             ;
 
         return services;

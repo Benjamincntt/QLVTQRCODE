@@ -23,4 +23,6 @@ public partial class QlvtKyKiemKeChiTietDff
     public decimal? PhanTramDong { get; set; }
 
     public decimal? TsKemPcMatPc { get; set; }
+
+    public virtual QlvtKyKiemKeChiTiet? KyKiemKeChiTiet { get; set; }
 }

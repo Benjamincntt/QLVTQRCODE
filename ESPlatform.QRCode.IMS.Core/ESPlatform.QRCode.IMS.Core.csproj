@@ -33,6 +33,7 @@
 
 
     <ItemGroup>
+      <Folder Include="DTOs\Accounts\Responses\" />
       <Folder Include="DTOs\ViTris\Requests\" />
       <Folder Include="DTOs\TraCuu\Requests\" />
       <Folder Include="DTOs\NguoiDungs\Responses\" />

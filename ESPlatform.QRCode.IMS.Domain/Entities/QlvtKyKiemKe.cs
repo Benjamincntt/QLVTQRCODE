@@ -53,6 +53,9 @@ public partial class QlvtKyKiemKe
     /// Người tạo
     /// </summary>
     public string? UserName { get; set; }
-    
+
     public short? KyKiemKeChinh { get; set; }
+
+    public virtual ICollection<QlvtKyKiemKeChiTiet> QlvtKyKiemKeChiTiets { get; set; } = new List<QlvtKyKiemKeChiTiet>();
 }
+

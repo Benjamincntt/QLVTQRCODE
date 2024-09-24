@@ -4,7 +4,6 @@ namespace ESPlatform.QRCode.IMS.Domain.Entities;
 [DisplayName("Vật tư")]
 public partial class QlvtVatTu
 {
-    [DisplayName("Mã vật tư")]
     public int KhoId { get; set; }
 
     public string? MaVatTu { get; set; }

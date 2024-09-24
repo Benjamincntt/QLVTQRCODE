@@ -12,4 +12,8 @@ public class CreatedSupplyRequest
     public string GhiChu { get; set; } = string.Empty;
     [DisplayName("Thông số kỹ thuật")]
     public string ThongSoKyThuat { get; set; } = string.Empty;
+    [DisplayName("Mã vật tư")]
+    public string MaVatTu { get; set; } = string.Empty;
+    [DisplayName("Xuất xứ")]
+    public string XuatXu { get; set; } = string.Empty;
 }

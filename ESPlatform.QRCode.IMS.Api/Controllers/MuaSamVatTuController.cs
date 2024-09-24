@@ -4,6 +4,7 @@ using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
+using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Microsoft.AspNetCore.Mvc;
 
@@ -94,5 +95,14 @@ public class MuaSamVatTuController : ApiControllerBase
     {
         return await _muaSamVatTuService.DeleteSupplyTicketAsync( supplyTicketId);
     }
-    
+
+    /// <summary>
+    /// Danh sách các kho hàng
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("danh-sach-kho")]
+    public async Task<IEnumerable<WarehouseResponseItem>> ListWarehousesAsync()
+    {
+        return await _muaSamVatTuService.ListWarehousesAsync();
+    }
 }

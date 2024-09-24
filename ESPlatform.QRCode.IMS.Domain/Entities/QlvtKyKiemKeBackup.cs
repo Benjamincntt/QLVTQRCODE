@@ -23,4 +23,11 @@ public partial class QlvtKyKiemKeBackup
     public string? EndTag { get; set; }
 
     public string? UserName { get; set; }
+
+    public short? Kykiemkechinh { get; set; }
+
+    public int? KiemKeIdGoc { get; set; }
+
+    public virtual ICollection<QlvtKyKiemKeChiTietBackup> QlvtKyKiemKeChiTietBackups { get; set; } =
+        new List<QlvtKyKiemKeChiTietBackup>();
 }

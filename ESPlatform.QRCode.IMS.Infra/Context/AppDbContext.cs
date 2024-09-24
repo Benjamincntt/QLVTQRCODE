@@ -14,7 +14,11 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<GetNewId> GetNewIds { get; set; }
 
+    public virtual DbSet<QlvtGioHang> QlvtGioHangs { get; set; }
+
     public virtual DbSet<QlvtKho> QlvtKhos { get; set; }
+
+    public virtual DbSet<QlvtKhoPhu> QlvtKhoPhus { get; set; }
 
     public virtual DbSet<QlvtKyKiemKe> QlvtKyKiemKes { get; set; }
 
@@ -165,6 +169,26 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.MyNewId).HasColumnName("MyNewID");
         });
 
+        modelBuilder.Entity<QlvtGioHang>(entity =>
+        {
+            entity.HasKey(e => e.GioHangId);
+
+            entity.ToTable("QLVT_GioHang");
+
+            entity.Property(e => e.GioHangId).HasColumnName("GioHang_Id");
+            entity.Property(e => e.GhiChu).HasMaxLength(250);
+            entity.Property(e => e.Image).HasMaxLength(200);
+            entity.Property(e => e.IsSystemSupply)
+                .IsRequired()
+                .HasDefaultValueSql("((1))");
+            entity.Property(e => e.SoLuong).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.TenVatTu).HasMaxLength(100);
+            entity.Property(e => e.ThoiGianCapNhat).HasColumnType("datetime");
+            entity.Property(e => e.ThoiGianTao).HasColumnType("datetime");
+            entity.Property(e => e.ThongSoKyThuat).HasMaxLength(250);
+            entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+        });
+
         modelBuilder.Entity<QlvtKho>(entity =>
         {
             entity.HasKey(e => e.OrganizationId);
@@ -192,33 +216,43 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("Operating_Unit");
             entity.Property(e => e.OrganizationCode)
                 .HasMaxLength(50)
-                .IsUnicode(false)
                 .HasComment("Mã Kho")
                 .HasColumnName("Organization_Code");
             entity.Property(e => e.OrganizationName)
                 .HasMaxLength(250)
-                .IsUnicode(false)
                 .HasComment("Tên Kho")
                 .HasColumnName("Organization_Name");
             entity.Property(e => e.OrganizationType)
                 .HasMaxLength(50)
-                .IsUnicode(false)
                 .HasComment("Loại kho")
                 .HasColumnName("Organization_Type");
             entity.Property(e => e.PrimaryCostMethod)
                 .HasMaxLength(50)
-                .IsUnicode(false)
                 .HasComment("Phương pháp tính giá")
                 .HasColumnName("Primary_Cost_Method");
             entity.Property(e => e.SubInventoryCode)
                 .HasMaxLength(50)
-                .IsUnicode(false)
                 .HasComment("Mã kho phụ")
                 .HasColumnName("Subinventory_Code");
             entity.Property(e => e.SubInventoryName)
                 .HasMaxLength(250)
-                .IsUnicode(false)
                 .HasComment("Tên kho phụ")
+                .HasColumnName("Subinventory_Name");
+        });
+
+        modelBuilder.Entity<QlvtKhoPhu>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("QLVT_KhoPhu");
+
+            entity.Property(e => e.GhiChu).HasMaxLength(1000);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.SubinventoryCode)
+                .HasMaxLength(50)
+                .HasColumnName("Subinventory_Code");
+            entity.Property(e => e.SubinventoryName)
+                .HasMaxLength(250)
                 .HasColumnName("Subinventory_Name");
         });
 
@@ -279,6 +313,8 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.FreezeDate)
                 .HasColumnType("datetime")
                 .HasColumnName("freeze_date");
+            entity.Property(e => e.KiemKeIdGoc).HasColumnName("KiemKe_Id_Goc");
+            entity.Property(e => e.Kykiemkechinh).HasColumnName("kykiemkechinh");
             entity.Property(e => e.OrganizationCode)
                 .HasMaxLength(255)
                 .HasColumnName("organization_code");
@@ -320,6 +356,10 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+
+            entity.HasOne(d => d.KyKiemKe).WithMany(p => p.QlvtKyKiemKeChiTiets)
+                .HasForeignKey(d => d.KyKiemKeId)
+                .HasConstraintName("FK_QLVT_KyKiemKe_ChiTiet_QLVT_KyKiemKe1");
         });
 
         modelBuilder.Entity<QlvtKyKiemKeChiTietBackup>(entity =>
@@ -331,7 +371,8 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
             entity.Property(e => e.KhoChinhId).HasColumnName("KhoChinh_Id");
             entity.Property(e => e.KhoPhuId).HasColumnName("KhoPhu_Id");
-            entity.Property(e => e.KyKiemKeId).HasColumnName("KyKiemKe_Id");
+            entity.Property(e => e.KiemKeIdGoc).HasColumnName("KiemKe_Id_Goc");
+            entity.Property(e => e.KyKiemKeBackupId).HasColumnName("KyKiemKe_Backup_Id");
             entity.Property(e => e.NgayKiemKe).HasColumnType("datetime");
             entity.Property(e => e.NguoiKiemKeId).HasColumnName("NguoiKiemKe_Id");
             entity.Property(e => e.NguoiKiemKeTen)
@@ -342,6 +383,10 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.SoLuongSoSach).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.SoThe).HasMaxLength(255);
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+
+            entity.HasOne(d => d.KyKiemKeBackup).WithMany(p => p.QlvtKyKiemKeChiTietBackups)
+                .HasForeignKey(d => d.KyKiemKeBackupId)
+                .HasConstraintName("FK_QLVT_KyKiemKe_ChiTiet_Backup_QLVT_KyKiemKe_Backup");
         });
 
         modelBuilder.Entity<QlvtKyKiemKeChiTietDff>(entity =>
@@ -363,6 +408,10 @@ public partial class AppDbContext : DbContext
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("TS_KemPc_MatPc");
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+
+            entity.HasOne(d => d.KyKiemKeChiTiet).WithMany(p => p.QlvtKyKiemKeChiTietDffs)
+                .HasForeignKey(d => d.KyKiemKeChiTietId)
+                .HasConstraintName("FK_QLVT_KyKiemKe_ChiTiet_DFF_QLVT_KyKiemKe_ChiTiet");
         });
 
         modelBuilder.Entity<QlvtKyKiemKeChiTietDffBackup>(entity =>
@@ -372,7 +421,8 @@ public partial class AppDbContext : DbContext
             entity.ToTable("QLVT_KyKiemKe_ChiTiet_DFF_Backup");
 
             entity.Property(e => e.ChiTietDffId).HasColumnName("ChiTiet_DFF_Id");
-            entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
+            entity.Property(e => e.KyKiemKeChiTietBackupId).HasColumnName("KyKiemKe_ChiTiet_Backup_Id");
+            entity.Property(e => e.KyKiemKeIdGoc).HasColumnName("KyKiemKe_Id_Goc");
             entity.Property(e => e.PhanTramDong).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.PhanTramKemPhamChat).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.PhanTramMatPhamChat).HasColumnType("decimal(5, 2)");
@@ -384,6 +434,10 @@ public partial class AppDbContext : DbContext
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("TS_KemPc_MatPc");
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+
+            entity.HasOne(d => d.KyKiemKeChiTietBackup).WithMany(p => p.QlvtKyKiemKeChiTietDffBackups)
+                .HasForeignKey(d => d.KyKiemKeChiTietBackupId)
+                .HasConstraintName("FK_QLVT_KyKiemKe_ChiTiet_DFF_Backup_QLVT_KyKiemKe_ChiTiet_Backup");
         });
 
         modelBuilder.Entity<QlvtKyKiemKeChiTietErpDemo>(entity =>
@@ -505,8 +559,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.DonViTinh).HasMaxLength(100);
             entity.Property(e => e.GhiChu).HasColumnType("text");
             entity.Property(e => e.Image).HasMaxLength(200);
+            entity.Property(e => e.MaVatTu)
+                .HasMaxLength(100)
+                .IsUnicode(false);
             entity.Property(e => e.TenVatTu).HasMaxLength(100);
             entity.Property(e => e.ThongSoKyThuat).HasColumnType("text");
+            entity.Property(e => e.XuatXu).HasMaxLength(200);
         });
 
         modelBuilder.Entity<QlvtVatTu>(entity =>
@@ -561,6 +619,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("Lot_Number");
             entity.Property(e => e.OnhandQuantity)
                 .HasComment("Số lượng tồn")
+                .HasColumnType("decimal(18, 2)")
                 .HasColumnName("Onhand_Quantity");
             entity.Property(e => e.SubinventoryCode)
                 .HasMaxLength(50)

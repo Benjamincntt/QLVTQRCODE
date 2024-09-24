@@ -24,6 +24,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
     private readonly IMuaSamPhieuDeXuatRepository _muaSamPhieuDeXuatRepository;
     private readonly IMuaSamPhieuDeXuatDetailRepository _muaSamPhieuDeXuatDetailRepository;
+    private readonly IKhoRepository _khoRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
 
     public MuaSamVatTuService(
@@ -31,6 +32,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
         IMuaSamPhieuDeXuatRepository muaSamPhieuDeXuatRepository,
         IMuaSamPhieuDeXuatDetailRepository muaSamPhieuDeXuatDetailRepository,
+        IKhoRepository khoRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork)
     {
@@ -38,6 +40,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
         _muaSamPhieuDeXuatRepository = muaSamPhieuDeXuatRepository;
         _muaSamPhieuDeXuatDetailRepository = muaSamPhieuDeXuatDetailRepository;
+        _khoRepository = khoRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
     }
@@ -200,7 +203,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId))
             .Adapt<IEnumerable<SupplyResponse>>();
         response.DanhSachVatTu = listSupplies.ToList();
-        response.Tong = response.DanhSachVatTu.Count();
+        response.Tong = response.DanhSachVatTu.Count;
         return response;
     }
 
@@ -221,5 +224,11 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             await _muaSamPhieuDeXuatDetailRepository.DeleteManyAsync(currentSupplyTicketDetails);
         }
         return await _muaSamPhieuDeXuatRepository.DeleteAsync(currentSupplyTicket);
+    }
+
+    public async Task<IEnumerable<WarehouseResponseItem>> ListWarehousesAsync()
+    {
+        var response = (await _khoRepository.ListWarehousesAsync()).Adapt<IEnumerable<WarehouseResponseItem>>();
+        return response;
     }
 }

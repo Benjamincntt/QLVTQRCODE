@@ -25,6 +25,7 @@ public static partial class Constants {
 				public const string InvalidFileType = "Loại file không được phép";
 				public const string EmptySupplies = "Danh sách vật tư trống";
 				public const string NoSupplyImageSelected = "Bạn chưa chọn ảnh vật tư";
+				public const string SupplyNotExist = "Vật tư không còn trong hệ thống";
 			}
 
 			public static class Login {
@@ -45,6 +46,13 @@ public static partial class Constants {
 			{
 				public const string InvalidId = "Id phiếu cung ứng không hợp lệ";
 				public const string InvalidSupplyTicket = "Bạn chưa chọn phiếu cung ứng";
+			}
+
+			public static class Cart
+			{
+				public const string InvalidQuantity = "Số lượng vật tư không được nhỏ hơn 1";
+				public const string SupplyNotExist = "Vật tư không còn trong giỏ hàng";
+				public const string DeletedSupply = "Vật tư đã không còn trong hệ thống nên đã bị xóa khỏi giỏ hàng";
 			}
 		}
 	}

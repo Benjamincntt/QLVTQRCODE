@@ -4,8 +4,6 @@ public partial class QlvtKyKiemKeChiTietBackup
 {
     public int KyKiemKeChiTietId { get; set; }
 
-    public int? KyKiemKeId { get; set; }
-
     public int? VatTuId { get; set; }
 
     public int? KhoChinhId { get; set; }
@@ -27,4 +25,12 @@ public partial class QlvtKyKiemKeChiTietBackup
     public int? NguoiKiemKeId { get; set; }
 
     public string? NguoiKiemKeTen { get; set; }
+
+    public int? KyKiemKeBackupId { get; set; }
+
+    public int? KiemKeIdGoc { get; set; }
+
+    public virtual QlvtKyKiemKeBackup? KyKiemKeBackup { get; set; }
+
+    public virtual ICollection<QlvtKyKiemKeChiTietDffBackup> QlvtKyKiemKeChiTietDffBackups { get; set; } = new List<QlvtKyKiemKeChiTietDffBackup>();
 }

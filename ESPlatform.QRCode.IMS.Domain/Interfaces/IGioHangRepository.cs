@@ -3,7 +3,7 @@ using ESPlatform.QRCode.IMS.Library.Database;
 
 namespace ESPlatform.QRCode.IMS.Domain.Interfaces;
 
-public interface IKhoRepository : IRepositoryBase<QlvtKho>
+public interface IGioHangRepository: IRepositoryBase<QlvtGioHang>
 {
-    Task<IEnumerable<dynamic>> ListWarehousesAsync();
+    Task<IEnumerable<dynamic>> ListSupplyAsync(int userId);
 }

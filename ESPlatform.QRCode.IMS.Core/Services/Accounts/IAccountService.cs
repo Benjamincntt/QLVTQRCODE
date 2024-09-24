@@ -1,7 +1,4 @@
 using ESPlatform.QRCode.IMS.Core.DTOs.Accounts.Requests;
-using ESPlatform.QRCode.IMS.Core.DTOs.Accounts.Responses;
-using ESPlatform.QRCode.IMS.Domain.Models.Accounts;
-using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.Accounts;
 
