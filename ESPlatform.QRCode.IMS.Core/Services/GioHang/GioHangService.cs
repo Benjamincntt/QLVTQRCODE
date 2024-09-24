@@ -104,6 +104,12 @@ public class GioHangService : IGioHangService
             supply.MoTa = request.ThongSoKyThuat;
             supply.GhiChu = request.GhiChu;
             await _vatTuRepository.UpdateAsync(supply);
+            
+            // Cập nhật lại thông tin trong bảng giỏ hàng
+            supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
+            supplyInCart.GhiChu = request.GhiChu;
+            supplyInCart.ThoiGianCapNhat = DateTime.Now;
+            return await _gioHangRepository.UpdateAsync(supplyInCart);
         }
         // Nếu là vật tư mới thêm => ktra xem vật tư còn trong bảng vật tư mới không
         var supplyNew = await _muaSamVatTuNewRepository.GetAsync(x => x.VatTuNewId == vatTuId);
