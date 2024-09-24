@@ -39,12 +39,13 @@ public class GioHangController : ApiControllerBase
     /// Tăng giảm số lượng của một vật tư trong giỏ hàng
     /// </summary>
     /// <param name="vatTuId"></param>
+    /// <param name="isSystemSupply"></param>
     /// <param name="quantity"> Số lượng vật tư </param>
     /// <returns></returns>
     [HttpPatch("{vatTuId:int}")]
-    public async Task<int> ModifyQuantityAsync(int vatTuId, int quantity = 0)
+    public async Task<int> ModifyQuantityAsync(int vatTuId, bool isSystemSupply, int quantity = 0)
     {
-        return await _gioHangService.ModifyQuantityAsync(vatTuId, quantity);
+        return await _gioHangService.ModifyQuantityAsync(vatTuId, isSystemSupply, quantity);
     }
 
     /// <summary>

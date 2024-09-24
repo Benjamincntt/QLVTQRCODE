@@ -44,7 +44,7 @@ public class GioHangService : IGioHangService
         return (await _gioHangRepository.ListSupplyAsync(userId)).Adapt<IEnumerable<CartSupplyResponse>>();
     }
 
-    public async Task<int> ModifyQuantityAsync(int vatTuId, int quantity)
+    public async Task<int> ModifyQuantityAsync(int vatTuId, bool isSystemSupply, int quantity)
     {
         if (vatTuId < 1)
         {
@@ -55,7 +55,9 @@ public class GioHangService : IGioHangService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Cart.InvalidQuantity);
         }
-        var vatTu = await _gioHangRepository.GetAsync(x => x.VatTuId == vatTuId && x.UserId == _authorizedContextFacade.AccountId);
+        var vatTu = await _gioHangRepository.GetAsync(x => x.VatTuId == vatTuId
+                                                           && x.UserId == _authorizedContextFacade.AccountId
+                                                           && x.IsSystemSupply == isSystemSupply);
         if (vatTu == null)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Cart.SupplyNotExist);
