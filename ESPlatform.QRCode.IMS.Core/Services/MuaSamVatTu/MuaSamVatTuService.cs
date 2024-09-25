@@ -113,6 +113,8 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.DuplicatedSupplyName);
         }
+
+        request.MaVatTu = request.MaVatTu.Trim();
         var vatTu = request.Adapt<QlvtMuaSamVatTuNew>();
         await _muaSamVatTuNewRepository.InsertAsync(vatTu);
         var vatTuAdded = await _muaSamVatTuNewRepository.GetAsync(x => x.TenVatTu == vatTu.TenVatTu);
