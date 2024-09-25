@@ -105,11 +105,22 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return response;
     }
 
-    public async Task<int> CreateSupplyAsync(CreatedSupplyRequest request)
+    public async Task<QlvtMuaSamVatTuNew> CreateSupplyAsync(CreatedSupplyRequest request)
     {   
         await ValidationHelper.ValidateAsync(request, new CreatedSupplyRequestValidation());
+        var existVatTuNew = await _muaSamVatTuNewRepository.ExistsAsync(x => x.TenVatTu.ToLower() == request.TenVatTu.ToLower());
+        if (existVatTuNew)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.DuplicatedSupplyName);
+        }
         var vatTu = request.Adapt<QlvtMuaSamVatTuNew>();
-        return await _muaSamVatTuNewRepository.InsertAsync(vatTu);  
+        await _muaSamVatTuNewRepository.InsertAsync(vatTu);
+        var vatTuAdded = await _muaSamVatTuNewRepository.GetAsync(x => x.TenVatTu == vatTu.TenVatTu);
+        if (vatTuAdded == null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.FailedToInsertSupply);
+        }
+        return vatTuAdded;
     }
 
     public async Task<int> CreateSupplyTicketAsync(string moTa, List<SupplyTicketDetailRequest> requests)

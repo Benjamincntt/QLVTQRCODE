@@ -49,7 +49,7 @@ public class MuaSamVatTuController : ApiControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost("them-moi-vat-tu")]
-    public async Task<int> CreateSupplyAsync([FromBody] CreatedSupplyRequest request)
+    public async Task<QlvtMuaSamVatTuNew> CreateSupplyAsync([FromBody] CreatedSupplyRequest request)
     {
         return await _muaSamVatTuService.CreateSupplyAsync(request);
     }

@@ -26,6 +26,8 @@ public static partial class Constants {
 				public const string EmptySupplies = "Danh sách vật tư trống";
 				public const string NoSupplyImageSelected = "Bạn chưa chọn ảnh vật tư";
 				public const string SupplyNotExist = "Vật tư không còn trong hệ thống";
+				public const string FailedToInsertSupply = "Thêm vật tư không thành công";
+				public const string DuplicatedSupplyName = "Vật tư có cùng tên đã tồn tại";
 			}
 
 			public static class Login {
