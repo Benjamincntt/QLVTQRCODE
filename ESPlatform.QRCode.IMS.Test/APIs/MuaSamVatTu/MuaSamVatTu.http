@@ -9,19 +9,6 @@ Content-Type: application/json
 kikiemke-id: {{kikiemkeId}}
 Authorization: Bearer {{accessToken}}
 
-### Thêm mới vật tư k có trong hệ thống
-POST {{host}}/{{muaSamVatTuPath}}/them-moi-vat-tu
-Content-Type: application/json
-Authorization: Bearer {{accessToken}}
-
-{
-  "tenVatTu": "Cáp điện tròn phi 18",
-  "donViTinh": "mét",
-  "ghiChu": "200 mét, có bọc xốp",
-  "thongSoKyThuat": "hàng loại 1"
-}
-
-
 ### Danh sách Phiếu cung ứng
 GET {{host}}/{{muaSamVatTuPath}}/list-phieu-cung-ung
 Content-Type: application/json

@@ -5,4 +5,6 @@ public class ModifiedCartSupplyRequest
     public string? ThongSoKyThuat { get; set; }
     
     public string? GhiChu { get; set; }
+    
+    public int SoLuong { get; set; }
 }

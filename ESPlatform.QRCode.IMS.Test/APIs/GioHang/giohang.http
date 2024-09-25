@@ -30,15 +30,30 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ###  Thêm mới 1 vật tư vào giỏ hàng
-POST {{host}}/{{gioHangPath}}/{{vatTuId}}
+POST {{host}}/{{gioHangPath}}/{{gioHangId}}
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "soLuong": 10,
-  "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
-  "ghiChu": "hàng nội địa",
-  "isSystemSupply": false
+  "tenVatTu": "tuavit 29",
+  "donViTinh": "cái",
+  "ghiChu": "loại có từ tính",
+  "thongSoKyThuat": "dài 22cm, tay nắm cao su, chất liệu thép không gỉ",
+  "maVatTu": "tuavit 22",
+  "xuatXu": "Trung quốc",
+  "soLuong": 100
+}
+
+### Thêm mới vật tư k có trong hệ thống và thêm vào giỏ hàng
+POST {{host}}/{{gioHangPath}}/them-moi-vat-tu
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "tenVatTu": "Cáp điện tròn phi 28",
+  "donViTinh": "mét",
+  "ghiChu": "200 mét, có bọc xốp",
+  "thongSoKyThuat": "hàng loại 1"
 }
 
 

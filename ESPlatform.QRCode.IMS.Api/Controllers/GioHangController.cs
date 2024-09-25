@@ -49,7 +49,7 @@ public class GioHangController : ApiControllerBase
     }
 
     /// <summary>
-    /// Cập nhật thông số kỹ thuật và ghi chú của 1 vật tư trong giỏ hàng
+    /// Cập nhật thông tin của 1 vật tư trong giỏ hàng
     /// </summary>
     /// <param name="gioHangId"></param>
     /// <param name="request"></param>

@@ -115,6 +115,7 @@ public class GioHangService : IGioHangService
         // Cập nhật lại thông tin trong bảng giỏ hàng
         supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
         supplyInCart.GhiChu = request.GhiChu;
+        supplyInCart.SoLuong = request.SoLuong;
         supplyInCart.ThoiGianCapNhat = DateTime.Now;
         return await _gioHangRepository.UpdateAsync(supplyInCart);
     }
