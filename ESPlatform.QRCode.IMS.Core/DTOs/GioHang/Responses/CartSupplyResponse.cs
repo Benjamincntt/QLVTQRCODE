@@ -5,4 +5,5 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.GioHang.Responses;
 public class CartSupplyResponse : SupplyResponse
 {
     public int VatTuId { get; set; }
+    public bool IsSystemSupply { get; set; }
 }

@@ -24,7 +24,8 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
                 x.SoLuong,
                 x.ThongSoKyThuat,
                 x.GhiChu,
-                x.Image
+                x.Image,
+                x.IsSystemSupply
             });
         return await query.ToListAsync();
     }
