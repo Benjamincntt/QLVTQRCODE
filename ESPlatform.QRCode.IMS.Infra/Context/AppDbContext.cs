@@ -557,13 +557,12 @@ public partial class AppDbContext : DbContext
             entity.ToTable("QLVT_MuaSam_VatTu_New");
 
             entity.Property(e => e.DonViTinh).HasMaxLength(100);
-            entity.Property(e => e.GhiChu).HasColumnType("text");
+            entity.Property(e => e.GhiChu).HasMaxLength(250);
             entity.Property(e => e.Image).HasMaxLength(200);
             entity.Property(e => e.MaVatTu)
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.TenVatTu).HasMaxLength(100);
-            entity.Property(e => e.ThongSoKyThuat).HasColumnType("text");
             entity.Property(e => e.XuatXu).HasMaxLength(200);
         });
 
