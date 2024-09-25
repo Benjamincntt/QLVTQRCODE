@@ -43,16 +43,6 @@ public class MuaSamVatTuController : ApiControllerBase
         return await _muaSamVatTuService.GetPurchaseSupplyAsync(id, isSystemSupply);
     }
     
-    /// <summary>
-    /// Thêm mới vật tư không có trong hệ thống 
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    [HttpPost("them-moi-vat-tu")]
-    public async Task<QlvtMuaSamVatTuNew> CreateSupplyAsync([FromBody] CreatedSupplyRequest request)
-    {
-        return await _muaSamVatTuService.CreateSupplyAsync(request);
-    }
     
     /// <summary>
     /// Thêm mới phiếu cung ứng

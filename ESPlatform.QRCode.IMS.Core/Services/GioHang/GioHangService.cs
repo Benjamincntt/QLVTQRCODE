@@ -1,10 +1,13 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.GioHang.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.GioHang.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
+using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
+using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
 using MapsterMapper;
 
@@ -115,7 +118,7 @@ public class GioHangService : IGioHangService
         supplyInCart.ThoiGianCapNhat = DateTime.Now;
         return await _gioHangRepository.UpdateAsync(supplyInCart);
     }
-    public async Task<int> CreateSupplyAsync(int vatTuId, CreatedCartSupplyRequest request)
+    public async Task<int> CreateCartSupplyAsync(int vatTuId, CreatedCartSupplyRequest request)
     {
         var userId = _authorizedContextFacade.AccountId;
         var supplyInCart = await _gioHangRepository.GetAsync(x => x.VatTuId == vatTuId && x.UserId == userId && x.IsSystemSupply == request.IsSystemSupply);
@@ -153,5 +156,32 @@ public class GioHangService : IGioHangService
         supplyToAdd.UserId = userId;
         supplyToAdd.ThoiGianTao = DateTime.Now;
         return await _gioHangRepository.InsertAsync(supplyToAdd);
+    }
+    public async Task<int> CreateSupplyAsync(CreatedSupplyRequest request)
+    {   
+        await ValidationHelper.ValidateAsync(request, new CreatedSupplyRequestValidation());
+        var existVatTuNew = await _muaSamVatTuNewRepository.ExistsAsync(x => x.TenVatTu.ToLower() == request.TenVatTu.ToLower());
+        if (existVatTuNew)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.DuplicatedSupplyName);
+        }
+
+        request.MaVatTu = request.MaVatTu.Trim();
+        var vatTu = request.Adapt<QlvtMuaSamVatTuNew>();
+        await _muaSamVatTuNewRepository.InsertAsync(vatTu);
+        var vatTuAdded = await _muaSamVatTuNewRepository.GetAsync(x => x.TenVatTu == vatTu.TenVatTu);
+        if (vatTuAdded == null)
+        {
+            return default;
+        }
+        //thêm vật tư mới vào giỏ hàng luôn
+        var createdCartSupplyRequest = new CreatedCartSupplyRequest()
+        {
+            SoLuong = request.SoLuong,
+            ThongSoKyThuat = vatTuAdded.ThongSoKyThuat ?? string.Empty,
+            GhiChu = vatTuAdded.GhiChu ?? string.Empty,
+            IsSystemSupply = false
+        };
+        return await CreateCartSupplyAsync(vatTuAdded.VatTuNewId, createdCartSupplyRequest);
     }
 }

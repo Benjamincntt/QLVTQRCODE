@@ -1,6 +1,7 @@
 ﻿using ESPlatform.QRCode.IMS.Api.Controllers.Base;
 using ESPlatform.QRCode.IMS.Core.DTOs.GioHang.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.GioHang.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.Services.GioHang;
 using Microsoft.AspNetCore.Mvc;
 
@@ -77,8 +78,19 @@ public class GioHangController : ApiControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost("{vatTuId:int}")]
-    public async Task<int> CreateSupplyAsync(int vatTuId,[FromBody] CreatedCartSupplyRequest request)
+    public async Task<int> CreateCartSupplyAsync(int vatTuId,[FromBody] CreatedCartSupplyRequest request)
     {
-        return await _gioHangService.CreateSupplyAsync(vatTuId, request);
+        return await _gioHangService.CreateCartSupplyAsync(vatTuId, request);
+    }
+    
+    /// <summary>
+    /// Thêm mới vật tư không có trong hệ thống  sau đó thêm vào giỏ hàng
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost("them-moi-vat-tu")]
+    public async Task<int> CreateSupplyAsync([FromBody] CreatedSupplyRequest request)
+    {
+        return await _gioHangService.CreateSupplyAsync(request);
     }
 }
