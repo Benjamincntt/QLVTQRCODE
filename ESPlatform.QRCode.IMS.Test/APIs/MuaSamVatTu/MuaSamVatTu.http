@@ -18,7 +18,7 @@ Authorization: Bearer {{accessToken}}
   "tenVatTu": "Cáp điện tròn phi 18",
   "donViTinh": "mét",
   "ghiChu": "200 mét, có bọc xốp",
-  "moTa": "hàng loại 1"
+  "thongSoKyThuat": "hàng loại 1"
 }
 
 

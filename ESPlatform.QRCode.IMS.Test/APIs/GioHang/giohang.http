@@ -9,23 +9,23 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ###  Tăng giảm số lượng của một vật tư trong giỏ hàng 
-PATCH {{host}}/{{gioHangPath}}/{{vatTuId}}?quantity=2
+PATCH {{host}}/{{gioHangPath}}/{{gioHangId}}?quantity=2
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ###  Cập nhật thông số kỹ thuật và ghi chú của 1 vật tư trong giỏ hàng
-PATCH {{host}}/{{gioHangPath}}/{{vatTuId}}/thong-tin
+PATCH {{host}}/{{gioHangPath}}/{{gioHangId}}/thong-tin
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "isSystemSupply": true,
-  "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
+  "isSystemSupply": false,
+  "thongSoKyThuat": "màu đỏ, loại 10mm, dài 5cm",
   "ghiChu": "hàng nhập khẩu"
 }
 
 ###  Xóa 1 vật tư trong giỏ hàng
-DELETE {{host}}/{{gioHangPath}}/{{vatTuId}}
+DELETE {{host}}/{{gioHangPath}}/{{gioHangId}}
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
@@ -35,12 +35,10 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "image": "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin/IMGVatTu/5/Van 1 chiều cánh bướm.png",
-  "tenVatTu": "seiken",
   "soLuong": 10,
   "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
-  "ghiChu": "hàng nhập khẩu",
-  "isSystemSupply": true
+  "ghiChu": "hàng nội địa",
+  "isSystemSupply": false
 }
 
 

@@ -38,37 +38,36 @@ public class GioHangController : ApiControllerBase
     /// <summary>
     /// Tăng giảm số lượng của một vật tư trong giỏ hàng
     /// </summary>
-    /// <param name="vatTuId"></param>
-    /// <param name="isSystemSupply"></param>
+    /// <param name="gioHangId"></param>
     /// <param name="quantity"> Số lượng vật tư </param>
     /// <returns></returns>
-    [HttpPatch("{vatTuId:int}")]
-    public async Task<int> ModifyQuantityAsync(int vatTuId, bool isSystemSupply, int quantity = 0)
+    [HttpPatch("{gioHangId:int}")]
+    public async Task<int> ModifyQuantityAsync(int gioHangId, int quantity = 0)
     {
-        return await _gioHangService.ModifyQuantityAsync(vatTuId, isSystemSupply, quantity);
+        return await _gioHangService.ModifyQuantityAsync(gioHangId, quantity);
     }
 
     /// <summary>
     /// Cập nhật thông số kỹ thuật và ghi chú của 1 vật tư trong giỏ hàng
     /// </summary>
-    /// <param name="vatTuId"></param>
+    /// <param name="gioHangId"></param>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPatch("{vatTuId:int}/thong-tin")]
-    public async Task<int> ModifyInformationAsync(int vatTuId, [FromBody] ModifiedCartSupplyRequest request)
+    [HttpPatch("{gioHangId:int}/thong-tin")]
+    public async Task<int> ModifyInformationAsync(int gioHangId, [FromBody] ModifiedCartSupplyRequest request)
     {
-        return await _gioHangService.ModifyInformationAsync(vatTuId, request);
+        return await _gioHangService.ModifyInformationAsync(gioHangId, request);
     }
     
     /// <summary>
     /// Xóa 1 vật tư trong giỏ hàng
     /// </summary>
-    /// <param name="vatTuId"></param>
+    /// <param name="gioHangId"></param>
     /// <returns></returns>
-    [HttpDelete("{vatTuId:int}")]
-    public async Task<int> DeleteSupplyAsync(int vatTuId)
+    [HttpDelete("{gioHangId:int}")]
+    public async Task<int> DeleteSupplyAsync(int gioHangId)
     {
-        return await _gioHangService.DeleteSupplyAsync(vatTuId);
+        return await _gioHangService.DeleteSupplyAsync(gioHangId);
     }
 
     /// <summary>
