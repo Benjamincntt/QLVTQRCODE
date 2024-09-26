@@ -2,6 +2,8 @@
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Library.Database.EfCore;
+using ESPlatform.QRCode.IMS.Library.Extensions;
+using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace ESPlatform.QRCode.IMS.Infra.Repositories;
@@ -12,9 +14,14 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
     {
     }
 
-    public async Task<IEnumerable<dynamic>> ListSupplyTicketAsync()
+    public async Task<PagedList<dynamic>> ListSupplyTicketAsync(string keywords, int pageIndex, int pageSize)
     {
         var query = DbContext.QlvtMuaSamPhieuDeXuats
+            .Where(x => string.IsNullOrWhiteSpace(keywords)
+                        || x.TenPhieu == null 
+                        || x.TenPhieu.ToLower().Contains(keywords)
+                        || x.MoTa == null
+                        || x.MoTa.ToLower().Contains(keywords))
             .OrderByDescending(x => x.NgayThem)
             .ThenBy(x => x.TrangThai)
             .Select(x => new
@@ -25,22 +32,6 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
                 x.MoTa,
                 x.TrangThai,
             });
-        return await query.ToListAsync();
-    }
-
-    public async Task<IEnumerable<dynamic>> ListSupplyTicketByTimeAsync(DateTime startTime, DateTime endTime)
-    {
-        var query = DbContext.QlvtMuaSamPhieuDeXuats
-            .Where(x => x.NgayThem >= startTime && x.NgayThem <= endTime)
-            .OrderByDescending(x => x.NgayThem)
-            .ThenBy(x => x.TrangThai)
-            .Select(x => new
-            {
-                x.NgayThem,
-                x.TenPhieu,
-                x.MoTa,
-                x.TrangThai,
-            });
-        return await query.ToListAsync();
+        return await query.ToPagedListAsync<dynamic>(pageIndex, pageSize);
     }
 }

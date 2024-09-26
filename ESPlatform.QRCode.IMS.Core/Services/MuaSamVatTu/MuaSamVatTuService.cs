@@ -146,18 +146,13 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         }
     }
 
-    public async Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync(DateTime? date)
+    public async Task<PagedList<SupplyTicketListResponseItem>> ListSupplyTicketAsync(PhraseAndPagingFilter requests)
     {
-        if (date != null)
-        {
-            var startTime = date.Value.Date;
-            var endTime = startTime.AddDays(1).AddTicks(-1);
-            var listPhieuByTime = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketByTimeAsync(startTime, endTime))
-                .Adapt<IEnumerable<SupplyTicketListResponseItem>>();
-            return listPhieuByTime;
-        }
-        var listPhieu = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketAsync())
-            .Adapt<IEnumerable<SupplyTicketListResponseItem>>();
+        var listPhieu = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketAsync(
+                string.IsNullOrWhiteSpace(requests.Keywords) ? string.Empty : requests.Keywords.ToLower(),
+                requests.GetPageIndex(),
+                requests.GetPageSize()))
+            .Adapt<PagedList<SupplyTicketListResponseItem>>();
         return listPhieu;
     }
 

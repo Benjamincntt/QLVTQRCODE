@@ -59,9 +59,9 @@ public class MuaSamVatTuController : ApiControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet("list-phieu-cung-ung")]
-    public async Task<IEnumerable<SupplyTicketListResponseItem>> ListSupplyTicketAsync([FromQuery] DateTime? date)
+    public async Task<PagedList<SupplyTicketListResponseItem>> ListSupplyTicketAsync([FromQuery] PhraseAndPagingFilter request )
     {
-        return await _muaSamVatTuService.ListSupplyTicketAsync(date);
+        return await _muaSamVatTuService.ListSupplyTicketAsync(request);
     }
     
     /// <summary>
