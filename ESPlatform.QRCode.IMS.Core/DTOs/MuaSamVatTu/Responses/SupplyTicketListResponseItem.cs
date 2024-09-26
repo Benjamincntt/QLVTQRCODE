@@ -2,6 +2,8 @@
 
 public class SupplyTicketListResponseItem
 {
+    public long Id { get; set; }
+    
     public string? MaPhieu { get; set; }
 
     public string? TenPhieu { get; set; }

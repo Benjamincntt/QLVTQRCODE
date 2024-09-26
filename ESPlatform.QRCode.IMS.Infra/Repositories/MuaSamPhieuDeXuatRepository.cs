@@ -19,6 +19,7 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
             .ThenBy(x => x.TrangThai)
             .Select(x => new
             {
+                x.Id,
                 x.NgayThem,
                 x.TenPhieu,
                 x.MoTa,
