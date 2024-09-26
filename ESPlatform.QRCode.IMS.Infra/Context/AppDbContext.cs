@@ -525,6 +525,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.DonViTinh).HasMaxLength(50);
             entity.Property(e => e.GhiChu).HasMaxLength(1000);
+            entity.Property(e => e.Image).HasMaxLength(200);
             entity.Property(e => e.IsSystemSupply)
                 .HasDefaultValueSql("((1))")
                 .HasComment("0: Vật tư chưa có trong hệ thống, 1: vật tư đã có trong hệ thống");

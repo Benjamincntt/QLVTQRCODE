@@ -25,6 +25,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IMuaSamPhieuDeXuatRepository _muaSamPhieuDeXuatRepository;
     private readonly IMuaSamPhieuDeXuatDetailRepository _muaSamPhieuDeXuatDetailRepository;
     private readonly IKhoRepository _khoRepository;
+    private readonly IGioHangRepository _gioHangRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
 
     public MuaSamVatTuService(
@@ -33,6 +34,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IMuaSamPhieuDeXuatRepository muaSamPhieuDeXuatRepository,
         IMuaSamPhieuDeXuatDetailRepository muaSamPhieuDeXuatDetailRepository,
         IKhoRepository khoRepository,
+        IGioHangRepository gioHangRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork)
     {
@@ -41,8 +43,10 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _muaSamPhieuDeXuatRepository = muaSamPhieuDeXuatRepository;
         _muaSamPhieuDeXuatDetailRepository = muaSamPhieuDeXuatDetailRepository;
         _khoRepository = khoRepository;
+        _gioHangRepository = gioHangRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
+        
     }
 
     public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync(SupplyListRequest request)
@@ -132,9 +136,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 {
                     throw new BadRequestException(Constants.Exceptions.Messages.Common.InsertFailed);
                 }
-
+                // thêm các vật tư đã chọn trong giỏ hàng vào phiếu
                 var supplyTicketId = addedSupplyTicket.Id;
                 await CreateManySupplyTicketDetailAsync(supplyTicketId, request.SupplyTicketDetails);
+                
+                // xóa các vật tư vừa chọn trong giỏ hàng
+                var gioHangIds = request.SupplyTicketDetails.Select(supplyTicketDetail => supplyTicketDetail.GioHangId).ToList();
+                var suppliesInCart = await _gioHangRepository.ListAsync(x => gioHangIds.Contains(x.GioHangId));
+                await _gioHangRepository.DeleteManyAsync(suppliesInCart);
                 await _unitOfWork.CommitAsync();
                 return supplyTicketId;
             }
@@ -163,10 +172,19 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplies);
         }
         var listSupplyTicketDetail = new List<QlvtMuaSamPhieuDeXuatDetail>();
-        foreach (var vatTu in requests)
-        {   
-            await ValidationHelper.ValidateAsync(vatTu, new SupplyTicketDetailRequestValidation());
-            var supplyTicketDetail = vatTu.Adapt<QlvtMuaSamPhieuDeXuatDetail>();
+        foreach (var supplyCart in requests)
+        {
+            if (supplyCart.GioHangId < 1)
+            {
+                throw new BadRequestException(Constants.Exceptions.Messages.Cart.InvalidCartInfo, new List<string>{ nameof(supplyCart.GioHangId)+ " is invalid"});
+            }
+
+            if (supplyCart.VatTuId < 1)
+            {
+                throw new BadRequestException(Constants.Exceptions.Messages.Cart.InvalidCartInfo, new List<string>{ nameof(supplyCart.VatTuId)+ " is invalid"});
+            }
+            await ValidationHelper.ValidateAsync(supplyCart, new SupplyTicketDetailRequestValidation());
+            var supplyTicketDetail = supplyCart.Adapt<QlvtMuaSamPhieuDeXuatDetail>();
             supplyTicketDetail.PhieuDeXuatId = supplyTicketId;
             listSupplyTicketDetail.Add(supplyTicketDetail);
         }

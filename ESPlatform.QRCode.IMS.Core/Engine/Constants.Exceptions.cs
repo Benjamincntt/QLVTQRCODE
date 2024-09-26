@@ -19,7 +19,7 @@ public static partial class Constants {
 			
 			public static class Supplies {
 				public const string InvalidSupply = "Bạn chưa chọn vật tư";
-				public const string EmptySupplyCode = "Mã vật tư không hợp lệ";
+				public const string EmptySupplyCode = "Mã vật tư bạn nhập vào không đúng. Vui lòng kiểm tra lại và thử lại";
 				public const string InvalidSupplyLocation = "Vị trí hiện tại của vật tư không đúng";
 				public const string NoSupplyLocationSelected = "Bạn chưa chọn vị trí chi tiết vật tư";
 				public const string InvalidFileType = "Loại file không được phép";
@@ -46,7 +46,6 @@ public static partial class Constants {
 
 			public static class SupplyTicket
 			{
-				public const string InvalidId = "Id phiếu cung ứng không hợp lệ";
 				public const string InvalidSupplyTicket = "Bạn chưa chọn phiếu cung ứng";
 			}
 
@@ -55,6 +54,7 @@ public static partial class Constants {
 				public const string InvalidQuantity = "Số lượng vật tư không được nhỏ hơn 1";
 				public const string SupplyNotExist = "Vật tư không còn trong giỏ hàng";
 				public const string DeletedSupply = "Vật tư đã không còn trong hệ thống nên đã bị xóa khỏi giỏ hàng";
+				public const string InvalidCartInfo = "Thông tin giỏ hàng không chính xác";
 			}
 		}
 	}
