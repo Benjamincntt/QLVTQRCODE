@@ -139,8 +139,6 @@ public class GioHangService : IGioHangService
             {
                 throw new BadRequestException(Constants.Exceptions.Messages.Supplies.SupplyNotExist);
             }
-            supplyToAdd.TenVatTu = supply.TenVatTu;
-            supplyToAdd.Image = supply.Image;
         }
         else
         {
@@ -149,8 +147,6 @@ public class GioHangService : IGioHangService
             {
                 throw new BadRequestException(Constants.Exceptions.Messages.Supplies.SupplyNotExist);
             }
-            supplyToAdd.TenVatTu = supplyNew.TenVatTu;
-            supplyToAdd.Image = supplyNew.Image;
         }
         
         supplyToAdd.VatTuId = vatTuId;

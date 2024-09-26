@@ -105,9 +105,9 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return response;
     }
 
-    public async Task<int> CreateSupplyTicketAsync(string moTa, List<SupplyTicketDetailRequest> requests)
+    public async Task<int> CreateSupplyTicketAsync(CreatedSupplyTicketRequest request)
     {
-        if (!requests.Any())
+        if (!request.SupplyTicketDetails.Any())
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplies);
         }
@@ -119,7 +119,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 var supplyTicket = new QlvtMuaSamPhieuDeXuat
                 {
                     TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
-                    MoTa = moTa,
+                    MoTa = request.Description,
                     TrangThai = (byte?)PurchaseOrderStatus.Unsigned,
                     NgayThem = DateTime.Now,
                     MaNguoiThem = _authorizedContextFacade.AccountId
@@ -134,7 +134,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 }
 
                 var supplyTicketId = addedSupplyTicket.Id;
-                await CreateManySupplyTicketDetailAsync(supplyTicketId, requests);
+                await CreateManySupplyTicketDetailAsync(supplyTicketId, request.SupplyTicketDetails);
                 await _unitOfWork.CommitAsync();
                 return supplyTicketId;
             }

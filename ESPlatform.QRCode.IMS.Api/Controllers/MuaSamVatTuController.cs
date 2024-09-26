@@ -49,9 +49,9 @@ public class MuaSamVatTuController : ApiControllerBase
     /// </summary>
     /// <returns>Id phiếu cung ứng</returns>
     [HttpPost("them-phieu-cung-ung")]
-    public async Task<int> CreateSupplyTicketAsync(string moTa, List<SupplyTicketDetailRequest> requests)
+    public async Task<int> CreateSupplyTicketAsync([FromBody]CreatedSupplyTicketRequest request)
     {
-        return await _muaSamVatTuService.CreateSupplyTicketAsync(moTa, requests);
+        return await _muaSamVatTuService.CreateSupplyTicketAsync(request);
     }
     
     /// <summary>

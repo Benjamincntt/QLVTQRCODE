@@ -19,8 +19,5 @@ public partial class QlvtGioHang
     public DateTime? ThoiGianCapNhat { get; set; }
 
     public bool? IsSystemSupply { get; set; }
-
-    public string? TenVatTu { get; set; }
-
-    public string? Image { get; set; }
 }
+

@@ -177,12 +177,10 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.GioHangId).HasColumnName("GioHang_Id");
             entity.Property(e => e.GhiChu).HasMaxLength(250);
-            entity.Property(e => e.Image).HasMaxLength(200);
             entity.Property(e => e.IsSystemSupply)
                 .IsRequired()
                 .HasDefaultValueSql("((1))");
             entity.Property(e => e.SoLuong).HasColumnType("decimal(18, 0)");
-            entity.Property(e => e.TenVatTu).HasMaxLength(100);
             entity.Property(e => e.ThoiGianCapNhat).HasColumnType("datetime");
             entity.Property(e => e.ThoiGianTao).HasColumnType("datetime");
             entity.Property(e => e.ThongSoKyThuat).HasMaxLength(250);
