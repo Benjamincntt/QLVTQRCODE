@@ -5,7 +5,7 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 public class SupplyTicketDetailRequest
 {
     [DisplayName("Id vật tư")]
-    public int IdVatTu { get; set; }
+    public int VatTuId { get; set; }
     [DisplayName("Tên vật tư")]
     public string TenVatTu { get; set; } = string.Empty;
     [DisplayName("Đơn vị tính")]

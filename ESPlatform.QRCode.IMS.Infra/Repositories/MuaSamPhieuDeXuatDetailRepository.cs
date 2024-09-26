@@ -17,7 +17,7 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
         // lấy thêm image từ bảng vật tư
         var vatTu = DbContext.QlvtMuaSamPhieuDeXuatDetails
             .Join(DbContext.QlvtVatTus,
-                x => x.IdVatTu,
+                x => x.VatTuId,
                 y => y.VatTuId,
                 (x, y) => new { PhieuDeXuatDetail = x, VatTu = y })
             .Where(x => x.PhieuDeXuatDetail.PhieuDeXuatId == supplyTicketId)
@@ -34,7 +34,7 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
         // lấy thông tin từ bảng vật tư mới tạo
         var vatTuNew = DbContext.QlvtMuaSamPhieuDeXuatDetails
             .Join(DbContext.QlvtMuaSamVatTuNews,
-                x => x.IdVatTu,
+                x => x.VatTuId,
                 y => y.VatTuNewId,
                 (x, y) => new { PhieuDeXuatDetail = x, VatTuNew = y })
             .Where(x => x.PhieuDeXuatDetail.PhieuDeXuatId == supplyTicketId)

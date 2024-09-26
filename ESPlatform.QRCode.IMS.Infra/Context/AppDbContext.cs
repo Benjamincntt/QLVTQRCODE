@@ -525,14 +525,14 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.DonViTinh).HasMaxLength(50);
             entity.Property(e => e.GhiChu).HasMaxLength(1000);
-            entity.Property(e => e.IdVatTu)
-                .HasComment("Nếu IDVatTu tồn tại thì vật tư được lấy từ hệ thông ERP, nếu không tồn tại thì Vật tư đc thêm mới vào phiếu đề xuất")
-                .HasColumnName("IDVatTu");
             entity.Property(e => e.IsSystemSupply)
                 .HasDefaultValueSql("((1))")
                 .HasComment("0: Vật tư chưa có trong hệ thống, 1: vật tư đã có trong hệ thống");
             entity.Property(e => e.PhieuDeXuatId).HasComment("Id phiếu đề xuất");
             entity.Property(e => e.TenVatTu).HasMaxLength(250);
+            entity.Property(e => e.VatTuId)
+                .HasComment("Nếu IDVatTu tồn tại thì vật tư được lấy từ hệ thông ERP, nếu không tồn tại thì Vật tư đc thêm mới vào phiếu đề xuất")
+                .HasColumnName("VatTu_Id");
             entity.Property(e => e.XuatXu).HasMaxLength(50);
         });
 

@@ -16,7 +16,7 @@ public class SupplyTicketDetailRequestValidation : AbstractValidator<SupplyTicke
         RuleFor(x => x.GhiChu).ValidateStringDefault();
         RuleFor(x => x.ThongSoKyThuat).ValidateStringDefault();
         RuleFor(x => x.SoLuong).GreaterThanOrEqualTo(1).WithMessage(MustGreaterThanOrEqual);
-        RuleFor(x => x.IdVatTu).GreaterThanOrEqualTo(1).WithMessage(MustGreaterThanOrEqual);
-        ;
+        RuleFor(x => x.VatTuId).GreaterThanOrEqualTo(1).WithMessage(MustGreaterThanOrEqual);
+        
     }
 }
