@@ -80,10 +80,10 @@ public class MuaSamVatTuController : ApiControllerBase
     /// </summary>
     /// <param name="supplyTicketId"></param>
     /// <returns></returns>
-    [HttpDelete("{supplyTicketId:int}/xoa-phieu-cung-ung")]
+    [HttpPatch("{supplyTicketId:int}/xoa-phieu-cung-ung")]
     public async Task<int> DeleteSupplyTicketAsync(int supplyTicketId)
     {
-        return await _muaSamVatTuService.DeleteSupplyTicketAsync( supplyTicketId);
+        return await _muaSamVatTuService.DeleteSupplyTicketAsync(supplyTicketId);
     }
 
     /// <summary>

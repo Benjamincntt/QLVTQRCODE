@@ -1,6 +1,6 @@
 ﻿namespace ESPlatform.QRCode.IMS.Domain.Enums;
 
-public enum PurchaseOrderStatus
+public enum SupplyTicketStatus
 {
     Unknown = 0,
     Unsigned = 1,

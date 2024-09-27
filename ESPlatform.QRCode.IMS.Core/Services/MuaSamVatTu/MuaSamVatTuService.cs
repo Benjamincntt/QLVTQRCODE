@@ -124,7 +124,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 {
                     TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
                     MoTa = request.Description,
-                    TrangThai = (byte?)PurchaseOrderStatus.Unsigned,
+                    TrangThai = (byte?)SupplyTicketStatus.Unsigned,
                     NgayThem = DateTime.Now,
                     MaNguoiThem = _authorizedContextFacade.AccountId
                 };
@@ -224,12 +224,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         {
             throw new NotFoundException(currentSupplyTicket.GetTypeEx(), null);
         }
-        var currentSupplyTicketDetails = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => x.PhieuDeXuatId == supplyTicketId)).ToList();
-        if (currentSupplyTicketDetails.Any())
-        {
-            await _muaSamPhieuDeXuatDetailRepository.DeleteManyAsync(currentSupplyTicketDetails);
-        }
-        return await _muaSamPhieuDeXuatRepository.DeleteAsync(currentSupplyTicket);
+        // var currentSupplyTicketDetails = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => x.PhieuDeXuatId == supplyTicketId)).ToList();
+        // if (currentSupplyTicketDetails.Any())
+        // {
+        //     await _muaSamPhieuDeXuatDetailRepository.DeleteManyAsync(currentSupplyTicketDetails);
+        // }
+        currentSupplyTicket.TrangThai = (byte?)SupplyTicketStatus.Deleted;
+        currentSupplyTicket.NgaySua = DateTime.Now;
+        return await _muaSamPhieuDeXuatRepository.UpdateAsync(currentSupplyTicket);
     }
 
     public async Task<IEnumerable<WarehouseResponseItem>> ListWarehousesAsync()
