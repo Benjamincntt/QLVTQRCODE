@@ -78,4 +78,13 @@ public static class StringExtensions {
 		return new Regex(@"[^\\s]+").Matches(input)
 									.Count;
 	}
+
+	public static string ToFileName(this string input)
+	{
+		var ticks = DateTime.Now.Ticks;
+		var fileType = input.Split('.').Last();
+		var fileName = input.Substring(0,input.Length - fileType.Length - 1);
+		fileName = fileName.ToUrlSlug();
+		return ticks + fileName + "." + fileType;
+	}
 }

@@ -141,7 +141,7 @@ public class CommonService : ICommonService
         }
 
         // Tạo ảnh mới
-        var fileName = $"{Path.GetFileName(file.FileName)}";
+        var fileName = file.FileName.ToFileName();
 
         // nếu thư mục chứa ảnh chưa tồn tại => tạo thư mục theo Id => lưu ảnh
         var localFolder = Path.Combine(localBasePath, vatTuId.ToString());
@@ -205,7 +205,7 @@ public class CommonService : ICommonService
         var folderPath = AppConfig.Instance.Image.FolderPath;
         var urlPath = AppConfig.Instance.Image.UrlPath;
         var localBasePath = (folderPath + urlPath).Replace("/", "\\");
-        var fileName = $"{Path.GetFileName(file.FileName)}";
+        var fileName = file.FileName.ToFileName();
 
         // check if server don't have path => create a new directory by path
         var pathUpload = Path.Combine(localBasePath, vatTuId.ToString());
