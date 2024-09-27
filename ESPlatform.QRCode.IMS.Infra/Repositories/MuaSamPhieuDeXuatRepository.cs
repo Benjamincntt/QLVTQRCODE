@@ -1,4 +1,5 @@
 ﻿using ESPlatform.QRCode.IMS.Domain.Entities;
+using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Library.Database.EfCore;
@@ -17,6 +18,7 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
     public async Task<PagedList<dynamic>> ListSupplyTicketAsync(string keywords, int pageIndex, int pageSize)
     {
         var query = DbContext.QlvtMuaSamPhieuDeXuats
+            .Where(x => x.TrangThai != (int?)SupplyTicketStatus.Deleted)
             .Where(x => string.IsNullOrWhiteSpace(keywords)
                         || x.TenPhieu == null 
                         || x.TenPhieu.ToLower().Contains(keywords)
