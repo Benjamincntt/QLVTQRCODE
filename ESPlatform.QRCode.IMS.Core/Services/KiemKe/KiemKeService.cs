@@ -185,6 +185,15 @@ public class KiemKeService : IKiemKeService
         // nếu vật tư chưa kiểm kê bao giờ => thêm mới kì kiểm kê chi tiết cho vật tư => thêm mới DFF
         if (kyKiemKeChiTietId == 0)
         {
+            // Có 2 trường hợp:
+            var kyKiemKeChiTiet = await _kyKiemKeChiTietRepository.GetAsync(x => x.VatTuId == vatTuId && x.KyKiemKeId == kyKiemKeId);
+            // 1 là có kỳ kiểm kê chi tiết rồi => nhập sai Id
+            if (kyKiemKeChiTiet != null)
+            {
+                throw new BadRequestException(Constants.Exceptions.Messages.InventoryCheck.InvalidKyKiemKeChiTiet,
+                    new List<string>{nameof(kyKiemKeChiTietId) + " is existed and not true."});
+            }
+            // 2 là không có kỳ kiểm kê chi tiết nào => thêm mới kỳ kiểm kê chi tiết
             await CreateInventoryCheckDetailAsync(vatTuId, kyKiemKeId, soLuongKiemKe);
             var kyKiemKeChiTietNew = await _kyKiemKeChiTietRepository.GetAsync(x => x.VatTuId == vatTuId && x.KyKiemKeId == kyKiemKeId);
             var kyKiemKeChiTietIdNew = kyKiemKeChiTietNew != null ? kyKiemKeChiTietNew.KyKiemKeChiTietId : 0;
@@ -199,7 +208,13 @@ public class KiemKeService : IKiemKeService
                 dffToCreate.PhanTramDong = request.SoLuongDong / soLuongKiemKe * 100;
                 dffToCreate.TsKemPcMatPc = request.SoLuongMatPhamChat + request.SoLuongKemPhamChat;
             }
-
+            else
+            {
+                dffToCreate.PhanTramMatPhamChat = 0;
+                dffToCreate.PhanTramKemPhamChat = 0;
+                dffToCreate.PhanTramDong = 0;
+                dffToCreate.TsKemPcMatPc = 0;
+            }
             var responseToCreate = _mapper.Map(request, dffToCreate);
             return await _kyKiemKeChiTietDffRepository.InsertAsync(responseToCreate);
         }
