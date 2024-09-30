@@ -20,35 +20,22 @@ POST {{host}}/{{muaSamVatTuPath}}/them-phieu-cung-ung?moTa=phiếu cung ứng v�
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
-[
-  {
-    "idVatTu": 4,
-    "tenVatTu": "fuchsyloken",
-    "donViTinh": "CHai",
-    "isSystemSupply": true,
-    "soLuong": 10,
-    "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
-    "ghiChu": ""
-  },
-  {
-    "idVatTu": 1006,
-    "tenVatTu": "Cáp điện tròn phi 18",
-    "donViTinh": "mét",
-    "isSystemSupply": true,
-    "soLuong": 1000,
-    "thongSoKyThuat": "hàng loại 1",
-    "ghiChu": "200 mét, có bọc xốp"
-  },
-  {
-    "idVatTu": 2,
-    "tenVatTu": "Ống nhựa HDPE Toàn Thắng",
-    "donViTinh": "mét",
-    "isSystemSupply": false,
-    "soLuong": 1000,
-    "thongSoKyThuat": "màu xanh",
-    "ghiChu": "1000 mét phi 20"
-  }
-]
+{
+  "description": "string",
+  "supplyTicketDetails": [
+    {
+      "gioHangId": 38,
+      "vatTuId": 4,
+      "tenVatTu": "fuchsyloken",
+      "donViTinh": "Chai",
+      "isSystemSupply": true,
+      "soLuong": 10,
+      "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
+      "ghiChu": "",
+      "image": "/IMGVatTu/4/1.jpg"
+    }
+  ]
+}
 
 ### Hiển thị thông tin chi tiết phiếu cung ứng
 GET {{host}}/{{muaSamVatTuPath}}/{{supplyTicketId}}/chi-tiet-phieu-cung-ung
@@ -56,6 +43,6 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ### Xóa một phiếu cung ứng
-DELETE {{host}}/{{muaSamVatTuPath}}/{{supplyTicketId}}/xoa-phieu-cung-ung
+PATCH {{host}}/{{muaSamVatTuPath}}/{{supplyTicketId}}/xoa-phieu-cung-ung
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
