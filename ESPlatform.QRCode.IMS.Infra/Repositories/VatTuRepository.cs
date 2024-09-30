@@ -29,7 +29,8 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 x.QlvtKyKiemKe.PhysicalInventoryName, // ten ky kiem ke
                 x.QlvtKyKiemKeChiTiet.SoLuongSoSach,
                 x.QlvtKyKiemKeChiTiet.SoLuongKiemKe,
-                x.QlvtKyKiemKeChiTiet.SoLuongChenhLech
+                x.QlvtKyKiemKeChiTiet.SoLuongChenhLech,
+                x.QlvtKyKiemKeChiTiet.SoThe
             })
             .FirstOrDefaultAsync();
         return response;

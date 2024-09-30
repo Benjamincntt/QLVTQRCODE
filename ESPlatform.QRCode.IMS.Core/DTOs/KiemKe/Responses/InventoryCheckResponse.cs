@@ -4,7 +4,7 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 
 public class InventoryCheckResponse
 {
-    public int Tag { get; set; }
+    //public int Tag { get; set; }
     
     public int KyKiemKeId { get; set; }
     public int KyKiemKeChiTietId { get; set; }
