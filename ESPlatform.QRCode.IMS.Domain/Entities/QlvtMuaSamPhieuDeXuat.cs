@@ -25,15 +25,11 @@ public partial class QlvtMuaSamPhieuDeXuat
 
     public byte? TrangThai { get; set; }
 
-    public int? IdcanBoDuyet { get; set; }
+    public string? GhiChu { get; set; }
 
-    public string? CanBoLyDo { get; set; }
+    public virtual ICollection<QlvtMuaSamPdxKy> QlvtMuaSamPdxKies { get; set; } = new List<QlvtMuaSamPdxKy>();
 
-    public string? CanBoFileKy { get; set; }
+    public virtual ICollection<QlvtPhieuTrangThai> QlvtPhieuTrangThais { get; set; } = new List<QlvtPhieuTrangThai>();
 
-    public int? IdlanhDaoDuyet { get; set; }
-
-    public string? LanhDaoLyDo { get; set; }
-
-    public string? LanhDaoFileKy { get; set; }
+    public virtual ICollection<QlvtVanBanKy> QlvtVanBanKies { get; set; } = new List<QlvtVanBanKy>();
 }
