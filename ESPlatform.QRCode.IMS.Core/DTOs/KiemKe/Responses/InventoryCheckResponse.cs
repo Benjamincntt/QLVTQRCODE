@@ -38,6 +38,9 @@ public class InventoryCheckResponse
     public List<SuppliesLocation> SuppliesLocation { get; set; } = new List<SuppliesLocation>();
     
     public SupplyDffResponse SupplyDff { get; set; } = new SupplyDffResponse();
+
+    public string SoThe { get; set; } = string.Empty;
+    
 }
 
 public class SuppliesLocation

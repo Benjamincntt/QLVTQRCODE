@@ -105,6 +105,7 @@ public class KiemKeService : IKiemKeService
             response.SoLuongSoSach = inventoryCheckInformationMapper.SoLuongSoSach;
             response.SoLuongKiemKe = inventoryCheckInformationMapper.SoLuongKiemKe;
             response.SoLuongChenhLech = inventoryCheckInformationMapper.SoLuongChenhLech;
+            response.SoThe = inventoryCheckInformationMapper.SoThe;
         }
 
         // DFF
