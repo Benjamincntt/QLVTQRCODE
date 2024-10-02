@@ -191,7 +191,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             await ValidationHelper.ValidateAsync(supplyCart, new SupplyTicketDetailRequestValidation());
             var supplyTicketDetail = supplyCart.Adapt<QlvtMuaSamPhieuDeXuatDetail>();
             // => cắt chuỗi còn id và tên
-            supplyTicketDetail.Image = supplyTicketDetail.Image?[relativeBasePath.Length..];
+            supplyTicketDetail.Image = string.IsNullOrWhiteSpace(supplyTicketDetail.Image) ? null : supplyTicketDetail.Image[relativeBasePath.Length..];
             supplyTicketDetail.PhieuDeXuatId = supplyTicketId;
             listSupplyTicketDetail.Add(supplyTicketDetail);
         }
