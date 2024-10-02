@@ -15,8 +15,8 @@ public class DynamicStaticFileMiddleware
     {
         // Xác định đường dẫn yêu cầu
         var requestPath = context.Request.Path.Value;
-        var folderPath = AppConfig.Instance.Image.FolderPath;//   "D:"
-        var urlPath = AppConfig.Instance.Image.UrlPath;      //   "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin/IMGVatTu"
+        var folderPath = AppConfig.Instance.ImagePath.RootPath;
+        var urlPath = AppConfig.Instance.ImagePath.RelativeBasePath;     
         var localBasePath =  (folderPath + urlPath).Replace("/", "\\");
         // Kiểm tra nếu đường dẫn yêu cầu bắt đầu bằng /images
         if (requestPath.StartsWith(urlPath, StringComparison.OrdinalIgnoreCase))

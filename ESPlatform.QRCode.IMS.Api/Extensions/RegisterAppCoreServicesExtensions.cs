@@ -5,9 +5,9 @@ using ESPlatform.QRCode.IMS.Core.Services.Authentication;
 using ESPlatform.QRCode.IMS.Core.Services.Common;
 using ESPlatform.QRCode.IMS.Core.Services.GioHang;
 using ESPlatform.QRCode.IMS.Core.Services.KiemKe;
-using ESPlatform.QRCode.IMS.Core.Services.Lookup;
 using ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 using ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
+using ESPlatform.QRCode.IMS.Core.Services.TraCuu;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Infra.Repositories;
@@ -62,7 +62,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IAuthenticationService, AuthenticationService>()
             .AddScoped<INguoiDungService, NguoiDungService>()
             .AddScoped<IKiemKeService, KiemKeService>()
-            .AddScoped<ILookupService, LookupService>()
+            .AddScoped<ITraCuuService, TraCuuService>()
             .AddScoped<ICommonService, CommonService>()
             .AddScoped<IMuaSamVatTuService, MuaSamVatTuService>()
             .AddScoped<IGioHangService, GioHangService>()

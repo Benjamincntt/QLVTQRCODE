@@ -14,6 +14,7 @@ using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
+using Microsoft.Extensions.Options;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 
@@ -27,6 +28,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IKhoRepository _khoRepository;
     private readonly IGioHangRepository _gioHangRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
+    private readonly ImagePath _imagePath;
 
     public MuaSamVatTuService(
         IVatTuRepository vatTuRepository,
@@ -36,7 +38,8 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IKhoRepository khoRepository,
         IGioHangRepository gioHangRepository,
         IAuthorizedContextFacade authorizedContextFacade,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IOptions<ImagePath> imagePath)
     {
         _vatTuRepository = vatTuRepository;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
@@ -46,24 +49,26 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _gioHangRepository = gioHangRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
-        
+        _imagePath = imagePath.Value;
     }
 
     public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync(SupplyListRequest request)
     {
         await ValidationHelper.ValidateAsync(request, new SupplyListRequestValidation());
+        var relativeBasePath = _imagePath.RelativeBasePath;
         var listVatTu = (await _vatTuRepository.ListAsync(
                 string.IsNullOrWhiteSpace(request.TenVatTu) ? string.Empty : request.TenVatTu.ToLower(),
                 string.IsNullOrWhiteSpace(request.MaVatTu) ? string.Empty : request.MaVatTu.ToLower(),
                 request.IdKho,
                 request.IdViTri,
+                relativeBasePath,
                 request.GetPageIndex(),
                 request.GetPageSize()))
             .Adapt<PagedList<SupplyListResponseItem>>();
         return listVatTu;
     }
 
-    public async Task<SupplyOrderDetailResponse> GetPurchaseSupplyAsync(int vatTuId, bool isSystemSupply)
+    public async Task<SupplyOrderDetailResponse> GetSupplyOrderDetailAsync(int vatTuId, bool isSystemSupply)
     {
         if (vatTuId <= 0 )
         {
@@ -83,11 +88,10 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             response.TenVatTu = vatTu.TenVatTu ?? string.Empty;
             response.ThongSoKyThuat = vatTu.MoTa ?? string.Empty;
             response.GhiChu = vatTu.GhiChu ?? string.Empty;
-            var folderPath = AppConfig.Instance.Image.FolderPath;               // "D:"
-            var urlPath = AppConfig.Instance.Image.UrlPath;                     // "/Images"
-            var localBasePath =  (folderPath + urlPath).Replace("/", "\\");     // "D:\Images"
+            var rootPath = _imagePath.RootPath;              
+            var relativeBasePath = _imagePath.RelativeBasePath;             
+            var localBasePath =  (rootPath + relativeBasePath).Replace("/", "\\"); 
             var folderImagePath = $@"{localBasePath}\{vatTuId}";
-            //var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
             if (Directory.Exists(folderImagePath))
             {
                 var imageFiles = Directory.GetFiles(folderImagePath);
@@ -95,7 +99,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 foreach (var file in imageFiles)
                 {
                     var fileName = Path.GetFileName(file);
-                    var fullPath = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
+                    var fullPath = Path.Combine(relativeBasePath, vatTuId.ToString(), fileName).Replace("\\", "/");
                     response.ImagePaths.Add(fullPath);
                 }
             }
@@ -167,6 +171,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 
     private async Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests)
      {
+         var relativeBasePath = _imagePath.RelativeBasePath;
         if (!requests.Any())
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplies);
@@ -185,6 +190,8 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             }
             await ValidationHelper.ValidateAsync(supplyCart, new SupplyTicketDetailRequestValidation());
             var supplyTicketDetail = supplyCart.Adapt<QlvtMuaSamPhieuDeXuatDetail>();
+            // => cắt chuỗi còn id và tên
+            supplyTicketDetail.Image = supplyTicketDetail.Image?[relativeBasePath.Length..];
             supplyTicketDetail.PhieuDeXuatId = supplyTicketId;
             listSupplyTicketDetail.Add(supplyTicketDetail);
         }
@@ -207,8 +214,15 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         response.TenPhieu = supplyTicket.TenPhieu ?? string.Empty;
         response.MoTa = supplyTicket.MoTa ?? string.Empty;
         var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId))
-            .Adapt<IEnumerable<SupplyResponse>>();
-        response.DanhSachVatTu = listSupplies.ToList();
+            .Adapt<IEnumerable<SupplyResponse>>().ToList();
+        var relativeBasePath = _imagePath.RelativeBasePath;
+        // subBasePath = "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin"
+        var subBasePath = relativeBasePath[.._imagePath.RelativeBasePath.LastIndexOf('/')]; 
+        foreach (var supply in listSupplies)
+        {
+            supply.Image = subBasePath + supply.Image;
+        }
+        response.DanhSachVatTu = listSupplies;
         response.Tong = response.DanhSachVatTu.Count;
         return response;
     }

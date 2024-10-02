@@ -1,17 +1,17 @@
 ﻿using ESPlatform.QRCode.IMS.Api.Controllers.Base;
 using ESPlatform.QRCode.IMS.Core.DTOs.TraCuu.Responses;
-using ESPlatform.QRCode.IMS.Core.Services.Lookup;
+using ESPlatform.QRCode.IMS.Core.Services.TraCuu;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ESPlatform.QRCode.IMS.Api.Controllers;
 
 public class TraCuuController: ApiControllerBase
 {
-    private readonly ILookupService _lookupService;
+    private readonly ITraCuuService _traCuuService;
 
-    public TraCuuController(ILookupService lookupService)
+    public TraCuuController(ITraCuuService traCuuService)
     {
-        _lookupService = lookupService;
+        _traCuuService = traCuuService;
     }
 
     /// <summary>
@@ -22,6 +22,6 @@ public class TraCuuController: ApiControllerBase
     [HttpGet("{maVatTu}")]
     public async Task<LookupSuppliesResponse> GetAsync(string maVatTu)
     {
-        return await _lookupService.GetAsync(maVatTu);
+        return await _traCuuService.GetAsync(maVatTu);
     }
 }

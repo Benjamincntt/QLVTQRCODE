@@ -12,6 +12,8 @@ using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
 using MapsterMapper;
+using Microsoft.Extensions.Options;
+using QRCoder;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 
@@ -24,6 +26,7 @@ public class KiemKeService : IKiemKeService
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IKhoRepository _khoRepository;
     private readonly IMapper _mapper;
+    private readonly ImagePath _imagePath;
 
     public KiemKeService(
         IVatTuRepository vatTuRepository,
@@ -32,7 +35,8 @@ public class KiemKeService : IKiemKeService
         IKyKiemKeChiTietRepository kyKiemKeChiTietRepository,
         IKyKiemKeRepository kyKiemKeRepository,
         IAuthorizedContextFacade authorizedContextFacade,
-        IMapper mapper)
+        IMapper mapper,
+        IOptions<ImagePath> imagePath)
     {
         _vatTuRepository = vatTuRepository;
         _kyKiemKeChiTietDffRepository = kyKiemKeChiTietDffRepository;
@@ -41,6 +45,7 @@ public class KiemKeService : IKiemKeService
         _kyKiemKeRepository = kyKiemKeRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _mapper = mapper;
+        _imagePath = imagePath.Value;
     }
 
     public async Task<InventoryCheckResponse> GetAsync(string maVatTu)
@@ -69,11 +74,10 @@ public class KiemKeService : IKiemKeService
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
         // ảnh đại diện
         response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
-        var folderPath = AppConfig.Instance.Image.FolderPath;//   "D:"
-        var urlPath = AppConfig.Instance.Image.UrlPath;//         "/Images"
-        var localBasePath =  (folderPath + urlPath).Replace("/", "\\");
+        var rootPath = _imagePath.RootPath;                               // "D:"
+        var relativeBasePath = _imagePath.RelativeBasePath;               // "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin/IMGVatTu"
+        var localBasePath =  (rootPath + relativeBasePath).Replace("/", "\\");
         var folderImagePath = $@"{localBasePath}\{vatTuId}";
-        //var urlPath = $"{AppConfig.Instance.Image.UrlPath}/{vatTuId}";
 
         if (Directory.Exists(folderImagePath))
         {
@@ -86,7 +90,7 @@ public class KiemKeService : IKiemKeService
                 var fileName = Path.GetFileName(file);
                 
                 // Tạo URL hoàn chỉnh từ urlPath và tên file
-                var fullPath = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
+                var fullPath = Path.Combine(relativeBasePath, vatTuId.ToString(), fileName).Replace("\\", "/");
 
                 // Thêm vào danh sách đường dẫn
                 response.ImagePaths.Add(fullPath);

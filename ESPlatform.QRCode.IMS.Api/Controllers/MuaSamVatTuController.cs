@@ -38,9 +38,9 @@ public class MuaSamVatTuController : ApiControllerBase
     /// <param name="isSystemSupply"></param>
     /// <returns></returns>
     [HttpGet("{id:int}/chi-tiet-vat-tu")]
-    public async Task<SupplyOrderDetailResponse> GetPurchaseSupplyAsync(int id, bool isSystemSupply = true)
+    public async Task<SupplyOrderDetailResponse> GetSupplyOrderDetailAsync(int id, bool isSystemSupply = true)
     {
-        return await _muaSamVatTuService.GetPurchaseSupplyAsync(id, isSystemSupply);
+        return await _muaSamVatTuService.GetSupplyOrderDetailAsync(id, isSystemSupply);
     }
     
     

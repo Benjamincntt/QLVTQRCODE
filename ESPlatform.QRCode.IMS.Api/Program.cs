@@ -20,7 +20,8 @@ builder.Services
 	   .RegisterAppCoreServices()
 	   .RegisterAuthenticationServices()
 	  // .RegisterMessageBroker()
-	   .RegisterOtherServices();
+	   .RegisterOtherServices()
+	   .RegisterImageRootPathService(builder.Configuration);
 
 // Configure services
 builder.Services

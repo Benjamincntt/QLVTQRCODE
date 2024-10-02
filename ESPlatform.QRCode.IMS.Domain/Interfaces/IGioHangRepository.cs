@@ -5,5 +5,5 @@ namespace ESPlatform.QRCode.IMS.Domain.Interfaces;
 
 public interface IGioHangRepository: IRepositoryBase<QlvtGioHang>
 {
-    Task<IEnumerable<dynamic>> ListSupplyAsync(int userId);
+    Task<IEnumerable<dynamic>> ListSupplyAsync(int userId, string relativeBasePath);
 }

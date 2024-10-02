@@ -9,7 +9,9 @@ using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.Common;
 
@@ -18,13 +20,18 @@ public class CommonService : ICommonService
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IVatTuViTriRepository _vatTuViTriRepository;
     private readonly IViTriRepository _viTriRepository;
+    private readonly ImagePath _imagePath;
 
-    public CommonService(IVatTuRepository vatTuRepository, IVatTuViTriRepository vatTuViTriRepository,
-        IViTriRepository viTriRepository)
+    public CommonService(
+        IVatTuRepository vatTuRepository,
+        IVatTuViTriRepository vatTuViTriRepository,
+        IViTriRepository viTriRepository,
+        IOptions<ImagePath> imagePath)
     {
         _vatTuRepository = vatTuRepository;
         _vatTuViTriRepository = vatTuViTriRepository;
         _viTriRepository = viTriRepository;
+        _imagePath = imagePath.Value;
     }
 
     public async Task<int> ModifySuppliesLocationAsync(int vatTuId, int idViTri,
@@ -130,14 +137,14 @@ public class CommonService : ICommonService
 
         #endregion
 
-        var folderPath = AppConfig.Instance.Image.FolderPath; // "D:"
-        var urlPath = AppConfig.Instance.Image.UrlPath; // "/Images"
-        var localBasePath = (folderPath + urlPath).Replace("/", "\\"); // "D:\Images"
-        var localPath = (folderPath + inputPath).Replace("/", "\\"); // "D:/Images/id/name.png"
+        var rootPath = _imagePath.RootPath; 
+        var relativeBasePath = _imagePath.RelativeBasePath; 
+        var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\"); 
+        var inputLocalPath = (rootPath + inputPath).Replace("/", "\\"); 
         // Xóa ảnh cũ
-        if (File.Exists(localPath))
+        if (File.Exists(inputLocalPath))
         {
-            File.Delete(localPath);
+            File.Delete(inputLocalPath);
         }
 
         // Tạo ảnh mới
@@ -150,7 +157,7 @@ public class CommonService : ICommonService
             Directory.CreateDirectory(localFolder);
         }
 
-        var fullPath = Path.Combine(localBasePath, vatTuId.ToString(), fileName); // "D:\Images\{vatTuId}\{fileName}"
+        var fullPath = Path.Combine(localBasePath, vatTuId.ToString(), fileName); 
         await using (var stream = new FileStream(fullPath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
@@ -163,13 +170,12 @@ public class CommonService : ICommonService
         if (imageFiles.Count > 0)
         {
             var firstImageFile = imageFiles.First();
-            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), Path.GetFileName(firstImageFile))
-                .Replace("\\", "/"); // "/Images/{vatTuId}/{firstImageFileName}"
+            vatTu.Image = Path.Combine("/", vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/"); 
             await _vatTuRepository.UpdateAsync(vatTu);
         }
 
-        return Path.Combine(AppConfig.Instance.Image.UrlPath, vatTuId.ToString(), fileName)
-            .Replace("\\", "/"); // "/Images/{vatTuId}/{fileName}"                                                                                          
+        return Path.Combine(_imagePath.RelativeBasePath, vatTuId.ToString(), fileName)
+            .Replace("\\", "/");                                                                                       
     }
 
     public async Task<string> CreateSuppliesImageAsync(int vatTuId, IFormFile file)
@@ -202,9 +208,9 @@ public class CommonService : ICommonService
         #endregion
 
         // create new image
-        var folderPath = AppConfig.Instance.Image.FolderPath;
-        var urlPath = AppConfig.Instance.Image.UrlPath;
-        var localBasePath = (folderPath + urlPath).Replace("/", "\\");
+        var rootPath = _imagePath.RootPath;
+        var relativeBasePath = _imagePath.RelativeBasePath;
+        var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\");
         var fileName = file.FileName.ToFileName();
 
         // check if server don't have path => create a new directory by path
@@ -228,12 +234,11 @@ public class CommonService : ICommonService
         if (imageFiles.Count > 0)
         {
             var firstImageFile = imageFiles.First();
-            vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), Path.GetFileName(firstImageFile))
-                .Replace("\\", "/"); // "/Images/{vatTuId}/{firstImageFileName}"
+            vatTu.Image = Path.Combine("/", vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/"); 
             await _vatTuRepository.UpdateAsync(vatTu);
         }
 
-        var urlResult = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
+        var urlResult = Path.Combine(relativeBasePath, vatTuId.ToString(), fileName).Replace("\\", "/");
         return urlResult;
     }
 
@@ -250,11 +255,11 @@ public class CommonService : ICommonService
             throw new NotFoundException(vatTu.GetTypeEx(), null);
         }
 
-        var folderPath = AppConfig.Instance.Image.FolderPath; 
-        var urlPath = AppConfig.Instance.Image.UrlPath;
-        var localBasePath = (folderPath + urlPath).Replace("/", "\\"); // "D:\Images"
-        var localPath = (folderPath + inputPath).Replace("/", "\\");
-        string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" }; // Các loại file được phép
+        var rootPath = _imagePath.RootPath; 
+        var relativeBasePath = _imagePath.RelativeBasePath;
+        var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\"); 
+        var localPath = (rootPath + inputPath).Replace("/", "\\");
+        string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" }; 
         // nếu không tồn tại ảnh => xóa không thành công 
         if (!File.Exists(localPath))
         {
@@ -273,8 +278,7 @@ public class CommonService : ICommonService
             return 1;
         }
         var firstImageFile = imageFiles.First();
-        vatTu.Image = Path.Combine(urlPath, vatTuId.ToString(), Path.GetFileName(firstImageFile))
-            .Replace("\\", "/"); 
+        vatTu.Image = Path.Combine("/", vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/"); 
         await _vatTuRepository.UpdateAsync(vatTu);
         return 1;
     }

@@ -66,7 +66,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         return response;
     }
 
-    public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri,
+    public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri, string relativeBasePath,
         int pageIndex, int pageSize)
     {
         var vatTu = DbContext.QlvtVatTus
@@ -95,7 +95,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 VatTuId = x.QlvtVatTu.VatTuId,
                 TenVatTu = x.QlvtVatTu.TenVatTu,
                 DonViTinh = x.QlvtVatTu.DonViTinh,
-                Image = x.QlvtVatTu.Image ?? string.Empty,
+                Image = x.QlvtVatTu.Image != null ? (relativeBasePath + x.QlvtVatTu.Image) : string.Empty,
                 IsSystemSupply = true,
             });
         // Query cho dữ liệu mới

@@ -7,23 +7,27 @@ using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
 using Mapster;
 using MapsterMapper;
+using Microsoft.Extensions.Options;
 
-namespace ESPlatform.QRCode.IMS.Core.Services.Lookup;
+namespace ESPlatform.QRCode.IMS.Core.Services.TraCuu;
 
-public class LookupService : ILookupService
+public class TraCuuService : ITraCuuService
 {
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IKhoRepository _khoRepository;
     private readonly IMapper _mapper;
+    private readonly ImagePath _imagePath;
 
-    public LookupService(
+    public TraCuuService(
         IVatTuRepository vatTuRepository,
         IKhoRepository khoRepository,
-        IMapper mapper)
+        IMapper mapper,
+        IOptions<ImagePath> imagePath)
     {
         _vatTuRepository = vatTuRepository;
         _khoRepository = khoRepository;
         _mapper = mapper;
+        _imagePath = imagePath.Value;
     }
 
     public async Task<LookupSuppliesResponse> GetAsync(string maVatTu)
@@ -48,9 +52,9 @@ public class LookupService : ILookupService
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
         // ảnh đại diện
         response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
-        var folderPath = AppConfig.Instance.Image.FolderPath;           //   "D:"
-         var urlPath = AppConfig.Instance.Image.UrlPath;                //   "/Images"
-        var localBasePath =  (folderPath + urlPath).Replace("/", "\\"); //   "D:\Images"
+        var rootPath = _imagePath.RootPath;           
+        var relativeBasePath = _imagePath.RelativeBasePath;                
+        var localBasePath =  (rootPath + relativeBasePath).Replace("/", "\\"); 
         var folderImagePath = $@"{localBasePath}\{vatTuId}";
         // list ảnh
         if (Directory.Exists(folderImagePath))
@@ -61,7 +65,7 @@ public class LookupService : ILookupService
             foreach (var file in imageFiles)
             {
                 var fileName = Path.GetFileName(file);
-                var fullPath = Path.Combine(urlPath, vatTuId.ToString(), fileName).Replace("\\", "/");
+                var fullPath = Path.Combine(relativeBasePath, vatTuId.ToString(), fileName).Replace("\\", "/");
                 response.ImagePaths.Add(fullPath);
             }
         }

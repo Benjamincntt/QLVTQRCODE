@@ -2,6 +2,7 @@
 using ESPlatform.QRCode.IMS.Core.DTOs.GioHang.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.Engine;
+using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
@@ -10,6 +11,7 @@ using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
 using MapsterMapper;
+using Microsoft.Extensions.Options;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.GioHang;
 
@@ -20,19 +22,22 @@ public class GioHangService : IGioHangService
     private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IMapper _mapper;
+    private readonly ImagePath _imagePath;
 
     public GioHangService(
         IGioHangRepository gioHangRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IVatTuRepository vatTuRepository
         ,IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
-        IMapper mapper)
+        IMapper mapper,
+        IOptions<ImagePath> imagePath)
     {
         _gioHangRepository = gioHangRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _vatTuRepository = vatTuRepository;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
         _mapper = mapper;
+        _imagePath = imagePath.Value;
     }
 
     public async Task<int> GetSupplyCountAsync()
@@ -44,7 +49,7 @@ public class GioHangService : IGioHangService
     public async Task<IEnumerable<CartSupplyResponse>> ListSupplyAsync()
     {
         var userId = _authorizedContextFacade.AccountId;
-        return (await _gioHangRepository.ListSupplyAsync(userId)).Adapt<IEnumerable<CartSupplyResponse>>();
+        return (await _gioHangRepository.ListSupplyAsync(userId, _imagePath.RelativeBasePath)).Adapt<IEnumerable<CartSupplyResponse>>();
     }
 
     public async Task<int> ModifyQuantityAsync(int gioHangId, int quantity)

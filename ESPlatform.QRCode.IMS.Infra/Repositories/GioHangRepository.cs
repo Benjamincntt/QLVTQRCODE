@@ -12,7 +12,7 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
     {
     }
 
-    public async Task<IEnumerable<dynamic>> ListSupplyAsync(int userId)
+    public async Task<IEnumerable<dynamic>> ListSupplyAsync(int userId, string relativeBasePath)
     {
         // var query = DbContext.QlvtGioHangs
         //     .Where(x => x.UserId == userId)
@@ -37,7 +37,7 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
             .Select(x => new
             {
                 x.VatTu.TenVatTu,
-                x.VatTu.Image,
+                Image = x.VatTu.Image != null ? (relativeBasePath + x.VatTu.Image) : null,
                 x.QlvtGioHang.VatTuId,
                 x.QlvtGioHang.IsSystemSupply,
                 x.QlvtGioHang.ThongSoKyThuat,

@@ -15,7 +15,7 @@ public class AppConfig {
 
 	public OtpSettings OtpSettings { get; set; } = new();
 	
-	public ImagePath Image { get; set; }
+	public ImagePath ImagePath { get; set; }
 
 	/* END Settings */
 
