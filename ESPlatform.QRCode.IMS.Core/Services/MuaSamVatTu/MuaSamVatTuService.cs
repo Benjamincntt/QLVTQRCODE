@@ -27,6 +27,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IMuaSamPhieuDeXuatDetailRepository _muaSamPhieuDeXuatDetailRepository;
     private readonly IKhoRepository _khoRepository;
     private readonly IGioHangRepository _gioHangRepository;
+    private readonly IVanBanKyRepository _vanBanKyRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly ImagePath _imagePath;
 
@@ -37,6 +38,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IMuaSamPhieuDeXuatDetailRepository muaSamPhieuDeXuatDetailRepository,
         IKhoRepository khoRepository,
         IGioHangRepository gioHangRepository,
+        IVanBanKyRepository vanBanKyRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork,
         IOptions<ImagePath> imagePath)
@@ -47,6 +49,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _muaSamPhieuDeXuatDetailRepository = muaSamPhieuDeXuatDetailRepository;
         _khoRepository = khoRepository;
         _gioHangRepository = gioHangRepository;
+        _vanBanKyRepository = vanBanKyRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
         _imagePath = imagePath.Value;
@@ -113,7 +116,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return response;
     }
 
-    public async Task<int> CreateSupplyTicketAsync(CreatedSupplyTicketRequest request)
+    public async Task<int> ProcessSupplyTicketCreationAsync(ProcessSupplyTicketCreationRequest request)
     {
         if (!request.SupplyTicketDetails.Any())
         {
@@ -124,18 +127,19 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         {
             try
             {
-                var supplyTicket = new QlvtMuaSamPhieuDeXuat
-                {
-                    TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
-                    MoTa = request.Description,
-                    TrangThai = (byte?)SupplyTicketStatus.Unsigned,
-                    NgayThem = DateTime.Now,
-                    MaNguoiThem = _authorizedContextFacade.AccountId
-                };
-                await _muaSamPhieuDeXuatRepository.InsertAsync(supplyTicket);
+                // var supplyTicket = new QlvtMuaSamPhieuDeXuat
+                // {
+                //     TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
+                //     MoTa = request.Description,
+                //     TrangThai = (byte?)SupplyTicketStatus.Unsigned,
+                //     NgayThem = DateTime.Now,
+                //     MaNguoiThem = _authorizedContextFacade.AccountId
+                // };
+                // await _muaSamPhieuDeXuatRepository.InsertAsync(supplyTicket);
+                var supplyTicketName = await CreateSupplyTicketAsync(request.Description);
 
                 var addedSupplyTicket =
-                    await _muaSamPhieuDeXuatRepository.GetAsync(x => x.TenPhieu == supplyTicket.TenPhieu);
+                    await _muaSamPhieuDeXuatRepository.GetAsync(x => x.TenPhieu == supplyTicketName);
                 if (addedSupplyTicket == null)
                 {
                     throw new BadRequestException(Constants.Exceptions.Messages.Common.InsertFailed);
@@ -148,6 +152,10 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 var gioHangIds = request.SupplyTicketDetails.Select(supplyTicketDetail => supplyTicketDetail.GioHangId).ToList();
                 var suppliesInCart = await _gioHangRepository.ListAsync(x => gioHangIds.Contains(x.GioHangId));
                 await _gioHangRepository.DeleteManyAsync(suppliesInCart);
+                
+                // thêm mới 2 phiếu vào bảng ký
+                await CreateTwoTextToSignAsync(supplyTicketId);
+                
                 await _unitOfWork.CommitAsync();
                 return supplyTicketId;
             }
@@ -252,5 +260,39 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     {
         var response = (await _khoRepository.ListWarehousesAsync()).Adapt<IEnumerable<WarehouseResponseItem>>();
         return response;
+    }
+
+    private async Task<string> CreateSupplyTicketAsync(string? description)
+    {
+        var supplyTicket = new QlvtMuaSamPhieuDeXuat
+        {
+            TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
+            MoTa = description,
+            TrangThai = (byte?)SupplyTicketStatus.Unsigned,
+            NgayThem = DateTime.Now,
+            MaNguoiThem = _authorizedContextFacade.AccountId
+        };
+        await _muaSamPhieuDeXuatRepository.InsertAsync(supplyTicket);
+        return supplyTicket.TenPhieu;
+    }
+
+    private async Task<int> CreateTwoTextToSignAsync(int supplyTicketId)
+    {
+        var textTosign = new List<QlvtVanBanKy>()
+        {
+            new QlvtVanBanKy
+            {
+                PhieuId = supplyTicketId,
+                MaLoaiVanBan = "PhieuDeXuat",
+                NgayTao = DateTime.Now
+            },
+            new QlvtVanBanKy
+            {
+                PhieuId = supplyTicketId,
+                MaLoaiVanBan = "PhieuDuyet",
+                NgayTao = DateTime.Now
+            }
+        };
+        return await _vanBanKyRepository.InsertManyAsync(textTosign);
     }
 }

@@ -52,6 +52,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IMuaSamVatTuNewRepository, MuaSamVatTuNewRepository>()
             .AddScoped<IMuaSamPhieuDeXuatDetailRepository, MuaSamPhieuDeXuatDetailRepository>()
             .AddScoped<IGioHangRepository, GioHangRepository>()
+            .AddScoped<IVanBanKyRepository, VanBanKyRepository>()
             .AddScoped<IUnitOfWork, UnitOfWork>()
 
             // Facades

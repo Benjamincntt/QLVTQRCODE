@@ -2,7 +2,7 @@
 
 public class QlvtCauHinhVbKy
 {
-    public string? Stt { get; set; }
+    public short? Stt { get; set; }
 
     public int Id { get; set; }
 
@@ -13,4 +13,8 @@ public class QlvtCauHinhVbKy
     public int? SoLuongChuKy { get; set; }
 
     public bool? CoTheBoQua { get; set; }
+
+    public string? IdDetect { get; set; }
+
+    public string? TypeSign { get; set; }
 }

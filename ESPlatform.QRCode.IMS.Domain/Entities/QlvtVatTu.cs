@@ -33,4 +33,6 @@ public partial class QlvtVatTu
     /// Thông số kỹ thuật
     /// </summary>
     public string? MoTa { get; set; }
+    
+    public int? DonGia { get; set; }
 }

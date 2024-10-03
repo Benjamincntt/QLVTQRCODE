@@ -24,7 +24,7 @@ Authorization: Bearer {{accessToken}}
   "description": "string",
   "supplyTicketDetails": [
     {
-      "gioHangId": 38,
+      "gioHangId": 52,
       "vatTuId": 4,
       "tenVatTu": "fuchsyloken",
       "donViTinh": "Chai",
@@ -32,7 +32,7 @@ Authorization: Bearer {{accessToken}}
       "soLuong": 10,
       "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
       "ghiChu": "",
-      "image": "/IMGVatTu/4/1.jpg"
+      "image": "/4/1.jpg"
     }
   ]
 }

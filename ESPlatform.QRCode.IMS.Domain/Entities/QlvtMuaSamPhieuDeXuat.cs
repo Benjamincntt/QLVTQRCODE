@@ -3,8 +3,7 @@
 namespace ESPlatform.QRCode.IMS.Domain.Entities;
 [DisplayName("Phiếu đề xuất")]
 public partial class QlvtMuaSamPhieuDeXuat
-{   
-    [DisplayName("Id Phiếu đề xuất")]
+{
     public int Id { get; set; }
 
     public string? MaPhieu { get; set; }
@@ -28,6 +27,8 @@ public partial class QlvtMuaSamPhieuDeXuat
     public string? GhiChu { get; set; }
 
     public virtual ICollection<QlvtMuaSamPdxKy> QlvtMuaSamPdxKies { get; set; } = new List<QlvtMuaSamPdxKy>();
+
+    public virtual ICollection<QlvtMuaSamPhieuDeXuatDetail> QlvtMuaSamPhieuDeXuatDetails { get; set; } = new List<QlvtMuaSamPhieuDeXuatDetail>();
 
     public virtual ICollection<QlvtPhieuTrangThai> QlvtPhieuTrangThais { get; set; } = new List<QlvtPhieuTrangThai>();
 

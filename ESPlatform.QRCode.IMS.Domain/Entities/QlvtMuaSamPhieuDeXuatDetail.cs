@@ -30,6 +30,8 @@ public partial class QlvtMuaSamPhieuDeXuatDetail
     /// Id phiếu đề xuất
     /// </summary>
     public int PhieuDeXuatId { get; set; }
-    
+
     public string? Image { get; set; }
+
+    public virtual QlvtMuaSamPhieuDeXuat PhieuDeXuat { get; set; } = null!;
 }

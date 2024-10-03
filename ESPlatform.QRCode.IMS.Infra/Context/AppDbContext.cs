@@ -54,7 +54,11 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<QlvtVatTu> QlvtVatTus { get; set; }
 
+    public virtual DbSet<QlvtVatTuBoMa> QlvtVatTuBoMas { get; set; }
+
     public virtual DbSet<QlvtVatTuTonKho> QlvtVatTuTonKhos { get; set; }
+
+    public virtual DbSet<QlvtVatTuTonKhoDinhMuc> QlvtVatTuTonKhoDinhMucs { get; set; }
 
     public virtual DbSet<QlvtVatTuViTri> QlvtVatTuViTris { get; set; }
 
@@ -94,11 +98,7 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<TbKieuNguoiDung> TbKieuNguoiDungs { get; set; }
 
-    public virtual DbSet<TbKieuNguoiDungChucNangLoaiKieuNguoiDung> TbKieuNguoiDungChucNangLoaiKieuNguoiDungs
-    {
-        get;
-        set;
-    }
+    public virtual DbSet<TbKieuNguoiDungChucNangLoaiKieuNguoiDung> TbKieuNguoiDungChucNangLoaiKieuNguoiDungs { get; set; }
 
     public virtual DbSet<TbKieuNguoiDungModunLoaiKieuNguoiDung> TbKieuNguoiDungModunLoaiKieuNguoiDungs { get; set; }
 
@@ -186,16 +186,20 @@ public partial class AppDbContext : DbContext
             entity.ToTable("QLVT_CauHinh_Vb_Ky");
 
             entity.Property(e => e.CoTheBoQua).HasColumnName("CoThe_BoQua");
+            entity.Property(e => e.IdDetect)
+                .HasMaxLength(20)
+                .IsUnicode(false);
             entity.Property(e => e.MaDoiTuongKy)
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.MaLoaiVanBan)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.Stt)
-                .HasMaxLength(10)
-                .IsFixedLength()
-                .HasColumnName("STT");
+            entity.Property(e => e.Stt).HasColumnName("STT");
+            entity.Property(e => e.TypeSign)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("typeSign");
         });
 
         modelBuilder.Entity<QlvtGioHang>(entity =>
@@ -573,10 +577,14 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PhieuDeXuatId).HasComment("Id phiếu đề xuất");
             entity.Property(e => e.TenVatTu).HasMaxLength(250);
             entity.Property(e => e.VatTuId)
-                .HasComment(
-                    "Nếu IDVatTu tồn tại thì vật tư được lấy từ hệ thông ERP, nếu không tồn tại thì Vật tư đc thêm mới vào phiếu đề xuất")
+                .HasComment("Nếu IDVatTu tồn tại thì vật tư được lấy từ hệ thông ERP, nếu không tồn tại thì Vật tư đc thêm mới vào phiếu đề xuất")
                 .HasColumnName("VatTu_Id");
             entity.Property(e => e.XuatXu).HasMaxLength(50);
+
+            entity.HasOne(d => d.PhieuDeXuat).WithMany(p => p.QlvtMuaSamPhieuDeXuatDetails)
+                .HasForeignKey(d => d.PhieuDeXuatId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_QLVT_MuaSam_PhieuDeXuat_Detail_QLVT_MuaSam_PhieuDeXuat");
         });
 
         modelBuilder.Entity<QlvtMuaSamPhieuDeXuatLichSu>(entity =>
@@ -651,13 +659,15 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("QLVT_VatTu");
 
-            entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
+            entity.Property(e => e.VatTuId)
+                .ValueGeneratedNever()
+                .HasColumnName("VatTu_Id");
+            entity.Property(e => e.DonGia).HasDefaultValueSql("((0))");
             entity.Property(e => e.DonViTinh).HasMaxLength(100);
             entity.Property(e => e.GhiChu).HasMaxLength(250);
             entity.Property(e => e.Image)
                 .HasMaxLength(200)
-                .HasComment(
-                    "Ảnh đại diện, mặc định ảnh đầu tiên sẽ là ảnh mặc định hiển thị ban đầu. Khi tồn tại ảnh này thì cần check folder tương ứng xem còn ảnh ko");
+                .HasComment("Ảnh đại diện, mặc định ảnh đầu tiên sẽ là ảnh mặc định hiển thị ban đầu. Khi tồn tại ảnh này thì cần check folder tương ứng xem còn ảnh ko");
             entity.Property(e => e.KhoId).HasColumnName("Kho_Id");
             entity.Property(e => e.MaVatTu)
                 .HasMaxLength(100)
@@ -668,6 +678,21 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NguoiTaoId).HasColumnName("NguoiTao_Id");
             entity.Property(e => e.TenVatTu).HasMaxLength(100);
             entity.Property(e => e.TrangThaiInQr).HasColumnName("TrangThai_InQr");
+        });
+
+        modelBuilder.Entity<QlvtVatTuBoMa>(entity =>
+        {
+            entity.HasKey(e => e.MaNhom).HasName("QLVT_VatTu_BoMa_PK");
+
+            entity.ToTable("QLVT_VatTu_BoMa");
+
+            entity.Property(e => e.MaNhom)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.Dvt)
+                .HasMaxLength(100)
+                .HasColumnName("DVT");
+            entity.Property(e => e.TenNhom).HasMaxLength(200);
         });
 
         modelBuilder.Entity<QlvtVatTuTonKho>(entity =>
@@ -704,6 +729,16 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false)
                 .HasComment("Mã kho phụ")
                 .HasColumnName("Subinventory_Code");
+        });
+
+        modelBuilder.Entity<QlvtVatTuTonKhoDinhMuc>(entity =>
+        {
+            entity.HasKey(e => e.IdVatTu).HasName("PK__QLVT_Vat__D4A7C3D84CC39D1B");
+
+            entity.ToTable("QLVT_VatTu_TonKho_DinhMuc");
+
+            entity.Property(e => e.IdVatTu).ValueGeneratedNever();
+            entity.Property(e => e.DinhMuc).HasDefaultValueSql("((0))");
         });
 
         modelBuilder.Entity<QlvtVatTuViTri>(entity =>
@@ -827,20 +862,15 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .HasComment("Email");
-            entity.Property(e => e.Lft)
-                .HasComment(
-                    "Thuộc tính đánh dấu cạnh trái của 1 node trong kỹ thuật lưu trữ và truy vấn dữ liệu dạng cây");
+            entity.Property(e => e.Lft).HasComment("Thuộc tính đánh dấu cạnh trái của 1 node trong kỹ thuật lưu trữ và truy vấn dữ liệu dạng cây");
             entity.Property(e => e.MaDonViSuDung).HasComment("Mã đơn vị sử dụng");
             entity.Property(e => e.MaNguoiQuanLy).HasComment("Mã người dùng của người quản lý đơn vị người dùng");
             entity.Property(e => e.NgayCapNhap).HasColumnType("datetime");
             entity.Property(e => e.NgayTao).HasColumnType("datetime");
             entity.Property(e => e.ParentId)
-                .HasComment(
-                    "Thuộc tính đánh dấu ID của node cha của 1 node trong kỹ thuật lưu trữ và truy vấn dữ liệu dạng cây")
+                .HasComment("Thuộc tính đánh dấu ID của node cha của 1 node trong kỹ thuật lưu trữ và truy vấn dữ liệu dạng cây")
                 .HasColumnName("ParentID");
-            entity.Property(e => e.Rght)
-                .HasComment(
-                    "Thuộc tính đánh dấu cạnh phải của 1 node trong kỹ thuật lưu trữ và truy vấn dữ liệu dạng cây");
+            entity.Property(e => e.Rght).HasComment("Thuộc tính đánh dấu cạnh phải của 1 node trong kỹ thuật lưu trữ và truy vấn dữ liệu dạng cây");
             entity.Property(e => e.SoDienThoai)
                 .HasMaxLength(20)
                 .HasComment("Số điện thoại");
@@ -880,9 +910,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.KichHoat)
                 .IsRequired()
                 .HasDefaultValueSql("((1))");
-            entity.Property(e => e.KieuMatKhau)
-                .HasComment(
-                    "1: kiểu mặc định; 2: kiểu mặc định đủ 6 ký tự trở lên; 3: kiểu gồm cả chữ và số; 4: kiểu gồm cả chữ và số đủ 6 ký tự trở lên");
+            entity.Property(e => e.KieuMatKhau).HasComment("1: kiểu mặc định; 2: kiểu mặc định đủ 6 ký tự trở lên; 3: kiểu gồm cả chữ và số; 4: kiểu gồm cả chữ và số đủ 6 ký tự trở lên");
             entity.Property(e => e.Logo).HasMaxLength(255);
             entity.Property(e => e.LogoKhoaHoc).HasMaxLength(255);
             entity.Property(e => e.LoiThongCaoBenNgoai).HasColumnType("ntext");
@@ -1110,8 +1138,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<TbKieuNguoiDungChucNangLoaiKieuNguoiDung>(entity =>
         {
-            entity.HasKey(e => new { e.MaKieuNguoiDung, e.MaChucNang, e.MaLoaiKieuNguoiDung })
-                .HasName("PK_Tb_ChucVu_ChucNang");
+            entity.HasKey(e => new { e.MaKieuNguoiDung, e.MaChucNang, e.MaLoaiKieuNguoiDung }).HasName("PK_Tb_ChucVu_ChucNang");
 
             entity.ToTable("Tb_KieuNguoiDung_ChucNang_LoaiKieuNguoiDung");
 
@@ -1123,16 +1150,14 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.MaKieuNguoiDung)
                 .HasConstraintName("FK_Tb_KieuNguoiDung_ChucNang_Tb_KieuNguoiDung");
 
-            entity.HasOne(d => d.MaLoaiKieuNguoiDungNavigation)
-                .WithMany(p => p.TbKieuNguoiDungChucNangLoaiKieuNguoiDungs)
+            entity.HasOne(d => d.MaLoaiKieuNguoiDungNavigation).WithMany(p => p.TbKieuNguoiDungChucNangLoaiKieuNguoiDungs)
                 .HasForeignKey(d => d.MaLoaiKieuNguoiDung)
                 .HasConstraintName("FK_Tb_KieuNguoiDung_ChucNang_LoaiKieuNguoiDung_Tb_LoaiKieuNguoiDung");
         });
 
         modelBuilder.Entity<TbKieuNguoiDungModunLoaiKieuNguoiDung>(entity =>
         {
-            entity.HasKey(e => new { e.MaKieuNguoiDung, e.MaModun, e.MaLoaiKieuNguoiDung })
-                .HasName("PK_Tb_ChucVu_Modun");
+            entity.HasKey(e => new { e.MaKieuNguoiDung, e.MaModun, e.MaLoaiKieuNguoiDung }).HasName("PK_Tb_ChucVu_Modun");
 
             entity.ToTable("Tb_KieuNguoiDung_Modun_LoaiKieuNguoiDung");
 
@@ -1191,14 +1216,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.MaLsNguoiDungCapNhatNguoiDung).HasColumnName("MaLS_NguoiDung_CapNhat_NguoiDung");
             entity.Property(e => e.ThoiGian).HasColumnType("datetime");
 
-            entity.HasOne(d => d.MaNguoiBiTacDongNavigation)
-                .WithMany(p => p.TbLsNguoiDungCapNhatNguoiDungMaNguoiBiTacDongNavigations)
+            entity.HasOne(d => d.MaNguoiBiTacDongNavigation).WithMany(p => p.TbLsNguoiDungCapNhatNguoiDungMaNguoiBiTacDongNavigations)
                 .HasForeignKey(d => d.MaNguoiBiTacDong)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Tb_LS_NguoiDung_CapNhat_NguoiDung_Tb_NguoiDung1");
 
-            entity.HasOne(d => d.MaNguoiTacDongNavigation)
-                .WithMany(p => p.TbLsNguoiDungCapNhatNguoiDungMaNguoiTacDongNavigations)
+            entity.HasOne(d => d.MaNguoiTacDongNavigation).WithMany(p => p.TbLsNguoiDungCapNhatNguoiDungMaNguoiTacDongNavigations)
                 .HasForeignKey(d => d.MaNguoiTacDong)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Tb_LS_NguoiDung_CapNhat_NguoiDung_Tb_NguoiDung");
@@ -1247,14 +1270,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.MaLsNguoiDungTaoNguoiDung).HasColumnName("MaLS_NguoiDung_Tao_NguoiDung");
             entity.Property(e => e.ThoiGian).HasColumnType("datetime");
 
-            entity.HasOne(d => d.MaNguoiBiTacDongNavigation)
-                .WithMany(p => p.TbLsNguoiDungTaoNguoiDungMaNguoiBiTacDongNavigations)
+            entity.HasOne(d => d.MaNguoiBiTacDongNavigation).WithMany(p => p.TbLsNguoiDungTaoNguoiDungMaNguoiBiTacDongNavigations)
                 .HasForeignKey(d => d.MaNguoiBiTacDong)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Tb_LS_NguoiDung_Tao_NguoiDung_Tb_NguoiDung1");
 
-            entity.HasOne(d => d.MaNguoiTacDongNavigation)
-                .WithMany(p => p.TbLsNguoiDungTaoNguoiDungMaNguoiTacDongNavigations)
+            entity.HasOne(d => d.MaNguoiTacDongNavigation).WithMany(p => p.TbLsNguoiDungTaoNguoiDungMaNguoiTacDongNavigations)
                 .HasForeignKey(d => d.MaNguoiTacDong)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Tb_LS_NguoiDung_Tao_NguoiDung_Tb_NguoiDung");
@@ -1280,24 +1301,19 @@ public partial class AppDbContext : DbContext
             entity.ToTable("Tb_LS_NguoiDung_Xoa_NguoiDung");
 
             entity.Property(e => e.MaLsNguoiDungXoaNguoiDung).HasColumnName("MaLS_NguoiDung_Xoa_NguoiDung");
-            entity.Property(e => e.MaNguoiThucHienKhoiPhuc)
-                .HasComment("Mã người dùng thực hiện khôi phục 1 bản ghi hay xóa vĩnh viễn 1 bản ghi khỏi thùng rác");
+            entity.Property(e => e.MaNguoiThucHienKhoiPhuc).HasComment("Mã người dùng thực hiện khôi phục 1 bản ghi hay xóa vĩnh viễn 1 bản ghi khỏi thùng rác");
             entity.Property(e => e.ThoiGian).HasColumnType("datetime");
             entity.Property(e => e.ThoiGianThucHien)
                 .HasComment("Thời gian khôi phục hay xóa vĩnh viễ 1 bản ghi trong thùng rác")
                 .HasColumnType("datetime");
-            entity.Property(e => e.TranngThai)
-                .HasComment(
-                    "Trạng thái: =1 hiển thị;=2 đã khôi phục (không hiển thị);= 10 xóa vĩnh viễn (không hiển thị)");
+            entity.Property(e => e.TranngThai).HasComment("Trạng thái: =1 hiển thị;=2 đã khôi phục (không hiển thị);= 10 xóa vĩnh viễn (không hiển thị)");
 
-            entity.HasOne(d => d.MaNguoiBiTacDongNavigation)
-                .WithMany(p => p.TbLsNguoiDungXoaNguoiDungMaNguoiBiTacDongNavigations)
+            entity.HasOne(d => d.MaNguoiBiTacDongNavigation).WithMany(p => p.TbLsNguoiDungXoaNguoiDungMaNguoiBiTacDongNavigations)
                 .HasForeignKey(d => d.MaNguoiBiTacDong)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Tb_LS_NguoiDung_Xoa_NguoiDung_Tb_NguoiDung1");
 
-            entity.HasOne(d => d.MaNguoiTacDongNavigation)
-                .WithMany(p => p.TbLsNguoiDungXoaNguoiDungMaNguoiTacDongNavigations)
+            entity.HasOne(d => d.MaNguoiTacDongNavigation).WithMany(p => p.TbLsNguoiDungXoaNguoiDungMaNguoiTacDongNavigations)
                 .HasForeignKey(d => d.MaNguoiTacDong)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Tb_LS_NguoiDung_Xoa_NguoiDung_Tb_NguoiDung");
@@ -1750,8 +1766,7 @@ public partial class AppDbContext : DbContext
             entity.ToTable("Tb_ViTriCongViec");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.IsGuiDanhGia)
-                .HasComment("0: Không gửi đánh giá/ 1: Gửi đánh ra lên đơn vị cấp trên");
+            entity.Property(e => e.IsGuiDanhGia).HasComment("0: Không gửi đánh giá/ 1: Gửi đánh ra lên đơn vị cấp trên");
             entity.Property(e => e.NgaySua).HasColumnType("datetime");
             entity.Property(e => e.NgayThem).HasColumnType("datetime");
             entity.Property(e => e.TenViTriCongViec).HasMaxLength(250);
