@@ -14,6 +14,7 @@ using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Options;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
@@ -64,6 +65,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 string.IsNullOrWhiteSpace(request.MaVatTu) ? string.Empty : request.MaVatTu.ToLower(),
                 request.IdKho,
                 request.IdViTri,
+                string.IsNullOrWhiteSpace(request.MaNhom) ? string.Empty : request.MaNhom.ToLower(),
                 relativeBasePath,
                 request.GetPageIndex(),
                 request.GetPageSize()))
@@ -80,8 +82,8 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         
         var response = new SupplyOrderDetailResponse();
         // if Id is VatTuId => get information from QlvtVatTu table
-        if (isSystemSupply)
-        {
+        // if (isSystemSupply)
+        // {
             var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
             if (vatTu == null)
             {
@@ -91,6 +93,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             response.TenVatTu = vatTu.TenVatTu ?? string.Empty;
             response.ThongSoKyThuat = vatTu.MoTa ?? string.Empty;
             response.GhiChu = vatTu.GhiChu ?? string.Empty;
+            response.DonGia = vatTu.DonGia ?? 0;
             var rootPath = _imagePath.RootPath;              
             var relativeBasePath = _imagePath.RelativeBasePath;             
             var localBasePath =  (rootPath + relativeBasePath).Replace("/", "\\"); 
@@ -107,13 +110,13 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 }
             }
             return response;
-        }
+        //}
         //if Id is VatTuNewId => get information from QlvtMuaSamVatTuNew table
-        var vatTuNew = await _muaSamVatTuNewRepository.GetAsync(vatTuId);
-        if (vatTuNew == null) return response;
-        response.TenVatTu = vatTuNew.TenVatTu;
-        response.ThongSoKyThuat = vatTuNew.ThongSoKyThuat ?? string.Empty;
-        return response;
+        // var vatTuNew = await _muaSamVatTuNewRepository.GetAsync(vatTuId);
+        // if (vatTuNew == null) return response;
+        // response.TenVatTu = vatTuNew.TenVatTu;
+        // response.ThongSoKyThuat = vatTuNew.ThongSoKyThuat ?? string.Empty;
+        // return response;
     }
 
     public async Task<int> ProcessSupplyTicketCreationAsync(ProcessSupplyTicketCreationRequest request)
@@ -224,11 +227,12 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId))
             .Adapt<IEnumerable<SupplyResponse>>().ToList();
         var relativeBasePath = _imagePath.RelativeBasePath;
-        // subBasePath = "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin"
-        var subBasePath = relativeBasePath[.._imagePath.RelativeBasePath.LastIndexOf('/')]; 
         foreach (var supply in listSupplies)
         {
-            supply.Image = subBasePath + supply.Image;
+            if (!string.IsNullOrWhiteSpace(supply.Image))
+            {
+                supply.Image = relativeBasePath + supply.Image;
+            }
         }
         response.DanhSachVatTu = listSupplies;
         response.Tong = response.DanhSachVatTu.Count;

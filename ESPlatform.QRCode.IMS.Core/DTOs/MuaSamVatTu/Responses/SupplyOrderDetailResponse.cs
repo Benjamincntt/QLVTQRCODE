@@ -9,4 +9,6 @@ public class SupplyOrderDetailResponse
     public string ThongSoKyThuat { get; set; } = string.Empty;
     
     public string GhiChu { get; set; } = string.Empty;
+    
+    public int DonGia { get; set; }
 }

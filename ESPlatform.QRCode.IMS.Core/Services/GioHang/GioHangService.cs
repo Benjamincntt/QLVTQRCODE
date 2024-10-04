@@ -99,8 +99,8 @@ public class GioHangService : IGioHangService
             throw new BadRequestException(Constants.Exceptions.Messages.Cart.SupplyNotExist);
         }
         // Nếu là vật tư => ktra xem vật tư còn trong hệ thống không
-        if (supplyInCart.IsSystemSupply == true)
-        {
+        // if (supplyInCart.IsSystemSupply == true)
+        // {
             var supply = await _vatTuRepository.GetAsync(x => x.VatTuId == supplyInCart.VatTuId);
             // vật tư không tồn tại => xóa trong giỏ hàng
             if (supply == null)
@@ -108,17 +108,17 @@ public class GioHangService : IGioHangService
                 await _gioHangRepository.DeleteAsync(supplyInCart);
                 throw new NotFoundException(Constants.Exceptions.Messages.Cart.DeletedSupply);
             }
-        }
+        //}
         // Nếu là vật tư mới thêm => ktra xem vật tư còn trong bảng vật tư mới không
-        var supplyNew = await _muaSamVatTuNewRepository.GetAsync(x => x.VatTuNewId == supplyInCart.VatTuId);
+        //var supplyNew = await _muaSamVatTuNewRepository.GetAsync(x => x.VatTuNewId == supplyInCart.VatTuId);
         // Vật tư không tồn tại => xóa trong giỏ hàng
-        if (supplyNew == null)
-        {
-            await _gioHangRepository.DeleteAsync(supplyInCart);
-            throw new NotFoundException(Constants.Exceptions.Messages.Cart.DeletedSupply);
-        }
+        // if (supplyNew == null)
+        // {
+        //     await _gioHangRepository.DeleteAsync(supplyInCart);
+        //     throw new NotFoundException(Constants.Exceptions.Messages.Cart.DeletedSupply);
+        // }
         // Cập nhật lại thông tin trong bảng giỏ hàng
-        supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
+        //supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
         supplyInCart.GhiChu = request.GhiChu;
         supplyInCart.SoLuong = request.SoLuong;
         supplyInCart.ThoiGianCapNhat = DateTime.Now;

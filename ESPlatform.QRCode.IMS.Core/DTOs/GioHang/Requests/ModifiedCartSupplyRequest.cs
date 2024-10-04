@@ -2,7 +2,7 @@
 
 public class ModifiedCartSupplyRequest
 {
-    public string? ThongSoKyThuat { get; set; }
+    //public string? ThongSoKyThuat { get; set; }
     
     public string? GhiChu { get; set; }
     

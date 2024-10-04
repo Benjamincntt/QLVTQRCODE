@@ -66,7 +66,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         return response;
     }
 
-    public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri, string relativeBasePath,
+    public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri, string maNhom, string relativeBasePath,
         int pageIndex, int pageSize)
     {
         var vatTu = DbContext.QlvtVatTus
@@ -82,14 +82,16 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
             .SelectMany(x => x.QlvtVatTuViTri.DefaultIfEmpty(),
                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
-            .Where(x => tenVatTu == string.Empty || x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
-            .Where(x => maVatTu == string.Empty || x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
+            .Where(x => string.IsNullOrWhiteSpace(tenVatTu) || x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
+            .Where(x => string.IsNullOrWhiteSpace(maVatTu) || x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
+            .Where(x => string.IsNullOrWhiteSpace(maNhom) || x.QlvtVatTu.MaVatTu.ToLower().Contains(maNhom))
             .Where(x => idKho == 0 || x.QlvtVatTu.KhoId == idKho)
             .Where(x => idViTri == 0 || x.QlvtVatTuViTri != null &&
                 (x.QlvtVatTuViTri.IdToMay == idViTri
                  || x.QlvtVatTuViTri.IdGiaKe == idViTri
                  || x.QlvtVatTuViTri.IdNgan == idViTri
                  || x.QlvtVatTuViTri.IdHop == idViTri))
+            .OrderBy(x => x.QlvtVatTu.TenVatTu)
             .Select(x => new 
             {
                 VatTuId = x.QlvtVatTu.VatTuId,
@@ -99,28 +101,29 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 IsSystemSupply = true,
             });
         // Query cho dữ liệu mới
-        var vatTuNew = DbContext.QlvtMuaSamVatTuNews
-            .Where(x => tenVatTu == string.Empty || x.TenVatTu.ToLower().Contains(tenVatTu.ToLower()))
-            .Where(x => maVatTu == string.Empty)
-            .Where(x => idKho == 0)
-            .Where(x => idViTri == 0)
-            .Select(x => new 
-            {
-                VatTuId = x.VatTuNewId,
-                TenVatTu = x.TenVatTu,
-                DonViTinh = x.DonViTinh,
-                Image = x.Image ?? string.Empty,
-                IsSystemSupply = false,
-            });
-
-        // Kết hợp cả hai query
-        var combinedQuery = vatTu
-            .Union(vatTuNew)
-            .OrderBy(x => x.TenVatTu)
-            ;
+        // var vatTuNew = DbContext.QlvtMuaSamVatTuNews
+        //     .Where(x => tenVatTu == string.Empty || x.TenVatTu.ToLower().Contains(tenVatTu.ToLower()))
+        //     .Where(x => maVatTu == string.Empty)
+        //     .Where(x => idKho == 0)
+        //     .Where(x => idViTri == 0)
+        //     .Select(x => new 
+        //     {
+        //         VatTuId = x.VatTuNewId,
+        //         TenVatTu = x.TenVatTu,
+        //         DonViTinh = x.DonViTinh,
+        //         Image = x.Image ?? string.Empty,
+        //         IsSystemSupply = false,
+        //     });
+        //
+        // // Kết hợp cả hai query
+        // var combinedQuery = vatTu
+        //     .Union(vatTuNew)
+        //     .OrderBy(x => x.TenVatTu)
+        //     ;
 
         // Phân trang kết quả kết hợp
-        return await combinedQuery.ToPagedListAsync<dynamic>(pageIndex, pageSize);
+        // return await combinedQuery.ToPagedListAsync<dynamic>(pageIndex, pageSize);
+        return await vatTu.ToPagedListAsync<dynamic>(pageIndex, pageSize);
     }
 
     public async Task<dynamic?> GetWarehouseIdAsync(int vatTuId)

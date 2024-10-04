@@ -14,5 +14,7 @@ public class SupplyListRequest : PagingFilter
     [DisplayName("Id vị trí")]
     public int IdViTri { get; set; } = 0;
     
+    public string? MaNhom { get; set; } = string.Empty;
+    
     //public bool IsSystemSupply { get; set; } = false;
 }

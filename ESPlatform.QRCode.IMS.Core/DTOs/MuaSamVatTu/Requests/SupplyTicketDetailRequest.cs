@@ -21,4 +21,6 @@ public class SupplyTicketDetailRequest
     public string GhiChu { get; set; } = string.Empty;
     
     public string Image { get; set; } = string.Empty;
+    
+    public int DonGia { get; set; }
 }

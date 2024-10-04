@@ -14,7 +14,7 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
 
     public async Task<IEnumerable<dynamic>> ListAsync(int supplyTicketId)
     {
-        // lấy thêm image từ bảng vật tư
+       
         var vatTu = DbContext.QlvtMuaSamPhieuDeXuatDetails
             .Join(DbContext.QlvtVatTus,
                 x => x.VatTuId,
@@ -29,29 +29,32 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
                 x.PhieuDeXuatDetail.ThongSoKyThuat,
                 x.PhieuDeXuatDetail.GhiChu,
                 x.PhieuDeXuatDetail.SoLuong,
-                x.VatTu.Image
+                x.VatTu.Image,
+                x.VatTu.DonGia
             });
+        return await vatTu.ToListAsync();
         // lấy thông tin từ bảng vật tư mới tạo
-        var vatTuNew = DbContext.QlvtMuaSamPhieuDeXuatDetails
-            .Join(DbContext.QlvtMuaSamVatTuNews,
-                x => x.VatTuId,
-                y => y.VatTuNewId,
-                (x, y) => new { PhieuDeXuatDetail = x, VatTuNew = y })
-            .Where(x => x.PhieuDeXuatDetail.PhieuDeXuatId == supplyTicketId)
-            .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == false)
-            .OrderBy(x => x.PhieuDeXuatDetail.TenVatTu)
-            .Select(x => new
-            {
-                x.PhieuDeXuatDetail.TenVatTu,
-                x.PhieuDeXuatDetail.ThongSoKyThuat,
-                x.PhieuDeXuatDetail.GhiChu,
-                x.PhieuDeXuatDetail.SoLuong,
-                x.VatTuNew.Image
-            });
-        var combinedQuery = vatTu
-                .Union(vatTuNew)
-                .OrderBy(x => x.TenVatTu)
-            ;
-        return await combinedQuery.ToListAsync();
+        // var vatTuNew = DbContext.QlvtMuaSamPhieuDeXuatDetails
+        //     .Join(DbContext.QlvtMuaSamVatTuNews,
+        //         x => x.VatTuId,
+        //         y => y.VatTuNewId,
+        //         (x, y) => new { PhieuDeXuatDetail = x, VatTuNew = y })
+        //     .Where(x => x.PhieuDeXuatDetail.PhieuDeXuatId == supplyTicketId)
+        //     .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == false)
+        //     .OrderBy(x => x.PhieuDeXuatDetail.TenVatTu)
+        //     .Select(x => new
+        //     {
+        //         x.PhieuDeXuatDetail.TenVatTu,
+        //         x.PhieuDeXuatDetail.ThongSoKyThuat,
+        //         x.PhieuDeXuatDetail.GhiChu,
+        //         x.PhieuDeXuatDetail.SoLuong,
+        //         x.VatTuNew.Image
+        //     });
+        // var combinedQuery = vatTu
+        //         .Union(vatTuNew)
+        //         .OrderBy(x => x.TenVatTu)
+        //     ;
+        //return await combinedQuery.ToListAsync();
+        
     }
 }
