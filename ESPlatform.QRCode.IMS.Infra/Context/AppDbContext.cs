@@ -48,8 +48,6 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<QlvtMuaSamVatTuNew> QlvtMuaSamVatTuNews { get; set; }
 
-    public virtual DbSet<QlvtPhieuTrangThai> QlvtPhieuTrangThais { get; set; }
-
     public virtual DbSet<QlvtVanBanKy> QlvtVanBanKies { get; set; }
 
     public virtual DbSet<QlvtVatTu> QlvtVatTus { get; set; }
@@ -615,20 +613,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.XuatXu).HasMaxLength(200);
         });
 
-        modelBuilder.Entity<QlvtPhieuTrangThai>(entity =>
-        {
-            entity.ToTable("QLVT_Phieu_TrangThai");
-
-            entity.Property(e => e.FilePath)
-                .HasMaxLength(500)
-                .HasColumnName("File_Path");
-            entity.Property(e => e.PhieuId).HasColumnName("Phieu_Id");
-
-            entity.HasOne(d => d.Phieu).WithMany(p => p.QlvtPhieuTrangThais)
-                .HasForeignKey(d => d.PhieuId)
-                .HasConstraintName("FK_QLVT_Phieu_TrangThai_QLVT_MuaSam_PhieuDeXuat");
-        });
-
         modelBuilder.Entity<QlvtVanBanKy>(entity =>
         {
             entity.ToTable("QLVT_VanBan_Ky");
@@ -676,7 +660,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NgayTao).HasColumnType("datetime");
             entity.Property(e => e.NguoiTao).HasMaxLength(100);
             entity.Property(e => e.NguoiTaoId).HasColumnName("NguoiTao_Id");
-            entity.Property(e => e.TenVatTu).HasMaxLength(100);
+            entity.Property(e => e.TenVatTu).HasMaxLength(500);
             entity.Property(e => e.TrangThaiInQr).HasColumnName("TrangThai_InQr");
         });
 
@@ -1767,6 +1751,9 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.IsGuiDanhGia).HasComment("0: Không gửi đánh giá/ 1: Gửi đánh ra lên đơn vị cấp trên");
+            entity.Property(e => e.MaDoiTuongKy)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.NgaySua).HasColumnType("datetime");
             entity.Property(e => e.NgayThem).HasColumnType("datetime");
             entity.Property(e => e.TenViTriCongViec).HasMaxLength(250);

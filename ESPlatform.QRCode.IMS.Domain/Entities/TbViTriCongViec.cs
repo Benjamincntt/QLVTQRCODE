@@ -28,4 +28,6 @@ public partial class TbViTriCongViec
     /// 0: Không gửi đánh giá/ 1: Gửi đánh ra lên đơn vị cấp trên
     /// </summary>
     public byte? IsGuiDanhGia { get; set; }
+
+    public string? MaDoiTuongKy { get; set; }
 }
