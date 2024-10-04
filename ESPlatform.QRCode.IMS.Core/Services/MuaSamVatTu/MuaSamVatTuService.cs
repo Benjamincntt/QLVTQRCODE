@@ -130,15 +130,6 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         {
             try
             {
-                // var supplyTicket = new QlvtMuaSamPhieuDeXuat
-                // {
-                //     TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
-                //     MoTa = request.Description,
-                //     TrangThai = (byte?)SupplyTicketStatus.Unsigned,
-                //     NgayThem = DateTime.Now,
-                //     MaNguoiThem = _authorizedContextFacade.AccountId
-                // };
-                // await _muaSamPhieuDeXuatRepository.InsertAsync(supplyTicket);
                 var supplyTicketName = await CreateSupplyTicketAsync(request.Description);
 
                 var addedSupplyTicket =

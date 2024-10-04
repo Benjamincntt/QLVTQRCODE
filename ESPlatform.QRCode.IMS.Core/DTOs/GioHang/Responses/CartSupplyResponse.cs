@@ -10,4 +10,5 @@ public class CartSupplyResponse
     public string ThongSoKyThuat { get; set; } = string.Empty;
     public string GhiChu { get; set; } = string.Empty;
     public int GioHangId { get; set; }
+    public int DonGia { get; set; }
 }

@@ -25,13 +25,14 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
             .Select(x => new
             {
                 x.VatTu.TenVatTu,
+                x.VatTu.DonGia,
                 Image = x.VatTu.Image != null ? (relativeBasePath + x.VatTu.Image) : null,
                 x.QlvtGioHang.VatTuId,
                 x.QlvtGioHang.IsSystemSupply,
                 ThongSoKyThuat = x.VatTu.MoTa,
                 x.QlvtGioHang.GhiChu,
                 x.QlvtGioHang.SoLuong,
-                x.QlvtGioHang.GioHangId
+                x.QlvtGioHang.GioHangId,
             });
         return await vatTu.ToListAsync();
         // lấy thông tin từ bảng vật tư mới tạo
