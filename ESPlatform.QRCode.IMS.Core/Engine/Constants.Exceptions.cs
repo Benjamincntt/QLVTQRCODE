@@ -56,6 +56,18 @@ public static partial class Constants {
 				public const string DeletedSupply = "Vật tư đã không còn trong hệ thống nên đã bị xóa khỏi giỏ hàng";
 				public const string InvalidCartInfo = "Thông tin giỏ hàng không chính xác";
 			}
-		}
+            // ký phiếu cung ứng
+            public static class KyCungUng
+            {
+                public const string EmptyPhieuIds = "Không có phiếu nào";
+                public const string InvalidPdx = "Không tồn tại phiếu đề xuất";
+                public const string InvalidChuKy = "Cấu hình chữ ký không tồn tại";
+                public const string Signed = "Phiếu đã được ký";
+                public const string CanNotIgnore = "Người ký không được bỏ qua chữ ký này";
+                public const int DaKy = 1;
+				public const int HuyBo = -1;
+            }
+			
+        }
 	}
 }

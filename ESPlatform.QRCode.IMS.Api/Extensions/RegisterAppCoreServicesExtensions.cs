@@ -6,6 +6,7 @@ using ESPlatform.QRCode.IMS.Core.Services.Common;
 using ESPlatform.QRCode.IMS.Core.Services.GioHang;
 using ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 using ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
+using ESPlatform.QRCode.IMS.Core.Services.PhieuKy;
 using ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
 using ESPlatform.QRCode.IMS.Core.Services.TraCuu;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
@@ -53,6 +54,10 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IMuaSamPhieuDeXuatDetailRepository, MuaSamPhieuDeXuatDetailRepository>()
             .AddScoped<IGioHangRepository, GioHangRepository>()
             .AddScoped<IVanBanKyRepository, VanBanKyRepository>()
+
+            .AddScoped<IPhieuKyRepository, PhieuKyRepository>()
+            .AddScoped<IPhieuDeXuatKyRepository, PhieuDeXuatKyRepository>()
+             .AddScoped<ICauHinhVanBanKyRepository, CauHinhVanBanKyRepository>()
             .AddScoped<IUnitOfWork, UnitOfWork>()
 
             // Facades
@@ -67,6 +72,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<ICommonService, CommonService>()
             .AddScoped<IMuaSamVatTuService, MuaSamVatTuService>()
             .AddScoped<IGioHangService, GioHangService>()
+            .AddScoped<IPhieuKyService, PhieuKyService>()
             ;
 
         return services;
