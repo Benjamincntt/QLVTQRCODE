@@ -242,6 +242,12 @@ public class AuthenticationService : IAuthenticationService
             AccessToken = accessToken,
 
             RefreshToken = MiscHelper.GenerateRandomBase64String(),
+            
+            TenNguoiDung = nguoiDung.Ten,
+            
+            ChucVu = nguoiDung.ChucVu ?? string.Empty,
+            
+            IdDonVi = nguoiDung.IddonVi,
         };
     }
 
