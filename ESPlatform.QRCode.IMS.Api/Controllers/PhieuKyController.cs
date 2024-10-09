@@ -99,11 +99,11 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
 
                 if (fileExists)
                 {
-                    return Ok(new { exists = true, message = "File exists.", data = result });
+                    return Ok(new { exists = true, message = "Có tồn tại file", data = result });
                 }
                 else
                 {
-                    return NotFound(new { exists = false, message = "File does not exist." });
+                    return NotFound(new { exists = false, message = "Không tồn tại file" });
                 }
             }
             catch (NotFoundException ex)

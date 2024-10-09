@@ -266,14 +266,21 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         {
             var kySoPath = _configuration.GetSection("KySoPath");
             var rootPath = kySoPath.GetValue<string>("RootPath");
+            
             var relativeBasePath = kySoPath.GetValue<string>("RelativeBasePath");
 
             if (string.IsNullOrEmpty(rootPath) || string.IsNullOrEmpty(relativeBasePath))
             {
                 throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
             }
-
+            // Kiểm tra và loại bỏ "KySo" nếu nó đã tồn tại trong RelativeBasePath
+            if (relativeBasePath.EndsWith("KySo"))
+            {
+                relativeBasePath = relativeBasePath.Substring(0, relativeBasePath.Length - "KySo".Length);
+            }
             var fullPath = Path.Combine(rootPath, relativeBasePath.Trim('/'), filePath.Trim('/'));
+            // Chuẩn hóa đường dẫn thành backslash cho Windows
+            fullPath = fullPath.Replace("/", "\\");
             return Task.FromResult(fullPath);
         }
     }
