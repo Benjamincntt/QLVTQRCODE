@@ -344,6 +344,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("freeze_date");
             entity.Property(e => e.KiemKeIdGoc).HasColumnName("KiemKe_Id_Goc");
             entity.Property(e => e.Kykiemkechinh).HasColumnName("kykiemkechinh");
+            entity.Property(e => e.NgaySaoLuu).HasColumnType("datetime");
             entity.Property(e => e.OrganizationCode)
                 .HasMaxLength(255)
                 .HasColumnName("organization_code");
@@ -914,6 +915,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ParentId).HasColumnName("ParentID");
             entity.Property(e => e.SoDienThoai).HasMaxLength(20);
             entity.Property(e => e.SoLuongToiDaNguoiTruyCap).HasDefaultValueSql("((20))");
+            entity.Property(e => e.SynchronizeAuto)
+                .HasDefaultValueSql("((0))")
+                .HasComment("Cài đặt tự động đồng bộ; =1 là tự động");
+            entity.Property(e => e.SynchronizeTime)
+                .HasDefaultValueSql("((24))")
+                .HasComment("Thời gian đồng bộ trong ngày, theo giờ (từ 1-24)");
             entity.Property(e => e.TenDonViSuDung).HasMaxLength(255);
             entity.Property(e => e.TenMienCon).HasMaxLength(50);
             entity.Property(e => e.TenMienRieng).HasMaxLength(50);

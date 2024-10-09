@@ -90,9 +90,15 @@ public partial class TbDonViSuDung
 
     public double? GiaXem { get; set; }
 
-    public double? GiaDownload { get; set; }
+    /// <summary>
+    /// Cài đặt tự động đồng bộ; =1 là tự động
+    /// </summary>
+    public bool? SynchronizeAuto { get; set; }
 
-    public bool? SuDungBlockChain { get; set; }
+    /// <summary>
+    /// Thời gian đồng bộ trong ngày, theo giờ (từ 1-24)
+    /// </summary>
+    public int? SynchronizeTime { get; set; }
 
     public virtual TbKieuDangKyNd MaKieuDangKyNdNavigation { get; set; } = null!;
 

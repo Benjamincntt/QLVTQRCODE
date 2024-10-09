@@ -28,6 +28,7 @@ public partial class QlvtKyKiemKeBackup
 
     public int? KiemKeIdGoc { get; set; }
 
-    public virtual ICollection<QlvtKyKiemKeChiTietBackup> QlvtKyKiemKeChiTietBackups { get; set; } =
-        new List<QlvtKyKiemKeChiTietBackup>();
+    public DateTime? NgaySaoLuu { get; set; }
+
+    public virtual ICollection<QlvtKyKiemKeChiTietBackup> QlvtKyKiemKeChiTietBackups { get; set; } = new List<QlvtKyKiemKeChiTietBackup>();
 }
