@@ -27,6 +27,10 @@ public class QlvtMuaSamPdxKy
     public DateTime? NgayTao { get; set; }
 
     public int? NguoiTao { get; set; }
+    
+    public int? Page { get; set; }
+
+    public double? PageHeight { get; set; }
 
     public virtual QlvtMuaSamPhieuDeXuat? PhieuDeXuat { get; set; }
 }
