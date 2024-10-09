@@ -2,6 +2,7 @@
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
+using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
@@ -10,6 +11,7 @@ using ESPlatform.QRCode.IMS.Infra.Repositories;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Mapster;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,10 +26,14 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         private readonly IPhieuKyRepository _phieuKyRepository;
         private readonly IPhieuDeXuatKyRepository _deXuatKyRepository;
         private readonly ICauHinhVanBanKyRepository _cauHinhVanBanKyRepository;
+        private readonly IVanBanKyRepository _vanBanKyRepository;
         private readonly IAuthorizedContextFacade _authorizedContextFacade;
+        private readonly IConfiguration _configuration;
         public PhieuKyService(IPhieuKyRepository phieuKyRepository, IAuthorizedContextFacade authorizedContextFacade
                 , IPhieuDeXuatKyRepository deXuatKyRepository
                 , ICauHinhVanBanKyRepository cauHinhVanBanKyRepository
+                , IVanBanKyRepository vanBanKyRepository
+                , IConfiguration configuration
                 , IUnitOfWork unitOfWork)
         {
             _phieuKyRepository = phieuKyRepository;
@@ -35,7 +41,9 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _unitOfWork = unitOfWork;
             _deXuatKyRepository = deXuatKyRepository;
             _cauHinhVanBanKyRepository = cauHinhVanBanKyRepository;
-    }
+            _vanBanKyRepository = vanBanKyRepository;
+            _configuration = configuration;
+        }
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
         {
 
@@ -54,6 +62,8 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 NgayThem = p.NgayThem,
                 TrangThai = p.TrangThai,
                 MaNguoiThem = p.MaNguoiThem,
+                TenDonViSuDung = p.TenDonViSuDung,
+                TenNguoiThem = p.TenNguoiThem,
                 VanBanKy = p.VanBanKy != null ? new VanBanKyModel // Kiểm tra ChuKys có null không
                 {
                     Id = p.VanBanKy.Id,
@@ -70,6 +80,8 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     ThuTuKy = p.ChuKy.ThuTuKy,
                     NgayKy = p.ChuKy.NgayKy,
                     MaDoiTuongKy = p.ChuKy?.MaDoiTuongKy,
+                    page = p.ChuKy?.page,
+                    pageHeight = p.ChuKy?.pageHeight,
                 } : null
             }).ToList();
             return response;
@@ -231,6 +243,38 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     throw;
                 }
             }
+        }
+
+        public async Task<VanBanKyModel> GetVanBanKyById(int id)
+        {
+            var vanBanKy = await _vanBanKyRepository.GetAsync(x => x.Id == id);
+            if (vanBanKy == null)
+            {
+                throw new BadRequestException("Không tồn tại văn bản ký này");
+            }
+            var response = new VanBanKyModel
+            {
+                Id = vanBanKy.Id,
+                PhieuId = vanBanKy.PhieuId,
+                FileName = vanBanKy.FileName,
+                FilePath = vanBanKy.FilePath,
+                TrangThaiTaoFile = vanBanKy.TrangThaiTaoFile
+            };
+            return response;
+        }
+        public Task<string> GetFullFilePath(string filePath)
+        {
+            var kySoPath = _configuration.GetSection("KySoPath");
+            var rootPath = kySoPath.GetValue<string>("RootPath");
+            var relativeBasePath = kySoPath.GetValue<string>("RelativeBasePath");
+
+            if (string.IsNullOrEmpty(rootPath) || string.IsNullOrEmpty(relativeBasePath))
+            {
+                throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
+            }
+
+            var fullPath = Path.Combine(rootPath, relativeBasePath.Trim('/'), filePath.Trim('/'));
+            return Task.FromResult(fullPath);
         }
     }
 }

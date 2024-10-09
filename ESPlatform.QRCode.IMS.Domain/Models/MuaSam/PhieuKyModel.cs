@@ -32,6 +32,8 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
         public VanBanKyModel? VanBanKy { get; set; } = new VanBanKyModel();
 
         public ChuKyModel? ChuKy { get; set; } = new ChuKyModel();
+        public string? TenDonViSuDung { get; set; }
+        public string? TenNguoiThem { get; set; }
     }
     public class ChuKyModel
     {
@@ -58,6 +60,8 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
         public DateTime? NgayTao { get; set; }
 
         public int? NguoiTao { get; set; }
+        public int? page { get; set; }
+        public float? pageHeight { get; set; }
     }
     public class VanBanKyModel
     {

@@ -147,9 +147,20 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                                 from p in query
                                 join v in DbContext.QlvtVanBanKies.Where(v => v.MaLoaiVanBan == maLoaiVanBan)
                                     on p.Id equals v.PhieuId
+
+
                                 join k in DbContext.QlvtMuaSamPdxKies.Where(k => k.MaDoiTuongKy == MaDoiTuongKy)
                                      on new { PhieuDeXuatId = (int?)p.Id, VanBan_Id = (int?)v.Id }
-                                     equals new { PhieuDeXuatId = (int?)k.PhieuDeXuatId, VanBan_Id = (int?)k.VanBanId } 
+                                     equals new { PhieuDeXuatId = (int?)k.PhieuDeXuatId, VanBan_Id = (int?)k.VanBanId }
+
+                                     // Join với bảng người dùng
+                                join nd in DbContext.TbNguoiDungs
+                                    on p.MaNguoiThem equals nd.MaNguoiDung
+
+                                // Join với bảng đơn vị sử dụng
+                                join dv in DbContext.TbDonViSuDungs
+                                    on nd.MaDonViSuDung equals dv.MaDonViSuDung
+
                                 orderby p.NgayThem descending, p.TenPhieu
                                 select new PhieuKyModel
                                 {
@@ -160,6 +171,8 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                                     MaDonViSuDung = p.MaDonViSuDung,
                                     NgayThem = p.NgayThem,
                                     MaNguoiThem = p.MaNguoiThem,
+                                    TenDonViSuDung = dv.TenDonViSuDung,
+                                    TenNguoiThem = nd.Ho + " " + nd.Ten,
                                     VanBanKy = new VanBanKyModel
                                     {
                                         Id = v.Id,
@@ -175,7 +188,9 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                                         MaDoiTuongKy = k.MaDoiTuongKy,
                                         NgayKy = k.NgayKy,
                                         ThuTuKy = k.ThuTuKy,
-                                        VanBanId= k.VanBanId
+                                        VanBanId= k.VanBanId,
+                                        page = k.Page,
+                                        pageHeight = (float?)k.PageHeight
                                     }
                                 })
                                 .ToListAsync();

@@ -16,5 +16,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter request);
         Task<int> CapNhatThongTinKyAsync(KyPhieuRequest request);
         Task<int> BoQuaKhongKy(ModifiedKySo request);
+        Task<VanBanKyModel> GetVanBanKyById(int id);
+        Task <string> GetFullFilePath(string filePath);
     }
 }
