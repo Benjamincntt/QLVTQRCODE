@@ -248,6 +248,7 @@ public class AuthenticationService : IAuthenticationService
             ChucVu = nguoiDung.ChucVu ?? string.Empty,
             
             IdDonVi = nguoiDung.IddonVi,
+            UserId = nguoiDung.MaNguoiDung
         };
     }
 
