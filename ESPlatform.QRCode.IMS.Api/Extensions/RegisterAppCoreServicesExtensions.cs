@@ -54,7 +54,8 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IMuaSamPhieuDeXuatDetailRepository, MuaSamPhieuDeXuatDetailRepository>()
             .AddScoped<IGioHangRepository, GioHangRepository>()
             .AddScoped<IVanBanKyRepository, VanBanKyRepository>()
-
+            .AddScoped<IVatTuBoMaRepository, VatTuBoMaRepository>()
+            
             .AddScoped<IPhieuKyRepository, PhieuKyRepository>()
             .AddScoped<IPhieuDeXuatKyRepository, PhieuDeXuatKyRepository>()
              .AddScoped<ICauHinhVanBanKyRepository, CauHinhVanBanKyRepository>()

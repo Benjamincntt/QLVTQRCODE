@@ -27,8 +27,8 @@ public class GioHangService : IGioHangService
     public GioHangService(
         IGioHangRepository gioHangRepository,
         IAuthorizedContextFacade authorizedContextFacade,
-        IVatTuRepository vatTuRepository
-        ,IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
+        IVatTuRepository vatTuRepository,
+        IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
         IMapper mapper,
         IOptions<ImagePath> imagePath)
     {

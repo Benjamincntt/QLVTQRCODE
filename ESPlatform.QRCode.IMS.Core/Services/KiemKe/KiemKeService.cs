@@ -109,7 +109,8 @@ public class KiemKeService : IKiemKeService
             response.SoLuongKiemKe = inventoryCheckInformationMapper.SoLuongKiemKe;
             response.SoLuongChenhLech = inventoryCheckInformationMapper.SoLuongChenhLech;
             response.SoThe = inventoryCheckInformationMapper.SoThe;
-            response.TrangThai = inventoryCheckInformationMapper.TrangThai;
+            response.TrangThai = inventoryCheckInformationMapper.TrangThai is null ? 0 : inventoryCheckInformationMapper.TrangThai;
+            response.TinhTrang_text = response.TrangThai == 0 ? $"Chưa kiểm kê" : $"Đã kiểm kê";
         }
 
         // DFF

@@ -40,7 +40,9 @@ public class InventoryCheckResponse
     public SupplyDffResponse SupplyDff { get; set; } = new SupplyDffResponse();
 
     public string SoThe { get; set; } = string.Empty;
-    
+
+    public string TinhTrang_text { get; set; } = "Chưa kiểm kê";
+
 }
 
 public class SuppliesLocation

@@ -100,6 +100,8 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 DonViTinh = x.QlvtVatTu.DonViTinh,
                 Image = x.QlvtVatTu.Image != null ? (relativeBasePath + x.QlvtVatTu.Image) : string.Empty,
                 IsSystemSupply = true,
+                x.QlvtVatTu.DonGia,
+                ThongSoKyThuat = x.QlvtVatTu.MoTa ?? string.Empty,
             });
         // Query cho dữ liệu mới
         // var vatTuNew = DbContext.QlvtMuaSamVatTuNews

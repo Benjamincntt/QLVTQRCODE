@@ -1,4 +1,4 @@
-### Danh sách vật tư
+### Danh sách vật tư để chọn mua
 GET {{host}}/{{muaSamVatTuPath}}
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
@@ -44,5 +44,16 @@ Authorization: Bearer {{accessToken}}
 
 ### Xóa một phiếu cung ứng
 PATCH {{host}}/{{muaSamVatTuPath}}/{{supplyTicketId}}/xoa-phieu-cung-ung
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Danh sách các kho hàng
+GET {{host}}/{{muaSamVatTuPath}}/danh-sach-kho
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+
+### Danh sách nhóm
+GET {{host}}/{{muaSamVatTuPath}}/danh-sach-nhom
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}

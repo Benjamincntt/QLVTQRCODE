@@ -95,4 +95,14 @@ public class MuaSamVatTuController : ApiControllerBase
     {
         return await _muaSamVatTuService.ListWarehousesAsync();
     }
+
+    /// <summary>
+    /// Danh sách nhóm
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("danh-sach-nhom")]
+    public async Task<IEnumerable<QlvtVatTuBoMa>> ListGroupCodeAsync()
+    {
+        return await _muaSamVatTuService.ListGroupCodeAsync();
+    }
 }

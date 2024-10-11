@@ -29,6 +29,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IKhoRepository _khoRepository;
     private readonly IGioHangRepository _gioHangRepository;
     private readonly IVanBanKyRepository _vanBanKyRepository;
+    private readonly IVatTuBoMaRepository _vatTuBoMaRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly ImagePath _imagePath;
 
@@ -40,6 +41,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IKhoRepository khoRepository,
         IGioHangRepository gioHangRepository,
         IVanBanKyRepository vanBanKyRepository,
+        IVatTuBoMaRepository vatTuBoMaRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork,
         IOptions<ImagePath> imagePath)
@@ -51,6 +53,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _khoRepository = khoRepository;
         _gioHangRepository = gioHangRepository;
         _vanBanKyRepository = vanBanKyRepository;
+        _vatTuBoMaRepository = vatTuBoMaRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
         _imagePath = imagePath.Value;
@@ -289,5 +292,10 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             }
         };
         return await _vanBanKyRepository.InsertManyAsync(textTosign);
+    }
+    
+    public async Task<IEnumerable<QlvtVatTuBoMa>> ListGroupCodeAsync()
+    {
+        return await _vatTuBoMaRepository.ListAsync();
     }
 }

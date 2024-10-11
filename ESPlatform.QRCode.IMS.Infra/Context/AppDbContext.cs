@@ -68,6 +68,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<TbCauHinhDieuHuongModun> TbCauHinhDieuHuongModuns { get; set; }
 
+    public virtual DbSet<TbCauHinhTrangThai> TbCauHinhTrangThais { get; set; }
+
     public virtual DbSet<TbChucNang> TbChucNangs { get; set; }
 
     public virtual DbSet<TbCoCauToChuc> TbCoCauToChucs { get; set; }
@@ -761,7 +763,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ParentId)
                 .HasComment("=0 đây là mức cha\r\n<>0 đây là ID cha")
                 .HasColumnName("ParentID");
-            entity.Property(e => e.Ten).HasMaxLength(200);
+            entity.Property(e => e.Ten).HasMaxLength(2001);
         });
 
         modelBuilder.Entity<TbAudience>(entity =>
@@ -785,6 +787,12 @@ public partial class AppDbContext : DbContext
             entity.HasIndex(e => e.TuKhoa, "IX_Tb_CaiDatHeThongDonVi").IsUnique();
 
             entity.Property(e => e.GiaTri).HasMaxLength(50);
+            entity.Property(e => e.KichHoaHienThi)
+                .HasDefaultValueSql("((0))")
+                .HasComment("Sử dụng trong đồng bộ, =1 là cho phép hiện thị tính năng đồng bộ tại giao diện quản lý");
+            entity.Property(e => e.KichHoat)
+                .HasDefaultValueSql("((0))")
+                .HasComment("Sử dụng trong đồng bộ, =1 là kích hoạt đồng bộ tự động");
             entity.Property(e => e.TuKhoa).HasMaxLength(50);
         });
 
@@ -800,6 +808,17 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.TenActionThayThe)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<TbCauHinhTrangThai>(entity =>
+        {
+            entity.ToTable("Tb_CauHinhTrangThai");
+
+            entity.Property(e => e.MaTrangThai)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.MoTa).HasMaxLength(250);
+            entity.Property(e => e.TenTrangThai).HasMaxLength(100);
         });
 
         modelBuilder.Entity<TbChucNang>(entity =>
@@ -917,12 +936,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ParentId).HasColumnName("ParentID");
             entity.Property(e => e.SoDienThoai).HasMaxLength(20);
             entity.Property(e => e.SoLuongToiDaNguoiTruyCap).HasDefaultValueSql("((20))");
-            entity.Property(e => e.SynchronizeAuto)
-                .HasDefaultValueSql("((0))")
-                .HasComment("Cài đặt tự động đồng bộ; =1 là tự động");
-            entity.Property(e => e.SynchronizeTime)
-                .HasDefaultValueSql("((24))")
-                .HasComment("Thời gian đồng bộ trong ngày, theo giờ (từ 1-24)");
             entity.Property(e => e.TenDonViSuDung).HasMaxLength(255);
             entity.Property(e => e.TenMienCon).HasMaxLength(50);
             entity.Property(e => e.TenMienRieng).HasMaxLength(50);

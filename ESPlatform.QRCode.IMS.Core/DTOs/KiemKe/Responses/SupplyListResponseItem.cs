@@ -11,5 +11,9 @@ public class SupplyListResponseItem
     public bool IsSystemSupply { get; set; }
     
     public string Image { get; set; } = string.Empty;
+
+    public int DonGia { get; set; } = 0; 
+    
+    public string ThongSoKyThuat { get; set; } = string.Empty;
     
 }
