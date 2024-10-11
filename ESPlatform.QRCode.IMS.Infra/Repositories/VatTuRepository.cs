@@ -30,7 +30,8 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 x.QlvtKyKiemKeChiTiet.SoLuongSoSach,
                 x.QlvtKyKiemKeChiTiet.SoLuongKiemKe,
                 x.QlvtKyKiemKeChiTiet.SoLuongChenhLech,
-                x.QlvtKyKiemKeChiTiet.SoThe
+                x.QlvtKyKiemKeChiTiet.SoThe,
+                x.QlvtKyKiemKeChiTiet.TrangThai,
             })
             .FirstOrDefaultAsync();
         return response;

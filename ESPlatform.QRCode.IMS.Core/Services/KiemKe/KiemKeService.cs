@@ -102,14 +102,14 @@ public class KiemKeService : IKiemKeService
             await _vatTuRepository.GetInventoryCheckInformationAsync(vatTuId, response.KyKiemKeId);
         if (inventoryCheckInformation != null)
         {
-            var inventoryCheckInformationMapper =
-                _mapper.Map<InventoryCheckResponse>(inventoryCheckInformation);
+            var inventoryCheckInformationMapper = _mapper.Map<InventoryCheckResponse>(inventoryCheckInformation);
             response.KyKiemKeChiTietId = inventoryCheckInformationMapper.KyKiemKeChiTietId;
             response.PhysicalInventoryName = inventoryCheckInformationMapper.PhysicalInventoryName;
             response.SoLuongSoSach = inventoryCheckInformationMapper.SoLuongSoSach;
             response.SoLuongKiemKe = inventoryCheckInformationMapper.SoLuongKiemKe;
             response.SoLuongChenhLech = inventoryCheckInformationMapper.SoLuongChenhLech;
             response.SoThe = inventoryCheckInformationMapper.SoThe;
+            response.TrangThai = inventoryCheckInformationMapper.TrangThai;
         }
 
         // DFF
