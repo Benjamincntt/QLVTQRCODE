@@ -26,7 +26,7 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
 
         public int? MaNguoiSua { get; set; }
 
-        public byte? TrangThai { get; set; }
+        public int TrangThai { get; set; }
 
         public string? GhiChu { get; set; }
         public VanBanKyModel? VanBanKy { get; set; } = new VanBanKyModel();
@@ -72,6 +72,7 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
         public string? FilePath { get; set; }
         public string ? FileName { get; set; }
         public DateTime? NgayTao { get; set; }
+        public string? kySoPath { get; set; }
 
     }
 

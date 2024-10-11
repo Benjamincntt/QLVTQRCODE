@@ -173,6 +173,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                                     MaNguoiThem = p.MaNguoiThem,
                                     TenDonViSuDung = dv.TenDonViSuDung,
                                     TenNguoiThem = nd.Ho + " " + nd.Ten,
+                                    TrangThai =p.TrangThai ?? 0,
                                     VanBanKy = new VanBanKyModel
                                     {
                                         Id = v.Id,
