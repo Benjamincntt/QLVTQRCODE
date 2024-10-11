@@ -5,12 +5,15 @@ using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Domain.Entities;
+using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
 using ESPlatform.QRCode.IMS.Infra.Repositories;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Mapster;
+using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -250,7 +253,8 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             var vanBanKy = await _vanBanKyRepository.GetAsync(x => x.Id == id);
             if (vanBanKy == null)
             {
-                throw new BadRequestException("Không tồn tại văn bản ký này");
+                return new VanBanKyModel();
+                //throw new BadRequestException("Không tồn tại văn bản ký này");
             }
             var response = new VanBanKyModel
             {
@@ -262,27 +266,161 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             };
             return response;
         }
+        //public Task<string> GetFullFilePath(string filePath)
+        //{
+        //    var kySoPath = _configuration.GetSection("KySoPath");
+        //    var rootPath = kySoPath.GetValue<string>("RootPath");
+            
+        //    var relativeBasePath = kySoPath.GetValue<string>("RelativeBasePath");
+
+        //    if (string.IsNullOrEmpty(rootPath) || string.IsNullOrEmpty(relativeBasePath))
+        //    {
+        //        throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
+        //    }
+        //    // Kiểm tra và loại bỏ "KySo" nếu nó đã tồn tại trong RelativeBasePath
+        //    if (relativeBasePath.EndsWith("KySo"))
+        //    {
+        //        relativeBasePath = relativeBasePath.Substring(0, relativeBasePath.Length - "KySo".Length);
+        //    }
+        //    var fullPath = Path.Combine(rootPath, relativeBasePath.Trim('/'), filePath.Trim('/'));
+        //    // Chuẩn hóa đường dẫn thành backslash cho Windows
+        //    fullPath = fullPath.Replace("/", "\\");
+        //    return Task.FromResult(fullPath);
+        //}
         public Task<string> GetFullFilePath(string filePath)
         {
             var kySoPath = _configuration.GetSection("KySoPath");
             var rootPath = kySoPath.GetValue<string>("RootPath");
-            
             var relativeBasePath = kySoPath.GetValue<string>("RelativeBasePath");
 
             if (string.IsNullOrEmpty(rootPath) || string.IsNullOrEmpty(relativeBasePath))
             {
                 throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
             }
-            // Kiểm tra và loại bỏ "KySo" nếu nó đã tồn tại trong RelativeBasePath
+
+            // Loại bỏ "KySo" nếu tồn tại trong relativeBasePath
             if (relativeBasePath.EndsWith("KySo"))
             {
                 relativeBasePath = relativeBasePath.Substring(0, relativeBasePath.Length - "KySo".Length);
             }
-            var fullPath = Path.Combine(rootPath, relativeBasePath.Trim('/'), filePath.Trim('/'));
+
+            // Kết hợp đường dẫn rootPath và relativeBasePath
+            var fullPath = Path.Combine(rootPath, relativeBasePath.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), filePath.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+
             // Chuẩn hóa đường dẫn thành backslash cho Windows
             fullPath = fullPath.Replace("/", "\\");
+
             return Task.FromResult(fullPath);
         }
+
+        public Task<string> GetRelativePath()
+        {
+            var kySoPath = _configuration.GetSection("KySoPath");
+            var relativeBasePath = kySoPath.GetValue<string>("RelativeBasePath");
+
+            if (string.IsNullOrEmpty(relativeBasePath))
+            {
+                throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
+            }
+            // Nếu relativeBasePath chắc chắn không null, có thể bỏ qua kiểm tra null
+            if (relativeBasePath.EndsWith("KySo"))
+            {
+                relativeBasePath = relativeBasePath[..^"KySo".Length];  // Sử dụng cú pháp cắt chuỗi gọn hơn
+            }
+
+            // Chuẩn hóa đường dẫn thành backslash cho Windows
+            return Task.FromResult(relativeBasePath.Replace("/", "\\"));
+        }
+
+
+
+        public async Task<int> UpdateThongTinKyAsync(UpdateFileRequest request)
+        {
+            using (var transaction = _unitOfWork.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Lấy thông tin phiếu mua sắm ký từ database dựa trên Id
+                    var phieuMuaSam = await _phieuKyRepository.GetAsync(x => x.Id == request.PhieuId);
+
+                    // Kiểm tra xem phiếu có tồn tại hay không
+                    if (phieuMuaSam == null)
+                    {
+                        throw new NotFoundException($"Phiếu có Id: {request.PhieuId} không tồn tại.");
+                    }
+
+                    // Kiểm tra trạng thái của phiếu (nếu đã ký thì không cho phép ký lại)
+                    if (phieuMuaSam.TrangThai != null && phieuMuaSam.TrangThai > 0)
+                    {
+                        throw new BadRequestException($"Phiếu có Id: {request.PhieuId} đã được ký.");
+                    }
+
+                    // Lấy thông tin ký từ bảng QLVT_MuaSam_PhieuDeXuat_Ky
+                    var maDoiTuongKy = request.MaDoiTuongKy?.ToLower() ?? "";
+                    var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.VanBanId
+                                                                             && x.PhieuDeXuatId == request.PhieuId
+                                                                             && (x.MaDoiTuongKy != null && x.MaDoiTuongKy.ToLower() == maDoiTuongKy));
+
+                    // Kiểm tra xem chữ ký có tồn tại hay không
+                    if (phieuMuaSamKy == null)
+                    {
+                        throw new NotFoundException("Chưa có cấu hình chữ ký cho người ký.");
+                    }
+
+                    // Kiểm tra trạng thái của chữ ký (nếu đã ký thì không cho phép ký lại)
+                    if (phieuMuaSamKy.TrangThai != null && phieuMuaSamKy.TrangThai > 0)
+                    {
+                        throw new BadRequestException($"Chữ ký với Id: {request.VanBanId} đã được ký.");
+                    }
+
+                    // Nếu chữ ký hợp lệ, tiến hành cập nhật thông tin
+                    phieuMuaSamKy.NgayKy = DateTime.Now;
+                    phieuMuaSamKy.NguoiKyId = request.SignUserId;
+                    phieuMuaSamKy.UsbSerial = request.SignType;
+                    phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
+
+                    switch (maDoiTuongKy)
+                    {
+                        case MaDoiTuongKyConstants.NguoiLap:
+                            phieuMuaSam.TrangThai = TrangThaiPhieu.NguoiLap;
+                            break;
+
+                        case MaDoiTuongKyConstants.KiemSoatAT:
+                            phieuMuaSam.TrangThai = TrangThaiPhieu.KiemSoatAT;
+                            break;
+
+                        case MaDoiTuongKyConstants.TruongDonVi:
+                            phieuMuaSam.TrangThai = TrangThaiPhieu.TruongDonVi;
+                            break;
+
+                        case MaDoiTuongKyConstants.Ph_KHVT:
+                            phieuMuaSam.TrangThai = TrangThaiPhieu.Ph_KHVT;
+                            break;
+
+                        case MaDoiTuongKyConstants.Ph_KTAT:
+                            phieuMuaSam.TrangThai = TrangThaiPhieu.Ph_KTAT;
+                            break;
+
+                        case MaDoiTuongKyConstants.TongGiamDoc:
+                            phieuMuaSam.TrangThai = TrangThaiPhieu.TongGiamDoc;
+                            break;
+
+                        default:
+                            throw new InvalidOperationException("Loại đối tượng ký không hợp lệ.");
+                    }
+                    // Lưu các thay đổi vào cơ sở dữ liệu
+                    await _unitOfWork.CommitAsync();
+                    return request.PhieuId;
+                }
+                catch
+                {
+                    // Nếu có lỗi xảy ra, rollback transaction và ném ngoại lệ
+                    await _unitOfWork.RollbackAsync();
+                    throw;
+                }
+            }
+        }
+
     }
 }
 

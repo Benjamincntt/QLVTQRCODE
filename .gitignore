@@ -366,3 +366,4 @@ Hemera.OnCms.Tpo.Test/_Scaffold/
 appsettings.Development.json
 *.private.env.json
 #!/*.DotSettings
+/ESPlatform.QRCode.IMS.Core/ESPlatform.QRCode.IMS.Core.csproj

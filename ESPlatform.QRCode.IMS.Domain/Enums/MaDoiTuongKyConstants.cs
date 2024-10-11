@@ -20,4 +20,13 @@ namespace ESPlatform.QRCode.IMS.Domain.Enums
         public const string PhieuDeXuat = "PhieuDeXuat";
         public const string PhieuDuyet = "PhieuDuyet";
     }
+    public static class TrangThaiPhieu
+    {
+        public const int NguoiLap = 1;
+        public const int KiemSoatAT = 2;
+        public const int TruongDonVi = 3;
+        public const int Ph_KHVT = 4;
+        public const int Ph_KTAT = 5;
+        public const int TongGiamDoc =6;
+    }
 }
