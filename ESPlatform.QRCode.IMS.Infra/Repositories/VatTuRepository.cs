@@ -103,29 +103,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 x.QlvtVatTu.DonGia,
                 ThongSoKyThuat = x.QlvtVatTu.MoTa ?? string.Empty,
             });
-        // Query cho dữ liệu mới
-        // var vatTuNew = DbContext.QlvtMuaSamVatTuNews
-        //     .Where(x => tenVatTu == string.Empty || x.TenVatTu.ToLower().Contains(tenVatTu.ToLower()))
-        //     .Where(x => maVatTu == string.Empty)
-        //     .Where(x => idKho == 0)
-        //     .Where(x => idViTri == 0)
-        //     .Select(x => new 
-        //     {
-        //         VatTuId = x.VatTuNewId,
-        //         TenVatTu = x.TenVatTu,
-        //         DonViTinh = x.DonViTinh,
-        //         Image = x.Image ?? string.Empty,
-        //         IsSystemSupply = false,
-        //     });
-        //
-        // // Kết hợp cả hai query
-        // var combinedQuery = vatTu
-        //     .Union(vatTuNew)
-        //     .OrderBy(x => x.TenVatTu)
-        //     ;
 
-        // Phân trang kết quả kết hợp
-        // return await combinedQuery.ToPagedListAsync<dynamic>(pageIndex, pageSize);
         return await vatTu.ToPagedListAsync<dynamic>(pageIndex, pageSize);
     }
 

@@ -216,7 +216,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.SoLuong).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.ThoiGianCapNhat).HasColumnType("datetime");
             entity.Property(e => e.ThoiGianTao).HasColumnType("datetime");
-            entity.Property(e => e.ThongSoKyThuat).HasMaxLength(250);
+            entity.Property(e => e.ThongSoKyThuat).HasComment("Thông số kỹ thuật");
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
         });
 
@@ -608,13 +608,14 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("QLVT_MuaSam_VatTu_New");
 
+            entity.Property(e => e.DonGia).HasDefaultValueSql("((0))");
             entity.Property(e => e.DonViTinh).HasMaxLength(100);
             entity.Property(e => e.GhiChu).HasMaxLength(250);
             entity.Property(e => e.Image).HasMaxLength(200);
             entity.Property(e => e.MaVatTu)
                 .HasMaxLength(100)
                 .IsUnicode(false);
-            entity.Property(e => e.TenVatTu).HasMaxLength(100);
+            entity.Property(e => e.TenVatTu).HasMaxLength(500);
             entity.Property(e => e.XuatXu).HasMaxLength(200);
         });
 

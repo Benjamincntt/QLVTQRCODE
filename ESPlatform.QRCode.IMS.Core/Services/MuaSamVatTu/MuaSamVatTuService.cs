@@ -95,8 +95,8 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         
         var response = new SupplyOrderDetailResponse();
         // if Id is VatTuId => get information from QlvtVatTu table
-        // if (isSystemSupply)
-        // {
+        if (isSystemSupply)
+        {
             var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
             if (vatTu == null)
             {
@@ -123,13 +123,15 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 }
             }
             return response;
-        //}
+        }
         //if Id is VatTuNewId => get information from QlvtMuaSamVatTuNew table
-        // var vatTuNew = await _muaSamVatTuNewRepository.GetAsync(vatTuId);
-        // if (vatTuNew == null) return response;
-        // response.TenVatTu = vatTuNew.TenVatTu;
-        // response.ThongSoKyThuat = vatTuNew.ThongSoKyThuat ?? string.Empty;
-        // return response;
+         var vatTuNew = await _muaSamVatTuNewRepository.GetAsync(vatTuId);
+         if (vatTuNew == null) return response;
+         response.TenVatTu = vatTuNew.TenVatTu;
+         response.ThongSoKyThuat = vatTuNew.ThongSoKyThuat ?? string.Empty;
+         response.DonGia = vatTuNew.DonGia ?? 0;
+         response.GhiChu = vatTuNew.GhiChu ?? string.Empty;
+         return response;
     }
 
     public async Task<int> ProcessSupplyTicketCreationAsync(ProcessSupplyTicketCreationRequest request)
@@ -228,8 +230,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         }
         response.TenPhieu = supplyTicket.TenPhieu ?? string.Empty;
         response.MoTa = supplyTicket.MoTa ?? string.Empty;
-        var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId))
-            .Adapt<IEnumerable<SupplyResponse>>().ToList();
+        var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId)).Adapt<IEnumerable<SupplyResponse>>().ToList();
+        if (!listSupplies.Any())
+        {
+            response.DanhSachVatTu = listSupplies;
+            response.Tong = 0;
+            return response;
+        }
+        
         var relativeBasePath = _imagePath.RelativeBasePath;
         foreach (var supply in listSupplies)
         {

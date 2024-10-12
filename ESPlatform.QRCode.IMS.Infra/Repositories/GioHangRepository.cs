@@ -21,7 +21,6 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
                 (x, y) => new { QlvtGioHang = x, VatTu = y })
             .Where(x => x.QlvtGioHang.UserId == userId)
             .Where(x => x.QlvtGioHang.IsSystemSupply == true)
-            .OrderBy(x => x.VatTu.TenVatTu)
             .Select(x => new
             {
                 x.VatTu.TenVatTu,
@@ -34,31 +33,32 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
                 x.QlvtGioHang.SoLuong,
                 x.QlvtGioHang.GioHangId,
             });
-        return await vatTu.ToListAsync();
+        //return await vatTu.ToListAsync();
         // lấy thông tin từ bảng vật tư mới tạo
-        // var vatTuNew = DbContext.QlvtGioHangs
-        //     .Join(DbContext.QlvtMuaSamVatTuNews,
-        //         x => x.VatTuId,
-        //         y => y.VatTuNewId,
-        //         (x, y) => new { QlvtGioHang = x, VatTuNew = y })
-        //     .Where(x => x.QlvtGioHang.UserId == userId)
-        //     .Where(x => x.QlvtGioHang.IsSystemSupply == false)
-        //     .Select(x => new
-        //     {
-        //         x.VatTuNew.TenVatTu,
-        //         x.VatTuNew.Image,
-        //         x.QlvtGioHang.VatTuId,
-        //         x.QlvtGioHang.IsSystemSupply,
-        //         x.QlvtGioHang.ThongSoKyThuat,
-        //         x.QlvtGioHang.GhiChu,
-        //         x.QlvtGioHang.SoLuong,
-        //         x.QlvtGioHang.GioHangId
-        //     });
-        // var combinedQuery = vatTu
-        //         .Union(vatTuNew)
-        //         .OrderBy(x => x.TenVatTu)
-        //     ;
-        // return await combinedQuery.ToListAsync();
+        var vatTuNew = DbContext.QlvtGioHangs
+            .Join(DbContext.QlvtMuaSamVatTuNews,
+                x => x.VatTuId,
+                y => y.VatTuNewId,
+                (x, y) => new { QlvtGioHang = x, VatTuNew = y })
+            .Where(x => x.QlvtGioHang.UserId == userId)
+            .Where(x => x.QlvtGioHang.IsSystemSupply == false)
+            .Select(x => new
+            {
+                x.VatTuNew.TenVatTu,
+                x.VatTuNew.DonGia,
+                Image = x.VatTuNew.Image ?? string.Empty,
+                x.QlvtGioHang.VatTuId,
+                x.QlvtGioHang.IsSystemSupply,
+                x.QlvtGioHang.ThongSoKyThuat,
+                x.QlvtGioHang.GhiChu,
+                x.QlvtGioHang.SoLuong,
+                x.QlvtGioHang.GioHangId
+            });
+        var combinedQuery = vatTu
+                .Union(vatTuNew)
+                .OrderBy(x => x.TenVatTu)
+            ;
+        return await combinedQuery.ToListAsync();
         
     }
 }
