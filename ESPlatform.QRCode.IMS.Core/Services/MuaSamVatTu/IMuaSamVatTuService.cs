@@ -17,4 +17,5 @@ public interface IMuaSamVatTuService
     Task<SupplyTicketDetailResponse> GetSupplyTicketDetailAsync(int supplyTicketId);
     Task<int> DeleteSupplyTicketAsync(int supplyTicketId);
     Task<IEnumerable<WarehouseResponseItem>> ListWarehousesAsync();
+    Task<IEnumerable<QlvtVatTuBoMa>> ListGroupCodeAsync();
 }

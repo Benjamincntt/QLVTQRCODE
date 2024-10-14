@@ -17,7 +17,7 @@ public class InventoryCheckResponse
     [DisplayName("Tên kỳ kiểm kê")] public string PhysicalInventoryName { get; set; } = string.Empty;
     [DisplayName("Mã kho")] public string OrganizationCode { get; set; } = string.Empty;
 
-    public string TinhTrang { get; set; } = string.Empty;
+    public short TrangThai { get; set; }
     [DisplayName("Mã kho phụ")] public string SubInventoryCode { get; set; } = string.Empty;
     [DisplayName("Tên kho phụ")] public string SubInventoryName { get; set; } = string.Empty;
 
@@ -40,7 +40,9 @@ public class InventoryCheckResponse
     public SupplyDffResponse SupplyDff { get; set; } = new SupplyDffResponse();
 
     public string SoThe { get; set; } = string.Empty;
-    
+
+    public string TinhTrang_text { get; set; } = "Chưa kiểm kê";
+
 }
 
 public class SuppliesLocation

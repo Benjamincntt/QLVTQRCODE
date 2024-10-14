@@ -29,6 +29,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IKhoRepository _khoRepository;
     private readonly IGioHangRepository _gioHangRepository;
     private readonly IVanBanKyRepository _vanBanKyRepository;
+    private readonly IVatTuBoMaRepository _vatTuBoMaRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly ImagePath _imagePath;
 
@@ -40,6 +41,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IKhoRepository khoRepository,
         IGioHangRepository gioHangRepository,
         IVanBanKyRepository vanBanKyRepository,
+        IVatTuBoMaRepository vatTuBoMaRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork,
         IOptions<ImagePath> imagePath)
@@ -51,6 +53,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _khoRepository = khoRepository;
         _gioHangRepository = gioHangRepository;
         _vanBanKyRepository = vanBanKyRepository;
+        _vatTuBoMaRepository = vatTuBoMaRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
         _imagePath = imagePath.Value;
@@ -70,6 +73,16 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 request.GetPageIndex(),
                 request.GetPageSize()))
             .Adapt<PagedList<SupplyListResponseItem>>();
+        if (listVatTu.Total == 0)
+        {
+            var listVatTuNew = (await _muaSamVatTuNewRepository.ListAsync(
+                    string.IsNullOrWhiteSpace(request.TenVatTu) ? string.Empty : request.TenVatTu.ToLower(),
+                    string.IsNullOrWhiteSpace(request.MaVatTu) ? string.Empty : request.MaVatTu.ToLower(),
+                    request.GetPageIndex(),
+                    request.GetPageSize()))
+                .Adapt<PagedList<SupplyListResponseItem>>();
+            return listVatTuNew;
+        }
         return listVatTu;
     }
 
@@ -82,8 +95,8 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         
         var response = new SupplyOrderDetailResponse();
         // if Id is VatTuId => get information from QlvtVatTu table
-        // if (isSystemSupply)
-        // {
+        if (isSystemSupply)
+        {
             var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
             if (vatTu == null)
             {
@@ -110,13 +123,15 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 }
             }
             return response;
-        //}
+        }
         //if Id is VatTuNewId => get information from QlvtMuaSamVatTuNew table
-        // var vatTuNew = await _muaSamVatTuNewRepository.GetAsync(vatTuId);
-        // if (vatTuNew == null) return response;
-        // response.TenVatTu = vatTuNew.TenVatTu;
-        // response.ThongSoKyThuat = vatTuNew.ThongSoKyThuat ?? string.Empty;
-        // return response;
+         var vatTuNew = await _muaSamVatTuNewRepository.GetAsync(vatTuId);
+         if (vatTuNew == null) return response;
+         response.TenVatTu = vatTuNew.TenVatTu;
+         response.ThongSoKyThuat = vatTuNew.ThongSoKyThuat ?? string.Empty;
+         response.DonGia = vatTuNew.DonGia ?? 0;
+         response.GhiChu = vatTuNew.GhiChu ?? string.Empty;
+         return response;
     }
 
     public async Task<int> ProcessSupplyTicketCreationAsync(ProcessSupplyTicketCreationRequest request)
@@ -215,8 +230,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         }
         response.TenPhieu = supplyTicket.TenPhieu ?? string.Empty;
         response.MoTa = supplyTicket.MoTa ?? string.Empty;
-        var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId))
-            .Adapt<IEnumerable<SupplyResponse>>().ToList();
+        var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId)).Adapt<IEnumerable<SupplyResponse>>().ToList();
+        if (!listSupplies.Any())
+        {
+            response.DanhSachVatTu = listSupplies;
+            response.Tong = 0;
+            return response;
+        }
+        
         var relativeBasePath = _imagePath.RelativeBasePath;
         foreach (var supply in listSupplies)
         {
@@ -289,5 +310,10 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             }
         };
         return await _vanBanKyRepository.InsertManyAsync(textTosign);
+    }
+    
+    public async Task<IEnumerable<QlvtVatTuBoMa>> ListGroupCodeAsync()
+    {
+        return await _vatTuBoMaRepository.ListAsync();
     }
 }
