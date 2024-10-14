@@ -19,6 +19,6 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         Task<VanBanKyModel> GetVanBanKyById(int id);
         Task <string> GetFullFilePath(string filePath);
         Task<string> GetRelativePath();
-        Task<int> UpdateThongTinKyAsync(UpdateFileRequest request);
+        Task<object> UpdateThongTinKyAsync(UpdateFileRequest request);
     }
 }

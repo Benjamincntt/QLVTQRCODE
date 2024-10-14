@@ -26,8 +26,20 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
         public async Task<IEnumerable<dynamic>> DanhSachPhieuDeXuatKy(DanhSachPhieuKyFilter requests, int userId)
         {
             var keywords = string.IsNullOrWhiteSpace(requests.Keywords) ? string.Empty : requests.Keywords.ToLower();
-            DateTime fromDate = DateTime.MinValue;
-            DateTime toDate = DateTime.MaxValue;
+            //DateTime fromDate = DateTime.MinValue;
+            //DateTime toDate = DateTime.MaxValue;
+            //if (!string.IsNullOrWhiteSpace(requests.FromDate))
+            //{
+            //    fromDate = DateTime.ParseExact(requests.FromDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            //}
+
+            //if (!string.IsNullOrWhiteSpace(requests.ToDate))
+            //{
+            //    toDate = DateTime.ParseExact(requests.ToDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            //}
+            DateTime fromDate = DateTime.Now.AddDays(-1); // Mặc định là ngày hiện tại
+            DateTime toDate = DateTime.Now.AddDays(1); // Mặc định là ngày hiện tại + 1 ngày
+
             if (!string.IsNullOrWhiteSpace(requests.FromDate))
             {
                 fromDate = DateTime.ParseExact(requests.FromDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
@@ -35,7 +47,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
 
             if (!string.IsNullOrWhiteSpace(requests.ToDate))
             {
-                toDate = DateTime.ParseExact(requests.ToDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                toDate = DateTime.ParseExact(requests.ToDate, "dd/MM/yyyy", CultureInfo.InvariantCulture).AddDays(1); // Cộng thêm 1 ngày
             }
             // lấy MaDoiTuongKy trong bảng Tb_ViTriCongViec
             var viTriMaDoiTuongKy = GetViTriVaMaDoiTuongKy(userId);
@@ -57,7 +69,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
             if(fromDate != DateTime.MinValue && toDate != DateTime.MaxValue)
             {
                 if(fromDate <= toDate) {
-                    query = query.Where(p => p.NgayThem >= fromDate && p.NgayThem <= toDate);
+                    query = query.Where(p => p.NgayThem >= fromDate && p.NgayThem < toDate);
                 }
             }
 
@@ -173,7 +185,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                                     MaNguoiThem = p.MaNguoiThem,
                                     TenDonViSuDung = dv.TenDonViSuDung,
                                     TenNguoiThem = nd.Ho + " " + nd.Ten,
-                                    TrangThai =p.TrangThai ?? 0,
+                                    TrangThai = p.TrangThai ?? 0,
                                     VanBanKy = new VanBanKyModel
                                     {
                                         Id = v.Id,
@@ -191,7 +203,8 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                                         ThuTuKy = k.ThuTuKy,
                                         VanBanId= k.VanBanId,
                                         page = k.Page,
-                                        pageHeight = (float?)k.PageHeight
+                                        pageHeight = (float?)k.PageHeight,
+                                        TrangThai = k.TrangThai ?? 0,
                                     }
                                 })
                                 .ToListAsync();
@@ -210,7 +223,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                             v.MaDoiTuongKy
                         };
 
-            return query.ToList<dynamic>(); // Hoặc sử dụng List<object>
+            return query.AsNoTracking().ToList<dynamic>(); // Hoặc sử dụng List<object>
         }
 
         public List<dynamic> GetCauHinhVbKy()
@@ -225,7 +238,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                             c.CoTheBoQua,
                         };
 
-            return query.ToList<dynamic>(); // Hoặc sử dụng List<object>
+            return query.AsNoTracking().ToList<dynamic>(); // Hoặc sử dụng List<object>
         }
 
         public List<dynamic> GetDanhSachPhieuDx(string MaDoiTuongKy)
@@ -241,7 +254,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                             c.TrangThai,
                         };
 
-            return query.ToList<dynamic>(); // Hoặc sử dụng List<object>
+            return query.AsNoTracking().ToList<dynamic>(); // Hoặc sử dụng List<object>
         }
 
         public List<int> GetPhieuDeXuatIds(string MaDoiTuongKy)

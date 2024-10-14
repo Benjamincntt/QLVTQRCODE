@@ -85,6 +85,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     MaDoiTuongKy = p.ChuKy?.MaDoiTuongKy,
                     page = p.ChuKy?.page,
                     pageHeight = p.ChuKy?.pageHeight,
+                    TrangThai = p.ChuKy?.TrangThai ?? 0
                 } : null
             }).ToList();
             return response;
@@ -235,6 +236,11 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 
                     await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
 
+                    // update trạng thái cho phiếu cung ứng
+                    phieuMuaSam.TrangThai = TrangThaiPhieu.KiemSoatAT;
+                    ////
+                    await _phieuKyRepository.UpdateAsync(phieuMuaSam);
+
                     await _unitOfWork.CommitAsync();
 
                     return request.PhieuId;
@@ -332,9 +338,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             return Task.FromResult(relativeBasePath.Replace("/", "\\"));
         }
 
-
-
-        public async Task<int> UpdateThongTinKyAsync(UpdateFileRequest request)
+        public async Task<object> UpdateThongTinKyAsync(UpdateFileRequest request)
         {
             using (var transaction = _unitOfWork.BeginTransactionAsync())
             {
@@ -342,42 +346,101 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 {
                     // Lấy thông tin phiếu mua sắm ký từ database dựa trên Id
                     var phieuMuaSam = await _phieuKyRepository.GetAsync(x => x.Id == request.PhieuId);
-
+                    var maDoiTuongKy = request.MaDoiTuongKy; //request.MaDoiTuongKy?.ToLower() ?? "";
                     // Kiểm tra xem phiếu có tồn tại hay không
                     if (phieuMuaSam == null)
                     {
-                        throw new NotFoundException($"Phiếu có Id: {request.PhieuId} không tồn tại.");
+                        return new ErrorResponse
+                        {
+                            Message = $"Phiếu có Id: {request.PhieuId} không tồn tại."
+                        };
                     }
-
-                    // Kiểm tra trạng thái của phiếu (nếu đã ký thì không cho phép ký lại)
-                    if (phieuMuaSam.TrangThai != null && phieuMuaSam.TrangThai > 0)
+                    switch (maDoiTuongKy)
                     {
-                        throw new BadRequestException($"Phiếu có Id: {request.PhieuId} đã được ký.");
-                    }
+                        case MaDoiTuongKyConstants.NguoiLap:
+                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.NguoiLap) // Nếu trạng thái đã là "Người lập"
+                            {
+                                return new ErrorResponse
+                                {
+                                    Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi người lập."
+                                };
+                            }
+                            break;
 
+                        case MaDoiTuongKyConstants.KiemSoatAT:
+                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.KiemSoatAT) // Nếu trạng thái đã là "Kiểm soát AT"
+                            {
+                                return new ErrorResponse
+                                {
+                                    Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi người kiểm soát an toàn."
+                                };
+                            }
+                            break;
+
+                        case MaDoiTuongKyConstants.TruongDonVi:
+                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.TruongDonVi) // Nếu trạng thái đã là "Trưởng đơn vị"
+                            {
+                                return new ErrorResponse
+                                {
+                                    Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi trưởng đơn vị."
+                                };
+                            }
+                            break;
+
+                        case MaDoiTuongKyConstants.Ph_KHVT:
+                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.Ph_KHVT) // Nếu trạng thái đã là "PH KHVT"
+                            {
+                                return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi PH KHVT." };
+                            }
+                            break;
+
+                        case MaDoiTuongKyConstants.Ph_KTAT:
+                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.Ph_KTAT) // Nếu trạng thái đã là "PH KTAT"
+                            {
+                                return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi PH KTA." };
+                            }
+                            break;
+
+                        case MaDoiTuongKyConstants.TongGiamDoc:
+                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.TongGiamDoc) // Nếu trạng thái đã là "Tổng giám đốc"
+                            {
+                                return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký Tổng Giám Đốc." };
+                            }
+                            break;
+
+                        default:
+                            return new ErrorResponse
+                            {
+                                Message = "Loại đối tượng ký không hợp lệ."
+                            };
+                    }
                     // Lấy thông tin ký từ bảng QLVT_MuaSam_PhieuDeXuat_Ky
-                    var maDoiTuongKy = request.MaDoiTuongKy?.ToLower() ?? "";
-                    var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.VanBanId
-                                                                             && x.PhieuDeXuatId == request.PhieuId
-                                                                             && (x.MaDoiTuongKy != null && x.MaDoiTuongKy.ToLower() == maDoiTuongKy));
+                  
+                    var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
 
                     // Kiểm tra xem chữ ký có tồn tại hay không
                     if (phieuMuaSamKy == null)
                     {
-                        throw new NotFoundException("Chưa có cấu hình chữ ký cho người ký.");
-                    }
-
-                    // Kiểm tra trạng thái của chữ ký (nếu đã ký thì không cho phép ký lại)
-                    if (phieuMuaSamKy.TrangThai != null && phieuMuaSamKy.TrangThai > 0)
+                        return new ErrorResponse
+                        {
+                            Message = "Chưa có cấu hình chữ ký cho người ký này."
+                        };
+                    } else
                     {
-                        throw new BadRequestException($"Chữ ký với Id: {request.VanBanId} đã được ký.");
+                        if(phieuMuaSamKy.TrangThai == 1)
+                        {
+                            return new ErrorResponse
+                            {
+                                Message = "Chữ ký này đã được ký."
+                            };
+                        }
                     }
-
                     // Nếu chữ ký hợp lệ, tiến hành cập nhật thông tin
                     phieuMuaSamKy.NgayKy = DateTime.Now;
                     phieuMuaSamKy.NguoiKyId = request.SignUserId;
                     phieuMuaSamKy.UsbSerial = request.SignType;
                     phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
+                   await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
 
                     switch (maDoiTuongKy)
                     {
@@ -408,15 +471,21 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         default:
                             throw new InvalidOperationException("Loại đối tượng ký không hợp lệ.");
                     }
-                    // Lưu các thay đổi vào cơ sở dữ liệu
+
+                    await _phieuKyRepository.UpdateAsync(phieuMuaSam);
+
                     await _unitOfWork.CommitAsync();
-                    return request.PhieuId;
+                    return new { PhieuId = request.PhieuId, Message = "Cập nhật thông tin thành công." };
                 }
-                catch
+                catch (Exception ex)
                 {
                     // Nếu có lỗi xảy ra, rollback transaction và ném ngoại lệ
                     await _unitOfWork.RollbackAsync();
-                    throw;
+                    return new ErrorResponse
+                    {
+                        Message = "Cập nhật thông tin không thành công.",
+                        Details = ex.Message
+                    };
                 }
             }
         }

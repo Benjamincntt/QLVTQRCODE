@@ -108,7 +108,7 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                 // Kiểm tra file upload
                 if (request.FileData == null || request.FileData.Length == 0)
                 {
-                    return BadRequest("No file uploaded.");
+                    return BadRequest("Không có file nào được tải lên.");
                 }
 
                 // Lấy thông tin văn bản ký từ database
@@ -126,6 +126,14 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                 {
                     return NotFound(new { exists = false, message = "File không tồn tại" });
                 }
+                // Cập nhật thông tin ký trong database
+                var resultUpdate = await _phieuKyService.UpdateThongTinKyAsync(request);
+                if (resultUpdate is ErrorResponse errorResponse)
+                {
+                    // Xử lý lỗi
+                    return BadRequest(errorResponse);
+                }
+
 
                 try
                 {
@@ -134,6 +142,16 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                     {
                         await request.FileData.CopyToAsync(stream);
                     }
+                    //// Tạo tên file mới, ví dụ thêm "_new" vào tên file gốc
+                    //string newFileName = Path.GetFileNameWithoutExtension(fullPath) + "_new" + Path.GetExtension(fullPath);
+                    //string newFilePath = Path.Combine(Path.GetDirectoryName(fullPath), newFileName);
+
+                    //// Ghi file mới với tên khác
+                    //using (var stream = new FileStream(newFilePath, FileMode.Create, FileAccess.Write))
+                    //{
+                    //    await request.FileData.CopyToAsync(stream);
+                    //}
+
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -143,9 +161,6 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                 {
                     return StatusCode(500, new { message = "Lỗi ghi file: " + ioEx.Message });
                 }
-
-                // Cập nhật thông tin ký trong database
-                var resultUpdate = await _phieuKyService.UpdateThongTinKyAsync(request);
 
                 return Ok(new { success = true, message = "Ký thành công", data = result });
             }
@@ -160,12 +175,55 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
             catch (Exception ex)
             {
                 // Ghi log lỗi chi tiết để phục vụ việc debug
-                return StatusCode(500, new { message = "Có lỗi xảy ra, vui lòng thử lại sau." +  ex.Message });
+                return StatusCode(500, new { message = "Có lỗi xảy ra, vui lòng thử lại sau." + ex.Message });
             }
         }
 
-        [HttpGet("GetFilePdf/{id}")]
-        public async Task<IActionResult> GetPdf(int id)
+        //[HttpGet("GetFilePdf/{id}")]
+        //public async Task<IActionResult> GetPdf(int id)
+        //{
+        //    try
+        //    {
+        //        // Lấy thông tin file dựa trên id
+        //        var result = await _phieuKyService.GetVanBanKyById(id);
+
+        //        // Kiểm tra xem result có null không và file path có tồn tại không
+        //        if (result == null || string.IsNullOrEmpty(result.FilePath))
+        //        {
+        //            return BadRequest(new { exists = false, message = "File không tồn tại", data = result });
+        //        }
+
+        //        // Lấy đường dẫn đầy đủ của file
+        //        var fullPath = await _phieuKyService.GetFullFilePath(result.FilePath);
+
+        //        // Kiểm tra file có tồn tại không
+        //        if (!System.IO.File.Exists(fullPath))
+        //        {
+        //            return NotFound("File không tồn tại");
+        //        }
+
+        //        // Đọc file và trả về kết quả dưới dạng PDF
+        //        var fileBytes = await System.IO.File.ReadAllBytesAsync(fullPath);
+        //        return fileBytes;
+        //    }
+        //    catch (FileNotFoundException)
+        //    {
+        //        return NotFound("File không tồn tại hoặc đã bị xóa.");
+        //    }
+        //    catch (UnauthorizedAccessException)
+        //    {
+        //        return StatusCode(StatusCodes.Status403Forbidden, "Bạn không có quyền truy cập vào file này.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Log exception (nếu cần)
+        //        // logger.LogError(ex, "Lỗi khi lấy file PDF với ID {Id}", id);
+        //        return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý yêu cầu.");
+        //    }
+        //}
+
+        [HttpGet("get-file/{id}")]
+        public async Task<ActionResult<byte[]>> GetFileById(int id)
         {
             try
             {
@@ -187,27 +245,16 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                     return NotFound("File không tồn tại");
                 }
 
-                // Đọc file và trả về kết quả dưới dạng PDF
+                // Đọc file và trả về kết quả dưới dạng byte[]
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(fullPath);
-                return File(fileBytes, "application/pdf");
-            }
-            catch (FileNotFoundException)
-            {
-                return NotFound("File không tồn tại hoặc đã bị xóa.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, "Bạn không có quyền truy cập vào file này.");
+                return Ok(fileBytes); // Trả về dữ liệu dạng byte
             }
             catch (Exception ex)
             {
-                // Log exception (nếu cần)
-                // logger.LogError(ex, "Lỗi khi lấy file PDF với ID {Id}", id);
-                return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý yêu cầu.");
+                // Xử lý lỗi, có thể log lại hoặc trả về thông báo lỗi
+                return StatusCode(500, new { message = "Đã xảy ra lỗi", error = ex.Message });
             }
         }
-
-
 
     }
 }
