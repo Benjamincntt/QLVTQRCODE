@@ -22,11 +22,7 @@ namespace ESPlatform.QRCode.IMS.Domain.Enums
     }
     public static class TrangThaiPhieu
     {
-        public const int NguoiLap = 2;
-        public const int KiemSoatAT = 3;
-        public const int TruongDonVi = 4;
-        public const int Ph_KHVT = 5;
-        public const int Ph_KTAT = 6;
-        public const int TongGiamDoc =7;
+        public const int TrongQuaTrinhKy = 2;
+        public const int TongGiamDoc =3;
     }
 }
