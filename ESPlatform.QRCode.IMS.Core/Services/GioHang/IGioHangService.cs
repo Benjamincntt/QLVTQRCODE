@@ -10,7 +10,7 @@ public interface IGioHangService
     Task<IEnumerable<CartSupplyResponse>> ListSupplyAsync();
     Task<int> ModifyQuantityAsync(int gioHangId, int quantity);
     Task<int> DeleteSupplyAsync(int gioHangId);
-    Task<int> ModifyInformationAsync(int gioHangId, int vatTuId, ModifiedCartSupplyRequest request);
+    Task<int> ModifyInformationAsync(int gioHangId, ModifiedCartSupplyRequest request);
     Task<int> CreateCartSupplyAsync(int vatTuId, CreatedCartSupplyRequest request);
     Task<int> CreateSupplyAsync(CreatedSupplyRequest request);
 }

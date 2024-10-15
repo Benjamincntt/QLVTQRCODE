@@ -87,13 +87,13 @@ public class GioHangService : IGioHangService
         return await _gioHangRepository.DeleteAsync(supplyInCart);
     }
 
-    public async Task<int> ModifyInformationAsync(int gioHangId, int vatTuId, ModifiedCartSupplyRequest request )
+    public async Task<int> ModifyInformationAsync(int gioHangId, ModifiedCartSupplyRequest request )
     {
         if (gioHangId < 1)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
         }
-        var supplyInCart = await _gioHangRepository.GetAsync(x => x.GioHangId == gioHangId && x.VatTuId == vatTuId);
+        var supplyInCart = await _gioHangRepository.GetAsync(x => x.GioHangId == gioHangId);
         if (supplyInCart == null)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Cart.SupplyNotExist);
