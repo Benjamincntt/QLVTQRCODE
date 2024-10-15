@@ -18,21 +18,28 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
     public async Task<PagedList<dynamic>> ListSupplyTicketAsync(string keywords, int pageIndex, int pageSize)
     {
         var query = DbContext.QlvtMuaSamPhieuDeXuats
-            .Where(x => x.TrangThai != (int?)SupplyTicketStatus.Deleted)
+            .Join(DbContext.TbCauHinhTrangThais,
+                x => x.TrangThai,
+                y => y.GiaTri,
+                (x, y) => new { PhieuDeXuat = x, CauHinhTrangThai = y})
+            .Where(x => x.PhieuDeXuat.TrangThai != (int?)SupplyTicketStatus.Deleted)
             .Where(x => string.IsNullOrWhiteSpace(keywords)
-                        || x.TenPhieu == null 
-                        || x.TenPhieu.ToLower().Contains(keywords)
-                        || x.MoTa == null
-                        || x.MoTa.ToLower().Contains(keywords))
-            .OrderByDescending(x => x.NgayThem)
-            .ThenBy(x => x.TrangThai)
+                        || x.PhieuDeXuat.TenPhieu == null 
+                        || x.PhieuDeXuat.TenPhieu.ToLower().Contains(keywords)
+                        || x.PhieuDeXuat.MoTa == null
+                        || x.PhieuDeXuat.MoTa.ToLower().Contains(keywords))
+            .OrderByDescending(x => x.PhieuDeXuat.NgayThem)
+            .ThenBy(x => x.PhieuDeXuat.TrangThai)
             .Select(x => new
             {
-                x.Id,
-                x.NgayThem,
-                x.TenPhieu,
-                x.MoTa,
-                x.TrangThai,
+                x.PhieuDeXuat.Id,
+                NgayThem = x.PhieuDeXuat.NgayThem ?? null,
+                TenPhieu = x.PhieuDeXuat.TenPhieu ?? string.Empty,
+                MaPhieu = x.PhieuDeXuat.MaPhieu ?? string.Empty,
+                MoTa = x.PhieuDeXuat.MoTa ?? string.Empty,
+                TrangThai = x.PhieuDeXuat.TrangThai ?? (int?)SupplyTicketStatus.Unsigned,
+                TenTrangThai = x.CauHinhTrangThai.TenTrangThai ?? string.Empty,
+                MaMau = x.CauHinhTrangThai.MaMau ?? string.Empty,
             });
         return await query.ToPagedListAsync<dynamic>(pageIndex, pageSize);
     }

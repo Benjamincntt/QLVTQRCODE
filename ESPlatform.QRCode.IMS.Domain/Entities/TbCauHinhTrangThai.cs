@@ -6,7 +6,7 @@ public partial class TbCauHinhTrangThai
 
     public string? TenTrangThai { get; set; }
 
-    public string? MaTrangThai { get; set; }
+    public string? MaMau { get; set; }
 
     public string? MoTa { get; set; }
 

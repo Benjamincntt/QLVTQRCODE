@@ -754,7 +754,7 @@ public partial class AppDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK_QLVT_VT_ToMay");
 
             entity.ToTable("QLVT_ViTri");
-
+ 
             entity.Property(e => e.IdKhoErp)
                 .HasDefaultValueSql("((0))")
                 .HasColumnName("IDKhoERP");
@@ -815,8 +815,8 @@ public partial class AppDbContext : DbContext
         {
             entity.ToTable("Tb_CauHinhTrangThai");
 
-            entity.Property(e => e.MaTrangThai)
-                .HasMaxLength(50)
+            entity.Property(e => e.MaMau)
+                .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.MoTa).HasMaxLength(250);
             entity.Property(e => e.TenTrangThai).HasMaxLength(100);

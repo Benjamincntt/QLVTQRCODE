@@ -1,9 +1,10 @@
 ﻿namespace ESPlatform.QRCode.IMS.Domain.Enums;
-
+// lấy từ bảng TbCauHinhTrangThai
 public enum SupplyTicketStatus
 {
     Unknown = 0,
     Unsigned = 1,
-    Signed = 2,
-    Deleted = 3
+    SigningInProgress = 2,
+    Signed = 3,
+    Deleted = 4
 }
