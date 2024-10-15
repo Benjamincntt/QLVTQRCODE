@@ -180,11 +180,14 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         }
 
 
-        public async Task<int> BoQuaKhongKy(ModifiedKySo request)
+        public async Task<object> BoQuaKhongKy(ModifiedKySo request)
         {
             if (request.PhieuId < 1)
             {
-                throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.InvalidPdx);
+                return new ErrorResponse
+                {
+                    Message = $"Phiếu có Id: {request.PhieuId} {Constants.Exceptions.Messages.KyCungUng.InvalidPdx}."
+                };
             }
             var userId = _authorizedContextFacade.AccountId;
             using (var transaction = _unitOfWork.BeginTransactionAsync())
@@ -198,11 +201,10 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     // Kiểm tra xem phiếu có tồn tại hay không
                     if (phieuMuaSam == null)
                     {
-                        throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.InvalidPdx);
-                    }
-                    if (phieuMuaSam.TrangThai != null && phieuMuaSam.TrangThai > 0)
-                    {
-                        throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.Signed);
+                        return new ErrorResponse
+                        {
+                            Message = $"Phiếu có Id: {request.PhieuId} không tồn tại."
+                        };
                     }
                     var maDoiTuongKy = request.MaDoiTuongKy != null ? request.MaDoiTuongKy.ToLower() : "";
 
@@ -213,21 +215,29 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         {
                             throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.CanNotIgnore);
                         }
+
                     }
 
                     var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId
-                                                                                && x.ThuTuKy == request.ThuTu_Ky
                                                                                  && x.VanBanId == request.VanBan_Id
                                                                                   && (x.MaDoiTuongKy != null && x.MaDoiTuongKy.ToLower() == maDoiTuongKy));
 
                     if (phieuMuaSamKy == null)
                     {
-                        throw new BadRequestException("Chưa có cấu hình chữ ký cho người ký với Id: { phieuKy.ChuKyId }.");
+                        return new ErrorResponse
+                        {
+                            Message = "Chưa có cấu hình chữ ký cho người ký này."
+                        };
                     }
-                    // Kiểm tra trạng thái của chữ ký
-                    if (phieuMuaSamKy.TrangThai != null && phieuMuaSamKy.TrangThai > 0)
+                    else
                     {
-                        throw new BadRequestException($"{Constants.Exceptions.Messages.KyCungUng.Signed}.");
+                        if (phieuMuaSamKy.TrangThai == 1)
+                        {
+                            return new ErrorResponse
+                            {
+                                Message = "Chữ ký này đã được ký."
+                            };
+                        }
                     }
 
                     phieuMuaSamKy.NgayKy = DateTime.Now;
@@ -235,11 +245,6 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
 
                     await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
-
-                    // update trạng thái cho phiếu cung ứng
-                    phieuMuaSam.TrangThai = TrangThaiPhieu.KiemSoatAT;
-                    ////
-                    await _phieuKyRepository.UpdateAsync(phieuMuaSam);
 
                     await _unitOfWork.CommitAsync();
 
@@ -355,65 +360,65 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                             Message = $"Phiếu có Id: {request.PhieuId} không tồn tại."
                         };
                     }
-                    switch (maDoiTuongKy)
-                    {
-                        case MaDoiTuongKyConstants.NguoiLap:
-                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.NguoiLap) // Nếu trạng thái đã là "Người lập"
-                            {
-                                return new ErrorResponse
-                                {
-                                    Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi người lập."
-                                };
-                            }
-                            break;
+                    //switch (maDoiTuongKy)
+                    //{
+                    //    case MaDoiTuongKyConstants.NguoiLap:
+                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.NguoiLap) // Nếu trạng thái đã là "Người lập"
+                    //        {
+                    //            return new ErrorResponse
+                    //            {
+                    //                Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi người lập."
+                    //            };
+                    //        }
+                    //        break;
 
-                        case MaDoiTuongKyConstants.KiemSoatAT:
-                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.KiemSoatAT) // Nếu trạng thái đã là "Kiểm soát AT"
-                            {
-                                return new ErrorResponse
-                                {
-                                    Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi người kiểm soát an toàn."
-                                };
-                            }
-                            break;
+                    //    case MaDoiTuongKyConstants.KiemSoatAT:
+                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.KiemSoatAT) // Nếu trạng thái đã là "Kiểm soát AT"
+                    //        {
+                    //            return new ErrorResponse
+                    //            {
+                    //                Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi người kiểm soát an toàn."
+                    //            };
+                    //        }
+                    //        break;
 
-                        case MaDoiTuongKyConstants.TruongDonVi:
-                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.TruongDonVi) // Nếu trạng thái đã là "Trưởng đơn vị"
-                            {
-                                return new ErrorResponse
-                                {
-                                    Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi trưởng đơn vị."
-                                };
-                            }
-                            break;
+                    //    case MaDoiTuongKyConstants.TruongDonVi:
+                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.TruongDonVi) // Nếu trạng thái đã là "Trưởng đơn vị"
+                    //        {
+                    //            return new ErrorResponse
+                    //            {
+                    //                Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi trưởng đơn vị."
+                    //            };
+                    //        }
+                    //        break;
 
-                        case MaDoiTuongKyConstants.Ph_KHVT:
-                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.Ph_KHVT) // Nếu trạng thái đã là "PH KHVT"
-                            {
-                                return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi PH KHVT." };
-                            }
-                            break;
+                    //    case MaDoiTuongKyConstants.Ph_KHVT:
+                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.Ph_KHVT) // Nếu trạng thái đã là "PH KHVT"
+                    //        {
+                    //            return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi PH KHVT." };
+                    //        }
+                    //        break;
 
-                        case MaDoiTuongKyConstants.Ph_KTAT:
-                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.Ph_KTAT) // Nếu trạng thái đã là "PH KTAT"
-                            {
-                                return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi PH KTA." };
-                            }
-                            break;
+                    //    case MaDoiTuongKyConstants.Ph_KTAT:
+                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.Ph_KTAT) // Nếu trạng thái đã là "PH KTAT"
+                    //        {
+                    //            return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi PH KTA." };
+                    //        }
+                    //        break;
 
-                        case MaDoiTuongKyConstants.TongGiamDoc:
-                            if (phieuMuaSam.TrangThai == TrangThaiPhieu.TongGiamDoc) // Nếu trạng thái đã là "Tổng giám đốc"
-                            {
-                                return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký Tổng Giám Đốc." };
-                            }
-                            break;
+                    //    case MaDoiTuongKyConstants.TongGiamDoc:
+                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.TongGiamDoc) // Nếu trạng thái đã là "Tổng giám đốc"
+                    //        {
+                    //            return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký Tổng Giám Đốc." };
+                    //        }
+                    //        break;
 
-                        default:
-                            return new ErrorResponse
-                            {
-                                Message = "Loại đối tượng ký không hợp lệ."
-                            };
-                    }
+                    //    default:
+                    //        return new ErrorResponse
+                    //        {
+                    //            Message = "Loại đối tượng ký không hợp lệ."
+                    //        };
+                    //}
                     // Lấy thông tin ký từ bảng QLVT_MuaSam_PhieuDeXuat_Ky
                   
                     var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
@@ -444,33 +449,35 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 
                     switch (maDoiTuongKy)
                     {
-                        case MaDoiTuongKyConstants.NguoiLap:
-                            phieuMuaSam.TrangThai = TrangThaiPhieu.NguoiLap;
-                            break;
+                        //case MaDoiTuongKyConstants.NguoiLap:
+                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.NguoiLap;
+                        //    break;
 
-                        case MaDoiTuongKyConstants.KiemSoatAT:
-                            phieuMuaSam.TrangThai = TrangThaiPhieu.KiemSoatAT;
-                            break;
+                        //case MaDoiTuongKyConstants.KiemSoatAT:
+                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.KiemSoatAT;
+                        //    break;
 
-                        case MaDoiTuongKyConstants.TruongDonVi:
-                            phieuMuaSam.TrangThai = TrangThaiPhieu.TruongDonVi;
-                            break;
+                        //case MaDoiTuongKyConstants.TruongDonVi:
+                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.TruongDonVi;
+                        //    break;
 
-                        case MaDoiTuongKyConstants.Ph_KHVT:
-                            phieuMuaSam.TrangThai = TrangThaiPhieu.Ph_KHVT;
-                            break;
+                        //case MaDoiTuongKyConstants.Ph_KHVT:
+                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.Ph_KHVT;
+                        //    break;
 
-                        case MaDoiTuongKyConstants.Ph_KTAT:
-                            phieuMuaSam.TrangThai = TrangThaiPhieu.Ph_KTAT;
-                            break;
+                        //case MaDoiTuongKyConstants.Ph_KTAT:
+                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.Ph_KTAT;
+                        //    break;
 
                         case MaDoiTuongKyConstants.TongGiamDoc:
                             phieuMuaSam.TrangThai = TrangThaiPhieu.TongGiamDoc;
                             break;
-
+                       
                         default:
-                            throw new InvalidOperationException("Loại đối tượng ký không hợp lệ.");
+                            phieuMuaSam.TrangThai = TrangThaiPhieu.TrongQuaTrinhKy;
+                            break;
                     }
+
 
                     await _phieuKyRepository.UpdateAsync(phieuMuaSam);
 

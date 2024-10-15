@@ -43,6 +43,11 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
             try
             {
                 var result = await _phieuKyService.BoQuaKhongKy(requests);
+                if (result is ErrorResponse errorResponse)
+                {
+                    // Xử lý lỗi
+                    return BadRequest(errorResponse);
+                }
                 return Ok(new { success = true, data = result });
             }
             catch (NotFoundException ex)
@@ -178,49 +183,6 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                 return StatusCode(500, new { message = "Có lỗi xảy ra, vui lòng thử lại sau." + ex.Message });
             }
         }
-
-        //[HttpGet("GetFilePdf/{id}")]
-        //public async Task<IActionResult> GetPdf(int id)
-        //{
-        //    try
-        //    {
-        //        // Lấy thông tin file dựa trên id
-        //        var result = await _phieuKyService.GetVanBanKyById(id);
-
-        //        // Kiểm tra xem result có null không và file path có tồn tại không
-        //        if (result == null || string.IsNullOrEmpty(result.FilePath))
-        //        {
-        //            return BadRequest(new { exists = false, message = "File không tồn tại", data = result });
-        //        }
-
-        //        // Lấy đường dẫn đầy đủ của file
-        //        var fullPath = await _phieuKyService.GetFullFilePath(result.FilePath);
-
-        //        // Kiểm tra file có tồn tại không
-        //        if (!System.IO.File.Exists(fullPath))
-        //        {
-        //            return NotFound("File không tồn tại");
-        //        }
-
-        //        // Đọc file và trả về kết quả dưới dạng PDF
-        //        var fileBytes = await System.IO.File.ReadAllBytesAsync(fullPath);
-        //        return fileBytes;
-        //    }
-        //    catch (FileNotFoundException)
-        //    {
-        //        return NotFound("File không tồn tại hoặc đã bị xóa.");
-        //    }
-        //    catch (UnauthorizedAccessException)
-        //    {
-        //        return StatusCode(StatusCodes.Status403Forbidden, "Bạn không có quyền truy cập vào file này.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log exception (nếu cần)
-        //        // logger.LogError(ex, "Lỗi khi lấy file PDF với ID {Id}", id);
-        //        return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý yêu cầu.");
-        //    }
-        //}
 
         [HttpGet("get-file/{id}")]
         public async Task<ActionResult<byte[]>> GetFileById(int id)

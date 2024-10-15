@@ -90,7 +90,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                 switch (MaDoiTuongKy)
                 {
                     case MaDoiTuongKyConstants.NguoiLap:
-                        query = query.Where(x => x.MaNguoiThem == userId);
+                        query = query.Where(x => x.MaNguoiThem == userId && x.TrangThai == 1);
 
                         break;
                     case MaDoiTuongKyConstants.KiemSoatAT:
