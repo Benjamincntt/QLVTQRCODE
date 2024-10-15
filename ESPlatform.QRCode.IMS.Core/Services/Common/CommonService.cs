@@ -34,7 +34,7 @@ public class CommonService : ICommonService
         _imagePath = imagePath.Value;
     }
 
-    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, int idViTri,
+    public async Task<int> ModifySuppliesLocationAsync(int vatTuId,
         ModifiedSuppliesLocationRequest request)
     {
         #region validate
@@ -45,12 +45,6 @@ public class CommonService : ICommonService
                 new List<string> { nameof(vatTuId) + " is invalid" });
         }
 
-        if (idViTri < 0)
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupplyLocation,
-                new List<string> { nameof(idViTri) + " is invalid" });
-        }
-
         var vatTu = await _vatTuRepository.GetAsync(vatTuId);
         if (vatTu == null)
         {
@@ -59,36 +53,43 @@ public class CommonService : ICommonService
 
         await ValidationHelper.ValidateAsync(request, new ModifiedSuppliesLocationRequestValidation());
 
-        if (request.IdToMay == null && request.IdGiaKe == null && request.IdNgan == null && request.IdHop == null)
+        if (request.IdToMay == null && request.IdGiaKe == null && request.IdNgan == null)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.NoSupplyLocationSelected);
         }
 
         #endregion
 
-        // lấy vị trí hiện tai
-        var vitri = await _vatTuViTriRepository.GetAsync(x => x.IdVatTu == vatTuId && x.IdViTri == idViTri);
+        // Lấy vị trí hiện tai
+        // Lấy thông tin từng cấp vị trí để ghép chuỗi hiển thị vị trí
+        var toMay = await _viTriRepository.GetAsync(x => x.Id == request.IdToMay);
+        var maToMay = toMay?.Ma;
+        var giaKe = await _viTriRepository.GetAsync(x => x.Id == request.IdGiaKe);
+        var maGiaKe = giaKe?.Ma;   
+        var ngan = await _viTriRepository.GetAsync(x => x.Id == request.IdNgan);
+        var maNgan = ngan?.Ma;
+        var chuoiToAdd = new[]
+        {
+            string.IsNullOrEmpty(maToMay) ? null : $"{maToMay}",
+            string.IsNullOrEmpty(maGiaKe) ? null : $"{maGiaKe}",
+            string.IsNullOrEmpty(maNgan) ? null : $"{maNgan}",
+        };
+        var vitri = await _vatTuViTriRepository.GetAsync(x => x.IdVatTu == vatTuId);
         // nếu chưa có vị trí => tạo vị trí mới 
         // trong case này nếu vị trí không được tìm thấy và có IdViTri => vẫn phải thêm mới vì trong db, bảng QLVT_VatTu_ViTri có IdViTri là key và là duy nhất
-        if (idViTri == 0 || vitri == null)
+        if (vitri == null)
         {
-            var viTriVatTuNew = new QlvtVatTuViTri();
-            viTriVatTuNew.IdToMay = request.IdToMay;
-            viTriVatTuNew.IdGiaKe = request.IdGiaKe;
-            viTriVatTuNew.IdNgan = request.IdNgan;
-            viTriVatTuNew.IdHop = request.IdHop;
-            var chuoiToAdd = new[]
+            var viTriVatTuNew = new QlvtVatTuViTri
             {
-                string.IsNullOrEmpty(request.TenToMay) ? null : $"{request.TenToMay}",
-                string.IsNullOrEmpty(request.TenGiaKe) ? null : $"{request.TenGiaKe}",
-                string.IsNullOrEmpty(request.TenNgan) ? null : $"{request.TenNgan}",
-                string.IsNullOrEmpty(request.TenHop) ? null : $"{request.TenHop}"
+                IdToMay = request.IdToMay,
+                IdGiaKe = request.IdGiaKe,
+                IdNgan = request.IdNgan,
+                IdVatTu = vatTuId,
+                TenVatTu = vatTu.TenVatTu ?? string.Empty,
+                IdKhoErp = vatTu.KhoId,
+                MaVatTu = vatTu.MaVatTu ?? string.Empty,
+                ViTri = string.Join(".", chuoiToAdd.Where(c => !string.IsNullOrEmpty(c)))
             };
-            viTriVatTuNew.IdVatTu = vatTuId;
-            viTriVatTuNew.TenVatTu = vatTu.TenVatTu ?? string.Empty;
-            viTriVatTuNew.IdKhoErp = vatTu.KhoId;
-            viTriVatTuNew.MaVatTu = vatTu.MaVatTu ?? string.Empty;
-            viTriVatTuNew.ViTri = string.Join(" -> ", chuoiToAdd.Where(c => !string.IsNullOrEmpty(c)));
             return await _vatTuViTriRepository.UpdateAsync(viTriVatTuNew);
         }
 
@@ -96,15 +97,8 @@ public class CommonService : ICommonService
         vitri.IdToMay = request.IdToMay;
         vitri.IdGiaKe = request.IdGiaKe;
         vitri.IdNgan = request.IdNgan;
-        vitri.IdHop = request.IdHop;
-        var chuoiToUpdate = new[]
-        {
-            string.IsNullOrEmpty(request.TenToMay) ? null : $"{request.TenToMay}",
-            string.IsNullOrEmpty(request.TenGiaKe) ? null : $"{request.TenGiaKe}",
-            string.IsNullOrEmpty(request.TenNgan) ? null : $"{request.TenNgan}",
-            string.IsNullOrEmpty(request.TenHop) ? null : $"{request.TenHop}"
-        };
-        vitri.ViTri = string.Join(" -> ", chuoiToUpdate.Where(c => !string.IsNullOrEmpty(c)));
+        vitri.ViTri = string.Join(".", chuoiToAdd.Where(c => !string.IsNullOrEmpty(c)));
+        
         return await _vatTuViTriRepository.UpdateAsync(vitri);
     }
 
@@ -285,7 +279,7 @@ public class CommonService : ICommonService
 
     public async Task<IEnumerable<SupplyLocationListResponseItem>> ListSuppliesLocationAsync(int parentId)
     {
-        if (parentId is < 0 or > 4)
+        if (parentId is < 0 or > 3)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Common.InvalidParameters);
         }

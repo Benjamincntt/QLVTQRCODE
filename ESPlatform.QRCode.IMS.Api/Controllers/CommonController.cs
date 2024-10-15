@@ -22,9 +22,9 @@ public class CommonController: ApiControllerBase
     /// <param name="idViTri"></param>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPatch("{vatTuId:int}/{idViTri:int}")]
-    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, [FromBody]ModifiedSuppliesLocationRequest request, int idViTri = 0) {
-        return await _commonService.ModifySuppliesLocationAsync(vatTuId, idViTri, request);
+    [HttpPatch("{vatTuId:int}/update-supply-location")]
+    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, [FromBody]ModifiedSuppliesLocationRequest request) {
+        return await _commonService.ModifySuppliesLocationAsync(vatTuId, request);
     }
 
     /// <summary>
@@ -67,7 +67,7 @@ public class CommonController: ApiControllerBase
     /// <summary>
     /// Danh sách vị trí của vật tư theo cấp
     /// </summary>
-    /// <param name="parentId"> 0: Tất cả vị trí, 1: Tổ máy, 2: Giá Kệ, 3: Ngăn, 4: Hộc</param>
+    /// <param name="parentId"> 0: Tất cả vị trí, 1: nhóm 8, 2: nhóm 9, 3: nhóm 10</param>
     /// <returns></returns>
     [HttpGet("{parentId:int}")]
     public async Task<IEnumerable<SupplyLocationListResponseItem>> ListSuppliesLocationAsync(int parentId)

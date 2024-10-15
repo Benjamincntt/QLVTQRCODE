@@ -55,7 +55,5 @@ public class SuppliesLocation
 
     public int IdNgan { get; set; }
 
-    public int IdHop { get; set; }
-
     public string ViTri { get; set; } = string.Empty;
 }

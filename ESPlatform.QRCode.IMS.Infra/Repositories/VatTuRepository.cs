@@ -47,7 +47,6 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 x.IdToMay,
                 x.IdGiaKe,
                 x.IdNgan,
-                x.IdHop,
                 x.ViTri
             })
             .ToListAsync();
@@ -67,8 +66,17 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         return response;
     }
 
-    public async Task<PagedList<dynamic>> ListAsync(string tenVatTu, string maVatTu, int idKho, int idViTri, string maNhom, string relativeBasePath,
-        int pageIndex, int pageSize)
+    public async Task<PagedList<dynamic>> ListAsync(
+        string tenVatTu,
+        string maVatTu,
+        int idKho,
+        int idToMay,
+        int idGiaKe,
+        int idNgan,
+        string maNhom,
+        string relativeBasePath,
+        int pageIndex,
+        int pageSize)
     {
         var vatTu = DbContext.QlvtVatTus
             .GroupJoin(DbContext.QlvtKhos,
@@ -87,11 +95,10 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
             .Where(x => string.IsNullOrWhiteSpace(maVatTu) || x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
             .Where(x => string.IsNullOrWhiteSpace(maNhom) || x.QlvtVatTu.MaVatTu.ToLower().Contains(maNhom))
             .Where(x => idKho == 0 || x.QlvtVatTu.KhoId == idKho)
-            .Where(x => idViTri == 0 || x.QlvtVatTuViTri != null &&
-                (x.QlvtVatTuViTri.IdToMay == idViTri
-                 || x.QlvtVatTuViTri.IdGiaKe == idViTri
-                 || x.QlvtVatTuViTri.IdNgan == idViTri
-                 || x.QlvtVatTuViTri.IdHop == idViTri))
+            .Where(x => idToMay == 0 || x.QlvtVatTuViTri != null && x.QlvtVatTuViTri.IdToMay == idToMay)
+            .Where(x => idGiaKe == 0 || x.QlvtVatTuViTri != null && x.QlvtVatTuViTri.IdGiaKe == idGiaKe)
+            .Where(x => idNgan == 0 || x.QlvtVatTuViTri != null && x.QlvtVatTuViTri.IdNgan == idNgan)
+
             .OrderBy(x => x.QlvtVatTu.TenVatTu)
             .Select(x => new 
             {

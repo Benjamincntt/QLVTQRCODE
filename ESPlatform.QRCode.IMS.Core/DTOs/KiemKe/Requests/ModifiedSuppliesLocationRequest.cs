@@ -10,15 +10,4 @@ public class ModifiedSuppliesLocationRequest
     public int? IdGiaKe { get; set; }
     [DisplayName("Id ngăn")]
     public int? IdNgan { get; set; }
-    [DisplayName("Id hộc")]
-    public int? IdHop { get; set; }
-    [DisplayName("Tên tổ máy")]
-    public string? TenToMay { get; set; } = string.Empty;
-    [DisplayName("Tên giá kệ")]
-    public string? TenGiaKe { get; set; } = string.Empty;
-    [DisplayName("Tên ngăn")]
-    public string? TenNgan { get; set; } = string.Empty;
-    [DisplayName("Tên hộc")]
-    public string? TenHop { get; set; } = string.Empty;
-    
 }

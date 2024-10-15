@@ -1,17 +1,12 @@
 ﻿### Cập nhật vị trí vật tư
-PATCH {{host}}/{{commonPath}}/{{vatTuId}}/{{idViTri}}
+PATCH {{host}}/{{commonPath}}/{{vatTuId}}/update-supply-location
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "IdToMay": 5,
-  "IdGiaKe": 8,
-  "IdNgan": 9,
-  "IdHop": 10,
-  "TenToMay": "Tổ máy 01",
-  "TenGiaKe": "Kệ 02",
-  "TenNgan": "Ngăn 01",
-  "TenHop": "Hộc 1"
+  "idToMay": 1027,
+  "idGiaKe": 1029,
+  "idNgan": 1005
 }
 
 ### Xóa ảnh vật tư

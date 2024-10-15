@@ -11,10 +11,11 @@ public class SupplyListRequest : PagingFilter
     public string? MaVatTu { get; set; } = string.Empty;
     [DisplayName("Id kho")]
     public int IdKho { get; set; } = 0;
-    [DisplayName("Id vị trí")]
-    public int IdViTri { get; set; } = 0;
-    
+    [DisplayName("Id nhóm 8")]
+    public int IdToMay { get; set; } = 0;
+    [DisplayName("Id nhóm 9")]
+    public int IdGiaKe { get; set; } = 0;
+    [DisplayName("Id nhóm 10")]
+    public int IdNgan { get; set; } = 0;
     public string? MaNhom { get; set; } = string.Empty;
-    
-    //public bool IsSystemSupply { get; set; } = false;
 }
