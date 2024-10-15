@@ -52,12 +52,13 @@ public class GioHangController : ApiControllerBase
     /// Cập nhật thông tin của 1 vật tư trong giỏ hàng
     /// </summary>
     /// <param name="gioHangId"></param>
+    /// <param name="vatTuId"></param>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPatch("{gioHangId:int}/thong-tin")]
-    public async Task<int> ModifyInformationAsync(int gioHangId, [FromBody] ModifiedCartSupplyRequest request)
+    [HttpPatch("{gioHangId:int}/{vatTuId:int}/thong-tin")]
+    public async Task<int> ModifyInformationAsync(int gioHangId, int vatTuId, [FromBody] ModifiedCartSupplyRequest request)
     {
-        return await _gioHangService.ModifyInformationAsync(gioHangId, request);
+        return await _gioHangService.ModifyInformationAsync(gioHangId, vatTuId, request);
     }
     
     /// <summary>

@@ -13,14 +13,13 @@ PATCH {{host}}/{{gioHangPath}}/{{gioHangId}}?quantity=2
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
-###  Cập nhật thông số kỹ thuật và ghi chú của 1 vật tư trong giỏ hàng
+###  Cập nhật thông tin của 1 vật tư trong giỏ hàng
 PATCH {{host}}/{{gioHangPath}}/{{gioHangId}}/thong-tin
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
   "isSystemSupply": false,
-  "thongSoKyThuat": "màu đỏ, loại 10mm, dài 5cm",
   "ghiChu": "hàng nhập khẩu"
 }
 
@@ -30,18 +29,14 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ###  Thêm mới 1 vật tư vào giỏ hàng
-POST {{host}}/{{gioHangPath}}/{{gioHangId}}
+POST {{host}}/{{gioHangPath}}/{{vatTuId}}
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "tenVatTu": "tuavit 29",
-  "donViTinh": "cái",
-  "ghiChu": "loại có từ tính",
-  "thongSoKyThuat": "dài 22cm, tay nắm cao su, chất liệu thép không gỉ",
-  "maVatTu": "tuavit 22",
-  "xuatXu": "Trung quốc",
-  "soLuong": 100
+  "soLuong": 1000,
+  "thongSoKyThuat": "test thông số",
+  "isSystemSupply": true
 }
 
 ### Thêm mới vật tư k có trong hệ thống và thêm vào giỏ hàng

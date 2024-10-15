@@ -87,13 +87,13 @@ public class GioHangService : IGioHangService
         return await _gioHangRepository.DeleteAsync(supplyInCart);
     }
 
-    public async Task<int> ModifyInformationAsync(int gioHangId, ModifiedCartSupplyRequest request )
+    public async Task<int> ModifyInformationAsync(int gioHangId, int vatTuId, ModifiedCartSupplyRequest request )
     {
         if (gioHangId < 1)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
         }
-        var supplyInCart = await _gioHangRepository.GetAsync(x => x.GioHangId == gioHangId);
+        var supplyInCart = await _gioHangRepository.GetAsync(x => x.GioHangId == gioHangId && x.VatTuId == vatTuId);
         if (supplyInCart == null)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Cart.SupplyNotExist);
@@ -108,6 +108,10 @@ public class GioHangService : IGioHangService
                 await _gioHangRepository.DeleteAsync(supplyInCart);
                 throw new NotFoundException(Constants.Exceptions.Messages.Cart.DeletedSupply);
             }
+            supplyInCart.GhiChu = request.GhiChu;
+            supplyInCart.SoLuong = request.SoLuong;
+            supplyInCart.ThoiGianCapNhat = DateTime.Now;
+            return await _gioHangRepository.UpdateAsync(supplyInCart);
         }
         // Nếu là vật tư mới thêm => ktra xem vật tư còn trong bảng vật tư mới không
         var supplyNew = await _muaSamVatTuNewRepository.GetAsync(x => x.VatTuNewId == supplyInCart.VatTuId);
