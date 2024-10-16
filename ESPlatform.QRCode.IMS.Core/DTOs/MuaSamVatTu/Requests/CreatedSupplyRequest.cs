@@ -17,5 +17,6 @@ public class CreatedSupplyRequest
     [DisplayName("Xuất xứ")]
     public string XuatXu { get; set; } = string.Empty;
     
+    public int DonGia { get; set; }
     public int SoLuong { get; set; }
 }
