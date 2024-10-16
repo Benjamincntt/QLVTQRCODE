@@ -12,10 +12,10 @@ public class SupplyListRequest : PagingFilter
     [DisplayName("Id kho")]
     public int IdKho { get; set; } = 0;
     [DisplayName("Id nhóm 8")]
-    public int IdToMay { get; set; } = 0;
+    public List<int>? ListIdToMay { get; set; } = new();
     [DisplayName("Id nhóm 9")]
-    public int IdGiaKe { get; set; } = 0;
+    public List<int>? ListIdGiaKe { get; set; }  = new();
     [DisplayName("Id nhóm 10")]
-    public int IdNgan { get; set; } = 0;
-    public string? MaNhom { get; set; } = string.Empty;
+    public List<int>? ListIdNgan { get; set; } = new();
+    public List<string>? ListMaNhom { get; set; } = new List<string>();
 }

@@ -70,10 +70,10 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         string tenVatTu,
         string maVatTu,
         int idKho,
-        int idToMay,
-        int idGiaKe,
-        int idNgan,
-        string maNhom,
+        List<int>? listIdToMay,
+        List<int>? listIdGiaKe,
+        List<int>? listIdNgan,
+        List<string>? listMaNhom,
         string relativeBasePath,
         int pageIndex,
         int pageSize)
@@ -91,15 +91,16 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
             .SelectMany(x => x.QlvtVatTuViTri.DefaultIfEmpty(),
                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
-            .Where(x => string.IsNullOrWhiteSpace(tenVatTu) || x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
-            .Where(x => string.IsNullOrWhiteSpace(maVatTu) || x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
-            .Where(x => string.IsNullOrWhiteSpace(maNhom) || x.QlvtVatTu.MaVatTu.ToLower().Contains(maNhom))
+            .Where(x => string.IsNullOrWhiteSpace(tenVatTu) || x.QlvtVatTu.TenVatTu != null && x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
+            .Where(x => string.IsNullOrWhiteSpace(maVatTu) || x.QlvtVatTu.MaVatTu != null && x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
             .Where(x => idKho == 0 || x.QlvtVatTu.KhoId == idKho)
-            .Where(x => idToMay == 0 || x.QlvtVatTuViTri != null && x.QlvtVatTuViTri.IdToMay == idToMay)
-            .Where(x => idGiaKe == 0 || x.QlvtVatTuViTri != null && x.QlvtVatTuViTri.IdGiaKe == idGiaKe)
-            .Where(x => idNgan == 0 || x.QlvtVatTuViTri != null && x.QlvtVatTuViTri.IdNgan == idNgan)
-
+            .Where(x => listMaNhom == null || !listMaNhom.Any() || x.QlvtVatTu.MaVatTu != null && listMaNhom.Contains(x.QlvtVatTu.MaVatTu.Substring(0,7)))
+            .Where(x => listIdToMay == null || !listIdToMay.Any() || x.QlvtVatTuViTri != null && listIdToMay.Contains((int)x.QlvtVatTuViTri.IdToMay!))
+            .Where(x => listIdGiaKe == null ||!listIdGiaKe.Any() || x.QlvtVatTuViTri != null && listIdGiaKe.Contains((int)x.QlvtVatTuViTri.IdGiaKe!))
+            .Where(x => listIdNgan == null ||!listIdNgan.Any() || x.QlvtVatTuViTri != null && listIdNgan.Contains((int)x.QlvtVatTuViTri.IdNgan!))
+            
             .OrderBy(x => x.QlvtVatTu.TenVatTu)
+            .ThenBy(x => x.QlvtVatTu.DonViTinh)
             .Select(x => new 
             {
                 VatTuId = x.QlvtVatTu.VatTuId,

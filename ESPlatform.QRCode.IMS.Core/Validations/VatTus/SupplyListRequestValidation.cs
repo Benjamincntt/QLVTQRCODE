@@ -12,9 +12,6 @@ public class SupplyListRequestValidation: AbstractValidator<SupplyListRequest>
     {
         RuleFor(x => x.PageIndex).GreaterThanOrEqualTo(0).WithMessage(MustGreaterThanOrEqual);
         RuleFor(o => o.PageSize).GreaterThanOrEqualTo(0).WithMessage(MustGreaterThanOrEqual);
-        RuleFor(o => o.IdToMay).GreaterThanOrEqualTo(0).WithMessage(MustGreaterThanOrEqual);
-        RuleFor(o => o.IdGiaKe).GreaterThanOrEqualTo(0).WithMessage(MustGreaterThanOrEqual);
-        RuleFor(o => o.IdNgan).GreaterThanOrEqualTo(0).WithMessage(MustGreaterThanOrEqual);
         RuleFor(o => o.IdKho).GreaterThanOrEqualTo(0).WithMessage(MustGreaterThanOrEqual);
         RuleFor(x => x.TenVatTu).ValidateStringDefault();
         RuleFor(x => x.MaVatTu).ValidateStringDefault();
