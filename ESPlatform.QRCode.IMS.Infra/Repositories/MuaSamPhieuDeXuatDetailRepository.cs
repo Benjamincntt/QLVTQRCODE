@@ -26,10 +26,10 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
             .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == true)
             .Select(x => new
             {
-                x.PhieuDeXuatDetail.TenVatTu,
-                x.PhieuDeXuatDetail.ThongSoKyThuat,
-                x.PhieuDeXuatDetail.GhiChu,
-                x.PhieuDeXuatDetail.SoLuong,
+                TenVatTu = x.PhieuDeXuatDetail.TenVatTu ?? string.Empty,
+                ThongSoKyThuat = x.PhieuDeXuatDetail.ThongSoKyThuat ?? string.Empty,
+                GhiChu = x.PhieuDeXuatDetail.GhiChu ?? string.Empty,
+                SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
                 Image = x.VatTu == null ? string.Empty : x.VatTu.Image ?? string.Empty,
                 DonGia = x.VatTu == null? 0 : x.VatTu.DonGia ?? 0
             });
@@ -46,10 +46,10 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
              .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == false)
              .Select(x => new
              {
-                 x.PhieuDeXuatDetail.TenVatTu,
-                 x.PhieuDeXuatDetail.ThongSoKyThuat,
-                 x.PhieuDeXuatDetail.GhiChu,
-                 x.PhieuDeXuatDetail.SoLuong,
+                 TenVatTu = x.PhieuDeXuatDetail.TenVatTu ?? string.Empty,
+                 ThongSoKyThuat = x.PhieuDeXuatDetail.ThongSoKyThuat ?? string.Empty,
+                 GhiChu = x.PhieuDeXuatDetail.GhiChu ?? string.Empty,
+                 SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
                  Image = x.VatTuNew == null ? string.Empty : x.VatTuNew.Image ?? string.Empty,
                  DonGia = x.VatTuNew == null? 0 : x.VatTuNew.DonGia ?? 0
              });

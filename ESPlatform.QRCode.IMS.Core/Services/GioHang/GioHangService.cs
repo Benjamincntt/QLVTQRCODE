@@ -111,6 +111,7 @@ public class GioHangService : IGioHangService
             supplyInCart.GhiChu = request.GhiChu;
             supplyInCart.SoLuong = request.SoLuong;
             supplyInCart.ThoiGianCapNhat = DateTime.Now;
+            supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
             return await _gioHangRepository.UpdateAsync(supplyInCart);
         }
         // Nếu là vật tư mới thêm => ktra xem vật tư còn trong bảng vật tư mới không
@@ -125,6 +126,7 @@ public class GioHangService : IGioHangService
         supplyInCart.GhiChu = request.GhiChu;
         supplyInCart.SoLuong = request.SoLuong;
         supplyInCart.ThoiGianCapNhat = DateTime.Now;
+        supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
         return await _gioHangRepository.UpdateAsync(supplyInCart);
     }
     public async Task<int> CreateCartSupplyAsync(int vatTuId, CreatedCartSupplyRequest request)

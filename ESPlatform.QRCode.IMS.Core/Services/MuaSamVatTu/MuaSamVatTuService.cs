@@ -129,7 +129,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         //if Id is VatTuNewId => get information from QlvtMuaSamVatTuNew table
          var vatTuNew = await _muaSamVatTuNewRepository.GetAsync(vatTuId);
          if (vatTuNew == null) return response;
-         response.TenVatTu = vatTuNew.TenVatTu;
+         response.TenVatTu = vatTuNew.TenVatTu ?? string.Empty;
          response.ThongSoKyThuat = vatTuNew.ThongSoKyThuat ?? string.Empty;
          response.DonGia = vatTuNew.DonGia ?? 0;
          response.GhiChu = vatTuNew.GhiChu ?? string.Empty;
