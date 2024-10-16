@@ -277,27 +277,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             };
             return response;
         }
-        //public Task<string> GetFullFilePath(string filePath)
-        //{
-        //    var kySoPath = _configuration.GetSection("KySoPath");
-        //    var rootPath = kySoPath.GetValue<string>("RootPath");
-            
-        //    var relativeBasePath = kySoPath.GetValue<string>("RelativeBasePath");
-
-        //    if (string.IsNullOrEmpty(rootPath) || string.IsNullOrEmpty(relativeBasePath))
-        //    {
-        //        throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
-        //    }
-        //    // Kiểm tra và loại bỏ "KySo" nếu nó đã tồn tại trong RelativeBasePath
-        //    if (relativeBasePath.EndsWith("KySo"))
-        //    {
-        //        relativeBasePath = relativeBasePath.Substring(0, relativeBasePath.Length - "KySo".Length);
-        //    }
-        //    var fullPath = Path.Combine(rootPath, relativeBasePath.Trim('/'), filePath.Trim('/'));
-        //    // Chuẩn hóa đường dẫn thành backslash cho Windows
-        //    fullPath = fullPath.Replace("/", "\\");
-        //    return Task.FromResult(fullPath);
-        //}
+        
         public Task<string> GetFullFilePath(string filePath)
         {
             var kySoPath = _configuration.GetSection("KySoPath");
@@ -309,10 +289,11 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
             }
 
-            // Loại bỏ "KySo" nếu tồn tại trong relativeBasePath
-            if (relativeBasePath.EndsWith("KySo"))
+            // Lấy phần sau dấu "/" thứ hai
+            var segments = filePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length >= 2)
             {
-                relativeBasePath = relativeBasePath.Substring(0, relativeBasePath.Length - "KySo".Length);
+                filePath = string.Join("/", segments.Skip(1)); // Bỏ phần đầu tiên và nối lại
             }
 
             // Kết hợp đường dẫn rootPath và relativeBasePath
@@ -333,12 +314,6 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             {
                 throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
             }
-            // Nếu relativeBasePath chắc chắn không null, có thể bỏ qua kiểm tra null
-            if (relativeBasePath.EndsWith("KySo"))
-            {
-                relativeBasePath = relativeBasePath[..^"KySo".Length];  // Sử dụng cú pháp cắt chuỗi gọn hơn
-            }
-
             // Chuẩn hóa đường dẫn thành backslash cho Windows
             return Task.FromResult(relativeBasePath.Replace("/", "\\"));
         }
