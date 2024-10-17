@@ -14,9 +14,10 @@ public class UnitOfWork: IUnitOfWork
         _appDbContext = appDbContext;
     }
     
-    public async Task BeginTransactionAsync()
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
-        _dbTransaction = await _appDbContext.Database.BeginTransactionAsync();
+        return await _appDbContext.Database.BeginTransactionAsync();
+
     }
 
     public async Task CommitAsync()

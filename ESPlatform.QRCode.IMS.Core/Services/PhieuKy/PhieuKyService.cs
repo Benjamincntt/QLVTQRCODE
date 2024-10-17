@@ -318,7 +318,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             return Task.FromResult(relativeBasePath.Replace("/", "\\"));
         }
 
-        public async Task<object> UpdateThongTinKyAsync(UpdateFileRequest request)
+        public async Task<object> UpdateThongTinKyAsync_(UpdateFileRequest request)
         {
             using (var transaction = _unitOfWork.BeginTransactionAsync())
             {
@@ -335,65 +335,6 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                             Message = $"Phiếu có Id: {request.PhieuId} không tồn tại."
                         };
                     }
-                    //switch (maDoiTuongKy)
-                    //{
-                    //    case MaDoiTuongKyConstants.NguoiLap:
-                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.NguoiLap) // Nếu trạng thái đã là "Người lập"
-                    //        {
-                    //            return new ErrorResponse
-                    //            {
-                    //                Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi người lập."
-                    //            };
-                    //        }
-                    //        break;
-
-                    //    case MaDoiTuongKyConstants.KiemSoatAT:
-                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.KiemSoatAT) // Nếu trạng thái đã là "Kiểm soát AT"
-                    //        {
-                    //            return new ErrorResponse
-                    //            {
-                    //                Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi người kiểm soát an toàn."
-                    //            };
-                    //        }
-                    //        break;
-
-                    //    case MaDoiTuongKyConstants.TruongDonVi:
-                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.TruongDonVi) // Nếu trạng thái đã là "Trưởng đơn vị"
-                    //        {
-                    //            return new ErrorResponse
-                    //            {
-                    //                Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi trưởng đơn vị."
-                    //            };
-                    //        }
-                    //        break;
-
-                    //    case MaDoiTuongKyConstants.Ph_KHVT:
-                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.Ph_KHVT) // Nếu trạng thái đã là "PH KHVT"
-                    //        {
-                    //            return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi PH KHVT." };
-                    //        }
-                    //        break;
-
-                    //    case MaDoiTuongKyConstants.Ph_KTAT:
-                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.Ph_KTAT) // Nếu trạng thái đã là "PH KTAT"
-                    //        {
-                    //            return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký bởi PH KTA." };
-                    //        }
-                    //        break;
-
-                    //    case MaDoiTuongKyConstants.TongGiamDoc:
-                    //        if (phieuMuaSam.TrangThai == TrangThaiPhieu.TongGiamDoc) // Nếu trạng thái đã là "Tổng giám đốc"
-                    //        {
-                    //            return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} đã được ký Tổng Giám Đốc." };
-                    //        }
-                    //        break;
-
-                    //    default:
-                    //        return new ErrorResponse
-                    //        {
-                    //            Message = "Loại đối tượng ký không hợp lệ."
-                    //        };
-                    //}
                     // Lấy thông tin ký từ bảng QLVT_MuaSam_PhieuDeXuat_Ky
                   
                     var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
@@ -424,26 +365,9 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 
                     switch (maDoiTuongKy)
                     {
-                        //case MaDoiTuongKyConstants.NguoiLap:
-                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.NguoiLap;
-                        //    break;
-
-                        //case MaDoiTuongKyConstants.KiemSoatAT:
-                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.KiemSoatAT;
-                        //    break;
-
-                        //case MaDoiTuongKyConstants.TruongDonVi:
-                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.TruongDonVi;
-                        //    break;
-
-                        //case MaDoiTuongKyConstants.Ph_KHVT:
-                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.Ph_KHVT;
-                        //    break;
-
-                        //case MaDoiTuongKyConstants.Ph_KTAT:
-                        //    phieuMuaSam.TrangThai = TrangThaiPhieu.Ph_KTAT;
-                        //    break;
-
+                        case MaDoiTuongKyConstants.NguoiLap:
+                            phieuMuaSam.TrangThai = TrangThaiPhieu.TrongQuaTrinhKy;
+                            break;
                         case MaDoiTuongKyConstants.TongGiamDoc:
                             phieuMuaSam.TrangThai = TrangThaiPhieu.TongGiamDoc;
                             break;
@@ -469,6 +393,82 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         Details = ex.Message
                     };
                 }
+            }
+        }
+
+        public async Task<object> UpdateThongTinKyAsync(UpdateFileRequest request)
+        {
+            // Không cần bắt đầu transaction ở đây nếu transaction đã được bắt đầu ở nơi gọi
+            try
+            {
+                // Lấy thông tin phiếu mua sắm ký từ database dựa trên Id
+                var phieuMuaSam = await _phieuKyRepository.GetAsync(x => x.Id == request.PhieuId);
+                var maDoiTuongKy = request.MaDoiTuongKy; // request.MaDoiTuongKy?.ToLower() ?? "";
+
+                // Kiểm tra xem phiếu có tồn tại hay không
+                if (phieuMuaSam == null)
+                {
+                    return new ErrorResponse
+                    {
+                        Message = $"Phiếu có Id: {request.PhieuId} không tồn tại."
+                    };
+                }
+
+                // Lấy thông tin ký từ bảng QLVT_MuaSam_PhieuDeXuat_Ky
+                var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
+
+                // Kiểm tra xem chữ ký có tồn tại hay không
+                if (phieuMuaSamKy == null)
+                {
+                    return new ErrorResponse
+                    {
+                        Message = "Chưa có cấu hình chữ ký cho người ký này."
+                    };
+                }
+                else
+                {
+                    if (phieuMuaSamKy.TrangThai == 1)
+                    {
+                        return new ErrorResponse
+                        {
+                            Message = "Chữ ký này đã được ký."
+                        };
+                    }
+                }
+
+                // Nếu chữ ký hợp lệ, tiến hành cập nhật thông tin
+                phieuMuaSamKy.NgayKy = DateTime.Now;
+                phieuMuaSamKy.NguoiKyId = request.SignUserId;
+                phieuMuaSamKy.UsbSerial = request.SignType;
+                phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
+
+                await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
+
+                switch (maDoiTuongKy)
+                {
+                    case MaDoiTuongKyConstants.NguoiLap:
+                        phieuMuaSam.TrangThai = TrangThaiPhieu.TrongQuaTrinhKy;
+                        break;
+                    case MaDoiTuongKyConstants.TongGiamDoc:
+                        phieuMuaSam.TrangThai = TrangThaiPhieu.TongGiamDoc;
+                        break;
+
+                    default:
+                        phieuMuaSam.TrangThai = TrangThaiPhieu.TrongQuaTrinhKy;
+                        break;
+                }
+
+                await _phieuKyRepository.UpdateAsync(phieuMuaSam);
+                return new { PhieuId = request.PhieuId, Message = "Cập nhật thông tin thành công." };
+            }
+            catch (Exception ex)
+            {
+                // Ghi log chi tiết và trả về thông báo lỗi
+                return new ErrorResponse
+                {
+                    Message = "Cập nhật thông tin không thành công.",
+                    Details = ex.Message
+                };
             }
         }
 

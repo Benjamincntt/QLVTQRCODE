@@ -3,6 +3,7 @@ using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 using ESPlatform.QRCode.IMS.Core.Services.PhieuKy;
+using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
@@ -18,9 +19,12 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
     public class PhieuKyController : ApiControllerBase
     {
         private readonly IPhieuKyService _phieuKyService;
-        public PhieuKyController(IPhieuKyService phieuKyService)
+        private readonly IUnitOfWork _unitOfWork;
+        public PhieuKyController(IPhieuKyService phieuKyService,
+            IUnitOfWork unitOfWork)
         {
             _phieuKyService = phieuKyService;
+            _unitOfWork = unitOfWork;
         }
         [HttpGet("danh-sach-phieu")]
         public async Task<ActionResult<IEnumerable<PhieuKyModel>>> DanhSachPhieuKyAsync([FromQuery] DanhSachPhieuKyFilter request)
@@ -131,40 +135,43 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                 {
                     return NotFound(new { exists = false, message = "File không tồn tại" });
                 }
-                // Cập nhật thông tin ký trong database
-                var resultUpdate = await _phieuKyService.UpdateThongTinKyAsync(request);
-                if (resultUpdate is ErrorResponse errorResponse)
-                {
-                    // Xử lý lỗi
-                    return BadRequest(errorResponse);
-                }
 
-
-                try
+                // Bắt đầu transaction
+                using (var transaction = await _unitOfWork.BeginTransactionAsync())
                 {
-                    // Ghi đè file gốc bằng file mới
-                    using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+                    // Cập nhật thông tin ký trong database
+                    var resultUpdate = await _phieuKyService.UpdateThongTinKyAsync(request);
+                    if (resultUpdate is ErrorResponse errorResponse)
                     {
-                        await request.FileData.CopyToAsync(stream);
+                        return BadRequest(errorResponse);
                     }
-                    //// Tạo tên file mới, ví dụ thêm "_new" vào tên file gốc
-                    //string newFileName = Path.GetFileNameWithoutExtension(fullPath) + "_new" + Path.GetExtension(fullPath);
-                    //string newFilePath = Path.Combine(Path.GetDirectoryName(fullPath), newFileName);
 
-                    //// Ghi file mới với tên khác
-                    //using (var stream = new FileStream(newFilePath, FileMode.Create, FileAccess.Write))
-                    //{
-                    //    await request.FileData.CopyToAsync(stream);
-                    //}
+                    try
+                    {
+                        // Ghi đè file gốc bằng file mới
+                        using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+                        {
+                            await request.FileData.CopyToAsync(stream);
+                        }
 
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    return StatusCode(403, new { message = "Bạn không có quyền ghi vào file này." });
-                }
-                catch (IOException ioEx)
-                {
-                    return StatusCode(500, new { message = "Lỗi ghi file: " + ioEx.Message });
+                        // Commit transaction nếu không có lỗi
+                        await transaction.CommitAsync();
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        await transaction.RollbackAsync(); // Rollback transaction nếu không có quyền
+                        return StatusCode(403, new { message = "Bạn không có quyền ghi vào file này." });
+                    }
+                    catch (IOException ioEx)
+                    {
+                        await transaction.RollbackAsync(); // Rollback transaction nếu có lỗi IO
+                        return StatusCode(500, new { message = "Lỗi ghi file: " + ioEx.Message });
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync(); // Rollback cho bất kỳ lỗi nào khác
+                        return StatusCode(500, new { message = "Có lỗi xảy ra khi ghi file: " + ex.Message });
+                    }
                 }
 
                 return Ok(new { success = true, message = "Ký thành công", data = result });
@@ -183,6 +190,8 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                 return StatusCode(500, new { message = "Có lỗi xảy ra, vui lòng thử lại sau." + ex.Message });
             }
         }
+
+
 
         [HttpGet("get-file/{id}")]
         public async Task<ActionResult<byte[]>> GetFileById(int id)
