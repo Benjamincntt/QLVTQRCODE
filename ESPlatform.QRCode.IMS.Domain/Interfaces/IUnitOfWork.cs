@@ -4,7 +4,7 @@ namespace ESPlatform.QRCode.IMS.Domain.Interfaces;
 
 public interface IUnitOfWork
 {
-    Task<IDbContextTransaction> BeginTransactionAsync();
+    Task BeginTransactionAsync();
     Task CommitAsync();
     Task RollbackAsync();
 }

@@ -114,6 +114,8 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
         {
             try
             {
+                await _unitOfWork.BeginTransactionAsync(); // Bắt đầu giao dịch
+
                 // Kiểm tra file upload
                 if (request.FileData == null || request.FileData.Length == 0)
                 {
@@ -136,44 +138,34 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                     return NotFound(new { exists = false, message = "File không tồn tại" });
                 }
 
-                // Bắt đầu transaction
-                using (var transaction = await _unitOfWork.BeginTransactionAsync())
+                // Cập nhật thông tin ký trong database
+                var resultUpdate = await _phieuKyService.UpdateThongTinKyAsync(request);
+                if (resultUpdate is ErrorResponse errorResponse)
                 {
-                    // Cập nhật thông tin ký trong database
-                    var resultUpdate = await _phieuKyService.UpdateThongTinKyAsync(request);
-                    if (resultUpdate is ErrorResponse errorResponse)
-                    {
-                        return BadRequest(errorResponse);
-                    }
-
-                    try
-                    {
-                        // Ghi đè file gốc bằng file mới
-                        using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
-                        {
-                            await request.FileData.CopyToAsync(stream);
-                        }
-
-                        // Commit transaction nếu không có lỗi
-                        await transaction.CommitAsync();
-                    }
-                    catch (UnauthorizedAccessException)
-                    {
-                        await transaction.RollbackAsync(); // Rollback transaction nếu không có quyền
-                        return StatusCode(403, new { message = "Bạn không có quyền ghi vào file này." });
-                    }
-                    catch (IOException ioEx)
-                    {
-                        await transaction.RollbackAsync(); // Rollback transaction nếu có lỗi IO
-                        return StatusCode(500, new { message = "Lỗi ghi file: " + ioEx.Message });
-                    }
-                    catch (Exception ex)
-                    {
-                        await transaction.RollbackAsync(); // Rollback cho bất kỳ lỗi nào khác
-                        return StatusCode(500, new { message = "Có lỗi xảy ra khi ghi file: " + ex.Message });
-                    }
+                    await _unitOfWork.RollbackAsync(); // Rollback giao dịch nếu có lỗi
+                    return BadRequest(errorResponse);
                 }
 
+                try
+                {
+                    // Ghi đè file gốc bằng file mới
+                    using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+                    {
+                        await request.FileData.CopyToAsync(stream);
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    await _unitOfWork.RollbackAsync(); // Rollback nếu có lỗi
+                    return StatusCode(403, new { message = "Bạn không có quyền ghi vào file này." });
+                }
+                catch (IOException ioEx)
+                {
+                    await _unitOfWork.RollbackAsync(); // Rollback nếu có lỗi
+                    return StatusCode(500, new { message = "Lỗi ghi file: " + ioEx.Message });
+                }
+
+                await _unitOfWork.CommitAsync(); // Cam kết giao dịch nếu mọi thứ thành công
                 return Ok(new { success = true, message = "Ký thành công", data = result });
             }
             catch (NotFoundException ex)
