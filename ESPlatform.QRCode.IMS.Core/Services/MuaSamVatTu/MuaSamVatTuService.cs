@@ -75,7 +75,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 request.GetPageIndex(),
                 request.GetPageSize()))
             .Adapt<PagedList<SupplyListResponseItem>>();
-        if (listVatTu.Total == 0)
+        if (listVatTu.Total == 0 && request.IsSystemSupply == false)
         {
             var listVatTuNew = (await _muaSamVatTuNewRepository.ListAsync(
                     string.IsNullOrWhiteSpace(request.TenVatTu) ? string.Empty : request.TenVatTu.ToLower(),

@@ -18,4 +18,6 @@ public class SupplyListRequest : PagingFilter
     [DisplayName("Id nhóm 10")]
     public List<int>? ListIdNgan { get; set; } = new();
     public List<string>? ListMaNhom { get; set; } = new List<string>();
+    
+    public bool IsSystemSupply { get; set; } = true;
 }
