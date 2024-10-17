@@ -231,7 +231,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     }
                     else
                     {
-                        if (phieuMuaSamKy.TrangThai == 1)
+                        if (phieuMuaSamKy.TrangThai >= 1)
                         {
                             return new ErrorResponse
                             {
@@ -242,7 +242,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 
                     phieuMuaSamKy.NgayKy = DateTime.Now;
                     phieuMuaSamKy.NguoiKyId = userId;
-                    phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
+                    phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.BoQua;
 
                     await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
 

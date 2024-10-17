@@ -66,6 +66,7 @@ public static partial class Constants {
                 public const string CanNotIgnore = "Người ký không được bỏ qua chữ ký này";
                 public const int DaKy = 1;
 				public const int HuyBo = -1;
+                public const int BoQua = 2;
             }
 			
         }

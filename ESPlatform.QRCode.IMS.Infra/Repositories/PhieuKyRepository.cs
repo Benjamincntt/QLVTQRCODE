@@ -26,17 +26,6 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
         public async Task<IEnumerable<dynamic>> DanhSachPhieuDeXuatKy(DanhSachPhieuKyFilter requests, int userId)
         {
             var keywords = string.IsNullOrWhiteSpace(requests.Keywords) ? string.Empty : requests.Keywords.ToLower();
-            //DateTime fromDate = DateTime.MinValue;
-            //DateTime toDate = DateTime.MaxValue;
-            //if (!string.IsNullOrWhiteSpace(requests.FromDate))
-            //{
-            //    fromDate = DateTime.ParseExact(requests.FromDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            //}
-
-            //if (!string.IsNullOrWhiteSpace(requests.ToDate))
-            //{
-            //    toDate = DateTime.ParseExact(requests.ToDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            //}
             DateTime fromDate = DateTime.Now.AddDays(-1); // Mặc định là ngày hiện tại
             DateTime toDate = DateTime.Now.AddDays(1); // Mặc định là ngày hiện tại + 1 ngày
 
@@ -111,7 +100,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                         if (previousMaDoiTuongKy != null)
                         {
                             phieuDeXuatOtherIds = await DbContext.QlvtMuaSamPdxKies
-                                .Where(k => k.MaDoiTuongKy == previousMaDoiTuongKy && k.TrangThai == 1 && k.PhieuDeXuatId.HasValue
+                                .Where(k => k.MaDoiTuongKy == previousMaDoiTuongKy && k.TrangThai >= 1 && k.PhieuDeXuatId.HasValue
                                                                                                        && phieuDeXuatIds.Contains(k.PhieuDeXuatId.Value))
                                 .Select(k => k.PhieuDeXuatId)
                                 .ToListAsync();
