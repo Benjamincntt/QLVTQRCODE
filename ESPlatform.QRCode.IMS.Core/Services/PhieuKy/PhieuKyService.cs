@@ -47,6 +47,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _vanBanKyRepository = vanBanKyRepository;
             _configuration = configuration;
         }
+        
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
         {
 

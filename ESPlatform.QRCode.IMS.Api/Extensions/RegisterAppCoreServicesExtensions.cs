@@ -59,6 +59,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IPhieuKyRepository, PhieuKyRepository>()
             .AddScoped<IPhieuDeXuatKyRepository, PhieuDeXuatKyRepository>()
              .AddScoped<ICauHinhVanBanKyRepository, CauHinhVanBanKyRepository>()
+              .AddScoped<IViTriCongViecRepository, ViTriCongViecRepository>()
             .AddScoped<IUnitOfWork, UnitOfWork>()
 
             // Facades

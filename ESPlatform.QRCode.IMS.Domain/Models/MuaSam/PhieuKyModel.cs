@@ -34,6 +34,8 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
         public ChuKyModel? ChuKy { get; set; } = new ChuKyModel();
         public string? TenDonViSuDung { get; set; }
         public string? TenNguoiThem { get; set; }
+        public string? NgayTaoString => NgayThem.HasValue? NgayThem.Value.ToString("dd/MM/yy HH:mm"): null;
+
     }
     public class ChuKyModel
     {
@@ -66,11 +68,11 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
     public class VanBanKyModel
     {
         public int Id { get; set; }
-        public int? PhieuId { get; set; } 
+        public int? PhieuId { get; set; }
         public bool? TrangThaiTaoFile { get; set; }
         public string? MaLoaiVanBan { get; set; }
         public string? FilePath { get; set; }
-        public string ? FileName { get; set; }
+        public string? FileName { get; set; }
         public DateTime? NgayTao { get; set; }
         public string? kySoPath { get; set; }
 

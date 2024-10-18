@@ -25,6 +25,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly JwtFacade _jwtFacade;
     private readonly OtpFacade _otpFacade;
     private readonly IDistributedCache _distributedCache;
+    private readonly IViTriCongViecRepository _viTriCongViecRepository;
 
     public AuthenticationService(IAccountRepository accountRepository,
         IAuthorizedContextFacade authorizedContextFacade,
@@ -32,7 +33,8 @@ public class AuthenticationService : IAuthenticationService
         INguoiDungRepository nguoiDungRepository,
         JwtFacade jwtFacade,
         OtpFacade otpFacade,
-        IDistributedCache distributedCache)
+        IDistributedCache distributedCache,
+        IViTriCongViecRepository viTriCongViecRepository)
     {
         _accountRepository = accountRepository;
         _authorizedContextFacade = authorizedContextFacade;
@@ -41,6 +43,7 @@ public class AuthenticationService : IAuthenticationService
         _jwtFacade = jwtFacade;
         _otpFacade = otpFacade;
         _distributedCache = distributedCache;
+        _viTriCongViecRepository = viTriCongViecRepository;
     }
 
     public async Task<LoginSuccessInfo> LoginAsync(LoginRequest request)
@@ -221,6 +224,10 @@ public class AuthenticationService : IAuthenticationService
     private async Task<LoginSuccessInfo>AcceptLogin(TbNguoiDung nguoiDung,
         RefreshTokenInfo? predecessorRefreshTokenInfo = null)
     {
+        // Lấy thông tin vị trí công việc từ bảng Tb_ViTriCongViec
+        
+        var viTriCongViec = await _viTriCongViecRepository.GetAsync(nguoiDung.ViTri ?? 0);
+
         // otherClaims là các phần phụ như madonvisudung
         var otherClaims = new Dictionary<string, string>();
         var accessToken = _jwtFacade.GenerateAccessToken(nguoiDung.MaNguoiDung, nguoiDung.TenDangNhap, otherClaims);
@@ -242,14 +249,16 @@ public class AuthenticationService : IAuthenticationService
             AccessToken = accessToken,
 
             RefreshToken = MiscHelper.GenerateRandomBase64String(),
-            
-            TenNguoiDung = nguoiDung.Ten,
-            
+
+            TenNguoiDung = nguoiDung.Ho + " " + nguoiDung.Ten,
+
             ChucVu = nguoiDung.ChucVu ?? string.Empty,
-            
+
             IdDonVi = nguoiDung.IddonVi,
-            UserId = nguoiDung.MaNguoiDung
+            UserId = nguoiDung.MaNguoiDung,
+            MaDoiTuongKy = viTriCongViec?.MaDoiTuongKy ?? string.Empty
         };
+
     }
 
     private static IEnumerable<RefreshTokenInfo> RemoveExpiredRefreshTokens(IEnumerable<RefreshTokenInfo> refreshTokens)

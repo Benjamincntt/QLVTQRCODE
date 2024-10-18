@@ -11,4 +11,5 @@ public class LoginSuccessInfo {
 
 	public int? IdDonVi { get; set; } = 0;
 	public int UserId { get;set; }
+    public string MaDoiTuongKy { get; set; } = string.Empty;
 }
