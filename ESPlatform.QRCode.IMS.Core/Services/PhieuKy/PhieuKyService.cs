@@ -32,6 +32,9 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         private readonly IVanBanKyRepository _vanBanKyRepository;
         private readonly IAuthorizedContextFacade _authorizedContextFacade;
         private readonly IConfiguration _configuration;
+        // Lấy thời gian UTC
+        private DateTime utcNow;
+        private DateTime vnTime;
         public PhieuKyService(IPhieuKyRepository phieuKyRepository, IAuthorizedContextFacade authorizedContextFacade
                 , IPhieuDeXuatKyRepository deXuatKyRepository
                 , ICauHinhVanBanKyRepository cauHinhVanBanKyRepository
@@ -46,8 +49,12 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _cauHinhVanBanKyRepository = cauHinhVanBanKyRepository;
             _vanBanKyRepository = vanBanKyRepository;
             _configuration = configuration;
+            utcNow = DateTime.UtcNow;
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            vnTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, vnTimeZone);
+
         }
-        
+
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
         {
 
@@ -358,7 +365,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         }
                     }
                     // Nếu chữ ký hợp lệ, tiến hành cập nhật thông tin
-                    phieuMuaSamKy.NgayKy = DateTime.Now;
+                    phieuMuaSamKy.NgayKy = vnTime;
                     phieuMuaSamKy.NguoiKyId = request.SignUserId;
                     phieuMuaSamKy.UsbSerial = request.SignType;
                     phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
@@ -438,7 +445,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 }
 
                 // Nếu chữ ký hợp lệ, tiến hành cập nhật thông tin
-                phieuMuaSamKy.NgayKy = DateTime.Now;
+                phieuMuaSamKy.NgayKy = vnTime;
                 phieuMuaSamKy.NguoiKyId = request.SignUserId;
                 phieuMuaSamKy.UsbSerial = request.SignType;
                 phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
