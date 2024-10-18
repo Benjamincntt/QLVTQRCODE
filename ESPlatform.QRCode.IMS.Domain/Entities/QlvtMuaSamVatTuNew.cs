@@ -19,4 +19,6 @@ public partial class QlvtMuaSamVatTuNew
     public string? XuatXu { get; set; }
 
     public int? DonGia { get; set; }
+    
+    public int? SoLuong { get; set; }
 }
