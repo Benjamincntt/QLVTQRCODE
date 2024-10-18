@@ -754,7 +754,7 @@ public partial class AppDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK_QLVT_VT_ToMay");
 
             entity.ToTable("QLVT_ViTri");
- 
+            
             entity.Property(e => e.IdKhoErp)
                 .HasDefaultValueSql("((0))")
                 .HasColumnName("IDKhoERP");
