@@ -249,7 +249,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
         public List<int> GetPhieuDeXuatIds(string MaDoiTuongKy)
         {
             List<int> phieuDeXuatIds = DbContext.QlvtMuaSamPdxKies
-                .Where(k => (k.TrangThai == null || k.TrangThai != 1) && k.MaDoiTuongKy == MaDoiTuongKy)
+                .Where(k => (k.TrangThai == null) && k.MaDoiTuongKy == MaDoiTuongKy)
                 .Select(k => k.PhieuDeXuatId.Value) // Lấy Id của các phiếu đề xuất
                 .ToList(); // Chuyển đổi thành danh sách
 

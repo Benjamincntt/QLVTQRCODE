@@ -34,7 +34,7 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
         public ChuKyModel? ChuKy { get; set; } = new ChuKyModel();
         public string? TenDonViSuDung { get; set; }
         public string? TenNguoiThem { get; set; }
-        public string? NgayTaoString => NgayThem.HasValue? NgayThem.Value.ToString("dd/MM/yy HH:mm"): null;
+        public string? NgayTaoString => NgayThem.HasValue? NgayThem.Value.ToString("dd/MM/yy HH:mm:ss"): null;
 
     }
     public class ChuKyModel

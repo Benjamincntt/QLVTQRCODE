@@ -35,6 +35,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         // Lấy thời gian UTC
         private DateTime utcNow;
         private DateTime vnTime;
+        private TimeZoneInfo vnTimeZone;
         public PhieuKyService(IPhieuKyRepository phieuKyRepository, IAuthorizedContextFacade authorizedContextFacade
                 , IPhieuDeXuatKyRepository deXuatKyRepository
                 , ICauHinhVanBanKyRepository cauHinhVanBanKyRepository
@@ -50,7 +51,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _vanBanKyRepository = vanBanKyRepository;
             _configuration = configuration;
             utcNow = DateTime.UtcNow;
-            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             vnTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, vnTimeZone);
 
         }
@@ -216,10 +217,10 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     }
                     var maDoiTuongKy = request.MaDoiTuongKy != null ? request.MaDoiTuongKy.ToLower() : "";
 
-                    var cauHinhVanBanKy = await _cauHinhVanBanKyRepository.GetAsync(x => x.MaDoiTuongKy!=null && x.MaDoiTuongKy.ToLower() == maDoiTuongKy);
-                    if(cauHinhVanBanKy != null)
+                    var cauHinhVanBanKy = await _cauHinhVanBanKyRepository.GetAsync(x => x.MaDoiTuongKy != null && x.MaDoiTuongKy.ToLower() == maDoiTuongKy);
+                    if (cauHinhVanBanKy != null)
                     {
-                        if(cauHinhVanBanKy.CoTheBoQua == false)
+                        if (cauHinhVanBanKy.CoTheBoQua == false)
                         {
                             throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.CanNotIgnore);
                         }
@@ -285,7 +286,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             };
             return response;
         }
-        
+
         public Task<string> GetFullFilePath(string filePath)
         {
             var kySoPath = _configuration.GetSection("KySoPath");
@@ -344,7 +345,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         };
                     }
                     // Lấy thông tin ký từ bảng QLVT_MuaSam_PhieuDeXuat_Ky
-                  
+
                     var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
 
                     // Kiểm tra xem chữ ký có tồn tại hay không
@@ -354,9 +355,10 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         {
                             Message = "Chưa có cấu hình chữ ký cho người ký này."
                         };
-                    } else
+                    }
+                    else
                     {
-                        if(phieuMuaSamKy.TrangThai == 1)
+                        if (phieuMuaSamKy.TrangThai == 1)
                         {
                             return new ErrorResponse
                             {
@@ -365,11 +367,11 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         }
                     }
                     // Nếu chữ ký hợp lệ, tiến hành cập nhật thông tin
-                    phieuMuaSamKy.NgayKy = vnTime;
+                    phieuMuaSamKy.NgayKy = DateTime.Now;
                     phieuMuaSamKy.NguoiKyId = request.SignUserId;
                     phieuMuaSamKy.UsbSerial = request.SignType;
                     phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
-                   await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
+                    await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
 
                     switch (maDoiTuongKy)
                     {
@@ -379,7 +381,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         case MaDoiTuongKyConstants.TongGiamDoc:
                             phieuMuaSam.TrangThai = TrangThaiPhieu.TongGiamDoc;
                             break;
-                       
+
                         default:
                             phieuMuaSam.TrangThai = TrangThaiPhieu.TrongQuaTrinhKy;
                             break;
@@ -445,7 +447,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 }
 
                 // Nếu chữ ký hợp lệ, tiến hành cập nhật thông tin
-                phieuMuaSamKy.NgayKy = vnTime;
+                phieuMuaSamKy.NgayKy = DateTime.Now;
                 phieuMuaSamKy.NguoiKyId = request.SignUserId;
                 phieuMuaSamKy.UsbSerial = request.SignType;
                 phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
