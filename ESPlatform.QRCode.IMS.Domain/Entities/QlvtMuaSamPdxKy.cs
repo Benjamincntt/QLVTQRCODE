@@ -20,7 +20,7 @@ public class QlvtMuaSamPdxKy
 
     public string? ToaDo { get; set; }
 
-    public DateTime? NgayKy { get; set; }
+    public DateTimeOffset? NgayKy { get; set; }
 
     public int? VanBanId { get; set; }
 

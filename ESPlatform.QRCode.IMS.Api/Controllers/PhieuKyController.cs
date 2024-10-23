@@ -10,6 +10,7 @@ using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System.Transactions;
 using static MassTransit.ValidationResultExtensions;
 
 
@@ -182,7 +183,6 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                 return StatusCode(500, new { message = "Có lỗi xảy ra, vui lòng thử lại sau." + ex.Message });
             }
         }
-
 
 
         [HttpGet("get-file/{id}")]
