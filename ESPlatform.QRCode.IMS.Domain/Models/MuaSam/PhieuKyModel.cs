@@ -55,7 +55,7 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
 
         public string? ToaDo { get; set; }
 
-        public DateTimeOffset? NgayKy { get; set; }
+        public DateTime? NgayKy { get; set; }
 
         public int? VanBanId { get; set; }
 

@@ -444,7 +444,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 }
 
 
-                phieuMuaSamKy.NgayKy = DateTimeOffset.Now;
+                phieuMuaSamKy.NgayKy = DateTime.Now;
                 phieuMuaSamKy.NguoiKyId = request.SignUserId;
                 phieuMuaSamKy.UsbSerial = request.SignType;
                 phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;

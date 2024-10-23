@@ -536,7 +536,7 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.LyDo).HasMaxLength(250);
             entity.Property(e => e.MaDoiTuongKy).HasMaxLength(50);
-            entity.Property(e => e.NgayKy).HasColumnType("datetimeoffset");
+            entity.Property(e => e.NgayKy).HasColumnType("datetime");
             entity.Property(e => e.NgayTao).HasColumnType("datetime");
             entity.Property(e => e.Page).HasColumnName("page");
             entity.Property(e => e.PageHeight).HasColumnName("pageHeight");
