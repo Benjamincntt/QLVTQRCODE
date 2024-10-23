@@ -18,7 +18,7 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
 
         public int? MaDonViSuDung { get; set; }
 
-        public DateTime? NgayThem { get; set; }
+        public DateTimeOffset? NgayThem { get; set; }
 
         public int? MaNguoiThem { get; set; }
 

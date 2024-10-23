@@ -7,9 +7,11 @@ using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Library.Database.EfCore;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Mapster;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -19,9 +21,9 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
 {
     public class PhieuKyRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuDeXuat, AppDbContext>, IPhieuKyRepository
     {
+        private readonly AppDbContext _dbContext;
         public PhieuKyRepository(AppDbContext dbContext) : base(dbContext)
         {
-
         }
         public async Task<IEnumerable<dynamic>> DanhSachPhieuDeXuatKy(DanhSachPhieuKyFilter requests, int userId)
         {
@@ -84,16 +86,16 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                         break;
                     case MaDoiTuongKyConstants.KiemSoatAT:
                     case MaDoiTuongKyConstants.TruongDonVi:
-                    case MaDoiTuongKyConstants.Ph_KHVT:
                     case MaDoiTuongKyConstants.Ph_KTAT:
+                    case MaDoiTuongKyConstants.Ph_KHVT:
                     case MaDoiTuongKyConstants.TongGiamDoc:
                         var previousMaDoiTuongKy = MaDoiTuongKy switch
                         {
-                            MaDoiTuongKyConstants.KiemSoatAT => MaDoiTuongKyConstants.NguoiLap,
+                            MaDoiTuongKyConstants.KiemSoatAT => MaDoiTuongKyConstants.NguoiLap, 
                             MaDoiTuongKyConstants.TruongDonVi => MaDoiTuongKyConstants.KiemSoatAT,
-                            MaDoiTuongKyConstants.Ph_KHVT => MaDoiTuongKyConstants.TruongDonVi,
-                            MaDoiTuongKyConstants.Ph_KTAT => MaDoiTuongKyConstants.Ph_KHVT,
-                            MaDoiTuongKyConstants.TongGiamDoc => MaDoiTuongKyConstants.Ph_KTAT,
+                            MaDoiTuongKyConstants.Ph_KTAT => MaDoiTuongKyConstants.TruongDonVi,
+                            MaDoiTuongKyConstants.Ph_KHVT => MaDoiTuongKyConstants.Ph_KTAT,
+                            MaDoiTuongKyConstants.TongGiamDoc => MaDoiTuongKyConstants.Ph_KHVT,
                             _ => null
                         };
 
@@ -110,8 +112,44 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                                 return Enumerable.Empty<dynamic>();
                             }
                         }
+                        
                         break;
 
+                    //case MaDoiTuongKyConstants.Ph_KTAT:
+                    //    // Lấy số lượng chữ ký từ cấu hình
+                    //    var slChuKyDx = await DbContext.QlvtCauHinhVbKies
+                    //        .Where(vb => vb.MaLoaiVanBan == LoaiPhieu.PhieuDeXuat)
+                    //        .Select(vb => vb.SoLuongChuKy)
+                    //        .FirstOrDefaultAsync();
+
+                    //    // Kiểm tra số lượng chữ ký trong bảng QLVT_MuaSam_PDX_Ky
+                    //    var countKy = await (from k in DbContext.QlvtMuaSamPdxKies
+                    //                         join vb in DbContext.QlvtVanBanKies
+                    //                         on k.VanBanId equals vb.Id
+                    //                         where (vb.MaLoaiVanBan == LoaiPhieu.PhieuDeXuat && k.TrangThai >= 1)
+                    //                         select k)
+                    //                        .CountAsync();
+
+                    //    if (slChuKyDx == countKy)
+                    //    {
+
+                    //        phieuDeXuatOtherIds = await DbContext.QlvtMuaSamPdxKies
+                    //       .Where(k => k.MaDoiTuongKy == MaDoiTuongKyConstants.Ph_KTAT && k.TrangThai == null && k.PhieuDeXuatId.HasValue
+                    //                                                                              && phieuDeXuatIds.Contains(k.PhieuDeXuatId.Value))
+                    //       .Select(k => k.PhieuDeXuatId)
+                    //       .ToListAsync();
+
+                    //        if (!phieuDeXuatOtherIds.Any())
+                    //        {
+                    //            return Enumerable.Empty<dynamic>();
+                    //        }
+
+                    //    }
+                    //    else
+                    //    {
+                    //        return Enumerable.Empty<dynamic>();
+                    //    }
+                    //    break;
                     default:
                         break;
                 }
@@ -255,5 +293,6 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
 
             return phieuDeXuatIds;
         }
+
     }
 }

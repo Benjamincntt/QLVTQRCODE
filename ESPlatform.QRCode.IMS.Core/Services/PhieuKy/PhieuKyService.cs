@@ -8,15 +8,18 @@ using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
+using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Infra.Repositories;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Mapster;
 using MassTransit;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,16 +35,14 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         private readonly IVanBanKyRepository _vanBanKyRepository;
         private readonly IAuthorizedContextFacade _authorizedContextFacade;
         private readonly IConfiguration _configuration;
-        // Lấy thời gian UTC
-        private DateTime utcNow;
-        private DateTime vnTime;
-        private TimeZoneInfo vnTimeZone;
+        
         public PhieuKyService(IPhieuKyRepository phieuKyRepository, IAuthorizedContextFacade authorizedContextFacade
                 , IPhieuDeXuatKyRepository deXuatKyRepository
                 , ICauHinhVanBanKyRepository cauHinhVanBanKyRepository
                 , IVanBanKyRepository vanBanKyRepository
                 , IConfiguration configuration
-                , IUnitOfWork unitOfWork)
+                , IUnitOfWork unitOfWork
+               )
         {
             _phieuKyRepository = phieuKyRepository;
             _authorizedContextFacade = authorizedContextFacade;
@@ -50,9 +51,6 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _cauHinhVanBanKyRepository = cauHinhVanBanKyRepository;
             _vanBanKyRepository = vanBanKyRepository;
             _configuration = configuration;
-            utcNow = DateTime.UtcNow;
-            vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-            vnTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, vnTimeZone);
 
         }
 
@@ -60,7 +58,6 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         {
 
             var userId = _authorizedContextFacade.AccountId;
-
 
             var lstPhieuKy = (await _phieuKyRepository.DanhSachPhieuDeXuatKy(requests, userId))
                 .Adapt<IEnumerable<PhieuKyModel>>().ToList();
@@ -446,7 +443,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     }
                 }
 
-                // Nếu chữ ký hợp lệ, tiến hành cập nhật thông tin
+
                 phieuMuaSamKy.NgayKy = DateTime.Now;
                 phieuMuaSamKy.NguoiKyId = request.SignUserId;
                 phieuMuaSamKy.UsbSerial = request.SignType;
