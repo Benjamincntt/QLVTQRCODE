@@ -213,7 +213,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.IsSystemSupply)
                 .IsRequired()
                 .HasDefaultValueSql("((1))");
-            entity.Property(e => e.SoLuong).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.SoLuong)
+                .HasDefaultValueSql("((0))")
+                .HasColumnType("decimal(18, 5)");
             entity.Property(e => e.ThoiGianCapNhat).HasColumnType("datetime");
             entity.Property(e => e.ThoiGianTao).HasColumnType("datetime");
             entity.Property(e => e.ThongSoKyThuat).HasComment("Thông số kỹ thuật");
@@ -578,6 +580,9 @@ public partial class AppDbContext : DbContext
                 .HasDefaultValueSql("((1))")
                 .HasComment("0: Vật tư chưa có trong hệ thống, 1: vật tư đã có trong hệ thống");
             entity.Property(e => e.PhieuDeXuatId).HasComment("Id phiếu đề xuất");
+            entity.Property(e => e.SoLuong)
+                .HasDefaultValueSql("((0))")
+                .HasColumnType("decimal(18, 5)");
             entity.Property(e => e.TenVatTu).HasMaxLength(250);
             entity.Property(e => e.VatTuId)
                 .HasComment("Nếu IDVatTu tồn tại thì vật tư được lấy từ hệ thông ERP, nếu không tồn tại thì Vật tư đc thêm mới vào phiếu đề xuất")
@@ -608,13 +613,18 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("QLVT_MuaSam_VatTu_New");
 
-            entity.Property(e => e.DonGia).HasDefaultValueSql("((0))");
+            entity.Property(e => e.DonGia)
+                .HasDefaultValueSql("((0))")
+                .HasColumnType("decimal(18, 5)");
             entity.Property(e => e.DonViTinh).HasMaxLength(100);
             entity.Property(e => e.GhiChu).HasMaxLength(250);
             entity.Property(e => e.Image).HasMaxLength(200);
             entity.Property(e => e.MaVatTu)
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.SoLuong)
+                .HasDefaultValueSql("((0))")
+                .HasColumnType("decimal(18, 5)");
             entity.Property(e => e.TenVatTu).HasMaxLength(500);
             entity.Property(e => e.XuatXu).HasMaxLength(200);
         });
@@ -652,7 +662,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.VatTuId)
                 .ValueGeneratedNever()
                 .HasColumnName("VatTu_Id");
-            entity.Property(e => e.DonGia).HasDefaultValueSql("((0))");
+            entity.Property(e => e.DonGia).HasColumnType("decimal(18, 5)");
             entity.Property(e => e.DonViTinh).HasMaxLength(100);
             entity.Property(e => e.GhiChu).HasMaxLength(250);
             entity.Property(e => e.Image)
@@ -728,7 +738,7 @@ public partial class AppDbContext : DbContext
             entity.ToTable("QLVT_VatTu_TonKho_DinhMuc");
 
             entity.Property(e => e.IdVatTu).ValueGeneratedNever();
-            entity.Property(e => e.DinhMuc).HasDefaultValueSql("((0))");
+            entity.Property(e => e.DinhMuc).HasColumnType("decimal(18, 5)");
         });
 
         modelBuilder.Entity<QlvtVatTuViTri>(entity =>
@@ -754,7 +764,7 @@ public partial class AppDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK_QLVT_VT_ToMay");
 
             entity.ToTable("QLVT_ViTri");
-            
+
             entity.Property(e => e.IdKhoErp)
                 .HasDefaultValueSql("((0))")
                 .HasColumnName("IDKhoERP");

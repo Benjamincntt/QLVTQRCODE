@@ -52,7 +52,7 @@ public class GioHangService : IGioHangService
         return (await _gioHangRepository.ListSupplyAsync(userId, _imagePath.RelativeBasePath)).Adapt<IEnumerable<CartSupplyResponse>>();
     }
 
-    public async Task<int> ModifyQuantityAsync(int gioHangId, int quantity)
+    public async Task<int> ModifyQuantityAsync(int gioHangId, decimal quantity)
     {
         if (gioHangId < 1)
         {
@@ -108,10 +108,22 @@ public class GioHangService : IGioHangService
                 await _gioHangRepository.DeleteAsync(supplyInCart);
                 throw new NotFoundException(Constants.Exceptions.Messages.Cart.DeletedSupply);
             }
-            supplyInCart.GhiChu = request.GhiChu;
-            supplyInCart.SoLuong = request.SoLuong;
+
+            if (request.GhiChu != null)
+            {
+                supplyInCart.GhiChu = request.GhiChu;
+            }
+
+            if (request.SoLuong != null)
+            {
+                supplyInCart.SoLuong = request.SoLuong;
+            }
+
+            if (request.ThongSoKyThuat != null)
+            {
+                supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
+            }
             supplyInCart.ThoiGianCapNhat = DateTime.Now;
-            supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
             return await _gioHangRepository.UpdateAsync(supplyInCart);
         }
         // Nếu là vật tư mới thêm => ktra xem vật tư còn trong bảng vật tư mới không
@@ -123,10 +135,21 @@ public class GioHangService : IGioHangService
              throw new NotFoundException(Constants.Exceptions.Messages.Cart.DeletedSupply);
          }
          //Cập nhật lại thông tin trong bảng giỏ hàng
-        supplyInCart.GhiChu = request.GhiChu;
-        supplyInCart.SoLuong = request.SoLuong;
+         if (request.GhiChu != null)
+         {
+             supplyInCart.GhiChu = request.GhiChu;
+         }
+
+         if (request.SoLuong != null)
+         {
+             supplyInCart.SoLuong = request.SoLuong;
+         }
+
+         if (request.ThongSoKyThuat != null)
+         {
+             supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
+         }
         supplyInCart.ThoiGianCapNhat = DateTime.Now;
-        supplyInCart.ThongSoKyThuat = request.ThongSoKyThuat;
         return await _gioHangRepository.UpdateAsync(supplyInCart);
     }
     public async Task<int> CreateCartSupplyAsync(int vatTuId, CreatedCartSupplyRequest request)
@@ -164,7 +187,7 @@ public class GioHangService : IGioHangService
         supplyToAdd.ThoiGianTao = DateTime.Now;
         return await _gioHangRepository.InsertAsync(supplyToAdd);
     }
-    public async Task<int> CreateSupplyAsync(CreatedSupplyRequest request)
+    public async Task<int> CreateCartSupplyNewAsync(CreatedSupplyRequest request)
     {   
         await ValidationHelper.ValidateAsync(request, new CreatedSupplyRequestValidation());
         var existVatTuNew = await _muaSamVatTuNewRepository.ExistsAsync(x => x.TenVatTu.ToLower() == request.TenVatTu.ToLower());

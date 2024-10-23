@@ -34,5 +34,5 @@ public partial class QlvtVatTu
     /// </summary>
     public string? MoTa { get; set; }
     
-    public int? DonGia { get; set; }
+    public decimal? DonGia { get; set; }
 }

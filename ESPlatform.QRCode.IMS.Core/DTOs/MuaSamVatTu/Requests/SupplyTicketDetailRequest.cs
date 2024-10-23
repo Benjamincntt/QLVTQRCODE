@@ -14,7 +14,7 @@ public class SupplyTicketDetailRequest
     public string DonViTinh { get; set; } = string.Empty;
     public bool IsSystemSupply { get; set; }
     [DisplayName("Số lượng")]
-    public int SoLuong { get; set; } = 0;
+    public decimal SoLuong { get; set; } = 0;
     [DisplayName("Thông số kỹ thuật")]
     public string ThongSoKyThuat { get; set; } = string.Empty;
     [DisplayName("Ghi chú")]
@@ -22,5 +22,5 @@ public class SupplyTicketDetailRequest
     
     public string Image { get; set; } = string.Empty;
     
-    public int DonGia { get; set; }
+    public decimal DonGia { get; set; }
 }

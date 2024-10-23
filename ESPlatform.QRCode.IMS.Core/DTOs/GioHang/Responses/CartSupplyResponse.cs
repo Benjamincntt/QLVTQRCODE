@@ -6,9 +6,9 @@ public class CartSupplyResponse
     public bool IsSystemSupply { get; set; }
     public string Image { get; set; } = string.Empty;
     public string TenVatTu { get; set; } = string.Empty;
-    public int SoLuong { get; set; } = 0;
+    public decimal SoLuong { get; set; } = 0;
     public string ThongSoKyThuat { get; set; } = string.Empty;
     public string GhiChu { get; set; } = string.Empty;
     public int GioHangId { get; set; }
-    public int DonGia { get; set; }
+    public decimal DonGia { get; set; } = 0;
 }

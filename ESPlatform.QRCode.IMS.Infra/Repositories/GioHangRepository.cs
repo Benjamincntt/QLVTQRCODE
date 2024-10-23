@@ -23,14 +23,14 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
             .Where(x => x.QlvtGioHang.IsSystemSupply == true)
             .Select(x => new
             {
-                x.VatTu.TenVatTu,
-                x.VatTu.DonGia,
-                Image = x.VatTu.Image != null ? (relativeBasePath + x.VatTu.Image) : null,
+                TenVatTu = x.VatTu.TenVatTu ?? string.Empty,
+                DonGia = x.VatTu.DonGia ?? 0,
+                Image = x.VatTu.Image != null ? (relativeBasePath + x.VatTu.Image) : string.Empty,
                 x.QlvtGioHang.VatTuId,
-                x.QlvtGioHang.IsSystemSupply,
-                ThongSoKyThuat = x.VatTu.MoTa,
-                x.QlvtGioHang.GhiChu,
-                x.QlvtGioHang.SoLuong,
+                IsSystemSupply = x.QlvtGioHang.IsSystemSupply ?? true,
+                ThongSoKyThuat = x.VatTu.MoTa ?? string.Empty,
+                GhiChu = x.QlvtGioHang.GhiChu ?? string.Empty,
+                SoLuong = x.QlvtGioHang.SoLuong ?? 0,
                 x.QlvtGioHang.GioHangId,
             });
         //return await vatTu.ToListAsync();
@@ -44,14 +44,14 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
             .Where(x => x.QlvtGioHang.IsSystemSupply == false)
             .Select(x => new
             {
-                x.VatTuNew.TenVatTu,
-                x.VatTuNew.DonGia,
+                TenVatTu = x.VatTuNew.TenVatTu ?? string.Empty,
+                DonGia = x.VatTuNew.DonGia ?? 0,
                 Image = x.VatTuNew.Image ?? string.Empty,
                 x.QlvtGioHang.VatTuId,
-                x.QlvtGioHang.IsSystemSupply,
-                x.QlvtGioHang.ThongSoKyThuat,
-                x.QlvtGioHang.GhiChu,
-                x.QlvtGioHang.SoLuong,
+                IsSystemSupply = x.QlvtGioHang.IsSystemSupply ?? false,
+                ThongSoKyThuat = x.QlvtGioHang.ThongSoKyThuat ?? string.Empty,
+                GhiChu = x.QlvtGioHang.GhiChu ?? string.Empty,
+                SoLuong = x.QlvtGioHang.SoLuong ?? 0,
                 x.QlvtGioHang.GioHangId
             });
         var combinedQuery = vatTu

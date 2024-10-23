@@ -43,7 +43,7 @@ public class GioHangController : ApiControllerBase
     /// <param name="quantity"> Số lượng vật tư </param>
     /// <returns></returns>
     [HttpPatch("{gioHangId:int}")]
-    public async Task<int> ModifyQuantityAsync(int gioHangId, int quantity = 0)
+    public async Task<int> ModifyQuantityAsync(int gioHangId, decimal quantity = 0)
     {
         return await _gioHangService.ModifyQuantityAsync(gioHangId, quantity);
     }
@@ -78,7 +78,7 @@ public class GioHangController : ApiControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost("{vatTuId:int}")]
-    public async Task<int> CreateCartSupplyAsync(int vatTuId,[FromBody] CreatedCartSupplyRequest request)
+    public async Task<int> CreateCartSupplyAsync(int vatTuId, [FromBody] CreatedCartSupplyRequest request)
     {
         return await _gioHangService.CreateCartSupplyAsync(vatTuId, request);
     }
@@ -89,8 +89,8 @@ public class GioHangController : ApiControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost("them-moi-vat-tu")]
-    public async Task<int> CreateSupplyAsync([FromBody] CreatedSupplyRequest request)
+    public async Task<int> CreateCartSupplyNewAsync([FromBody] CreatedSupplyRequest request)
     {
-        return await _gioHangService.CreateSupplyAsync(request);
+        return await _gioHangService.CreateCartSupplyNewAsync(request);
     }
 }

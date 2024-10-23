@@ -14,7 +14,6 @@ using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
-using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Options;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;

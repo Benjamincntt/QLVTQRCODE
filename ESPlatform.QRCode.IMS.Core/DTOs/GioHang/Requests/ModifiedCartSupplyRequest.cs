@@ -6,5 +6,5 @@ public class ModifiedCartSupplyRequest
     
     public string? GhiChu { get; set; }
     
-    public int SoLuong { get; set; }
+    public decimal? SoLuong { get; set; }
 }

@@ -4,5 +4,5 @@ public class SupplyResponse : SupplyTicketDto
 {
     public string Image { get; set; } = string.Empty;
     
-    public int DonGia { get; set; } 
+    public decimal DonGia { get; set; } 
 }

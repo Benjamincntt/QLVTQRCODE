@@ -10,5 +10,5 @@ public class SupplyOrderDetailResponse
     
     public string GhiChu { get; set; } = string.Empty;
     
-    public int DonGia { get; set; }
+    public decimal DonGia { get; set; }
 }

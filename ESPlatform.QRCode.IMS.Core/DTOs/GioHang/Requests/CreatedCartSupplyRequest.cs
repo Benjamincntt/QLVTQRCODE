@@ -2,7 +2,7 @@
 
 public class CreatedCartSupplyRequest
 {
-    public int SoLuong { get; set; } = 0;
+    public decimal SoLuong { get; set; } = 0;
     public string ThongSoKyThuat { get; set; } = string.Empty;
     public string GhiChu { get; set; } = string.Empty;
     public bool IsSystemSupply { get; set; } = true;

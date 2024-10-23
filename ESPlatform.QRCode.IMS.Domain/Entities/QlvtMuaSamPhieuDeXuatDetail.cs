@@ -11,7 +11,7 @@ public partial class QlvtMuaSamPhieuDeXuatDetail
 
     public string? TenVatTu { get; set; }
 
-    public double? SoLuong { get; set; }
+    public decimal? SoLuong { get; set; }
 
     public string? DonViTinh { get; set; }
 
