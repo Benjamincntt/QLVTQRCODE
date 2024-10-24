@@ -26,13 +26,10 @@ Authorization: Bearer {{accessToken}}
     {
       "gioHangId": 150,
       "vatTuId": 33,
-      "tenVatTu": "Xăng A92",
-      "donViTinh": "Lít",
       "isSystemSupply": true,
       "soLuong": 10,
       "thongSoKyThuat": "Trường hợp nghỉ hưu sớm",
-      "ghiChu": "ghi chú test",
-      "image": "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin/IMGVatTu/33/638646042577161609img_20241015_150430.jpg"
+      "ghiChu": "ghi chú test"
     }
   ]
 }

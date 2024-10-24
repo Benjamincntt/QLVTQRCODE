@@ -8,10 +8,10 @@ public class SupplyTicketDetailRequest
     public int GioHangId { get; set; }
      [DisplayName("Id vật tư")]
     public int VatTuId { get; set; }
-    [DisplayName("Tên vật tư")]
-    public string TenVatTu { get; set; } = string.Empty;
-    [DisplayName("Đơn vị tính")]
-    public string DonViTinh { get; set; } = string.Empty;
+    // [DisplayName("Tên vật tư")]
+    // public string TenVatTu { get; set; } = string.Empty;
+    // [DisplayName("Đơn vị tính")]
+    // public string DonViTinh { get; set; } = string.Empty;
     public bool IsSystemSupply { get; set; }
     [DisplayName("Số lượng")]
     public decimal SoLuong { get; set; } = 0;
@@ -20,7 +20,7 @@ public class SupplyTicketDetailRequest
     [DisplayName("Ghi chú")]
     public string GhiChu { get; set; } = string.Empty;
     
-    public string Image { get; set; } = string.Empty;
+    // public string Image { get; set; } = string.Empty;
     
-    public decimal DonGia { get; set; }
+    // public decimal DonGia { get; set; }
 }

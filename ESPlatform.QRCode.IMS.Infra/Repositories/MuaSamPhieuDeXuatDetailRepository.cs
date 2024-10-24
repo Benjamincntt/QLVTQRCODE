@@ -26,7 +26,7 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
             .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == true)
             .Select(x => new
             {
-                TenVatTu = x.PhieuDeXuatDetail.TenVatTu ?? string.Empty,
+                TenVatTu = x.VatTu != null ? x.VatTu.TenVatTu ?? string.Empty : string.Empty,
                 ThongSoKyThuat = x.PhieuDeXuatDetail.ThongSoKyThuat ?? string.Empty,
                 GhiChu = x.PhieuDeXuatDetail.GhiChu ?? string.Empty,
                 SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
@@ -46,7 +46,7 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
              .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == false)
              .Select(x => new
              {
-                 TenVatTu = x.PhieuDeXuatDetail.TenVatTu ?? string.Empty,
+                 TenVatTu = x.VatTuNew != null ? (x.VatTuNew.TenVatTu ?? string.Empty): string.Empty,
                  ThongSoKyThuat = x.PhieuDeXuatDetail.ThongSoKyThuat ?? string.Empty,
                  GhiChu = x.PhieuDeXuatDetail.GhiChu ?? string.Empty,
                  SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,

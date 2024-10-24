@@ -9,9 +9,6 @@ public class SupplyTicketDetailRequestValidation : AbstractValidator<SupplyTicke
 {
     public SupplyTicketDetailRequestValidation()
     {
-        RuleFor(x => x.TenVatTu).ValidateStringDefault(false)
-            .MaximumLength(500).WithMessage(RequireMaximumLength);
-        RuleFor(x => x.DonViTinh).ValidateStringDefault();
         RuleFor(x => x.GhiChu).ValidateStringDefault()
             .MaximumLength(250).WithMessage(RequireMaximumLength);
         RuleFor(x => x.ThongSoKyThuat).ValidateStringDefault();
