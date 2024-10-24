@@ -48,7 +48,7 @@ public class MuaSamVatTuController : ApiControllerBase
     /// Thêm mới phiếu cung ứng
     /// </summary>
     /// <returns>Id phiếu cung ứng</returns>
-    [HttpPost("them-phieu-cung-ung")]
+    [HttpPost("them-phieu-cung-ung")] 
     public async Task<int> ProcessSupplyTicketCreationAsync([FromBody]ProcessSupplyTicketCreationRequest creationRequest)
     {
         return await _muaSamVatTuService.ProcessSupplyTicketCreationAsync(creationRequest);

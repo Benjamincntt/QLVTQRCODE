@@ -94,7 +94,7 @@ public class NguoiDungService : INguoiDungService
 
         var nguoiDung = userRequest.Adapt<TbNguoiDung>();
         nguoiDung.Ho = "";
-        nguoiDung.Ten = nguoiDung.TenDangNhap;
+        nguoiDung.TenDangNhap = nguoiDung.TenDangNhap;
         nguoiDung.KichHoat = false;
         nguoiDung.Salt = GetPassword.GetRandomLetters(5);
         nguoiDung.MatKhau = GetPassword.GetMD5(nguoiDung.Salt + nguoiDung.Salt);

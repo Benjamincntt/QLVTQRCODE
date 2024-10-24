@@ -7,9 +7,11 @@ using static ESPlatform.QRCode.IMS.Core.Engine.Constants.Validation.Messages;
 namespace ESPlatform.QRCode.IMS.Core.Validations.NguoiDungs;
 
 public class NguoiDungCreatedRequestValidation: AbstractValidator<CreatedUserRequest> {
-    public NguoiDungCreatedRequestValidation() {
+    public NguoiDungCreatedRequestValidation()
+    {
         RuleFor(x => x.MatKhau).ValidateStringDefault(false);
-        RuleFor(o => o.TenDangNhap).ValidateStringDefault(false);
+        RuleFor(o => o.TenDangNhap).ValidateStringDefault(false)
+            .MaximumLength(50).WithMessage(RequireMaximumLength);
         RuleFor(o => o.FullName).ValidateStringDefault(false);
         RuleFor(x => x.Email)
             .ValidateStringDefault()

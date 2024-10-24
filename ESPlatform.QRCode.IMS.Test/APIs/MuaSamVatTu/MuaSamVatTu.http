@@ -16,7 +16,7 @@ Authorization: Bearer {{accessToken}}
 
 
 ### Thêm mới phiếu cung ứng
-POST {{host}}/{{muaSamVatTuPath}}/them-phieu-cung-ung?moTa=phiếu cung ứng vật tư số 19
+POST {{host}}/{{muaSamVatTuPath}}/them-phieu-cung-ung?moTa=phiếu cung ứng vật tư số 50
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
@@ -24,15 +24,15 @@ Authorization: Bearer {{accessToken}}
   "description": "string",
   "supplyTicketDetails": [
     {
-      "gioHangId": 52,
-      "vatTuId": 4,
-      "tenVatTu": "fuchsyloken",
-      "donViTinh": "Chai",
+      "gioHangId": 150,
+      "vatTuId": 33,
+      "tenVatTu": "Xăng A92",
+      "donViTinh": "Lít",
       "isSystemSupply": true,
       "soLuong": 10,
-      "thongSoKyThuat": "màu xanh, loại 10mm, dài 5cm",
-      "ghiChu": "",
-      "image": "/4/1.jpg"
+      "thongSoKyThuat": "Trường hợp nghỉ hưu sớm",
+      "ghiChu": "ghi chú test",
+      "image": "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin/IMGVatTu/33/638646042577161609img_20241015_150430.jpg"
     }
   ]
 }
