@@ -28,7 +28,8 @@ public class MuaSamVatTuNewRepository : EfCoreRepositoryBase<QlvtMuaSamVatTuNew,
             IsSystemSupply = false,
             x.DonGia,
             ThongSoKyThuat = x.ThongSoKyThuat
-        });
+        })
+        .OrderBy(x => x.TenVatTu);
         return await vatTuNew.ToPagedListAsync<dynamic>(pageIndex, pageSize);
     }
 }

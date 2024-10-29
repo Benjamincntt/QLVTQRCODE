@@ -99,8 +99,8 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
             .Where(x => listIdGiaKe == null ||!listIdGiaKe.Any() || x.QlvtVatTuViTri != null && listIdGiaKe.Contains((int)x.QlvtVatTuViTri.IdGiaKe!))
             .Where(x => listIdNgan == null ||!listIdNgan.Any() || x.QlvtVatTuViTri != null && listIdNgan.Contains((int)x.QlvtVatTuViTri.IdNgan!))
             
-            .OrderBy(x => x.QlvtVatTu.TenVatTu)
-            .ThenBy(x => x.QlvtVatTu.DonViTinh)
+            .OrderBy(x => x.QlvtVatTu.MaVatTu)
+            .ThenBy(x => x.QlvtVatTu.TenVatTu)
             .Select(x => new 
             {
                 VatTuId = x.QlvtVatTu.VatTuId,
