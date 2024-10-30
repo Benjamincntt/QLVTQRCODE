@@ -8,8 +8,8 @@ public interface IKiemKeService
 {
     Task<InventoryCheckResponse> GetAsync(string maVatTu);
 
-    Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, int soLuongKiemKe, ModifiedSuppliesDffRequest request);
-    Task<int> ModifySuppliesQtyAsync(int vatTuId, int kyKiemKeId, int soLuongKiemKe);
+    Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, decimal soLuongKiemKe, ModifiedSuppliesDffRequest request);
+    Task<int> ModifySuppliesQtyAsync(int vatTuId, int kyKiemKeId, decimal soLuongKiemKe);
     Task<IEnumerable<InventoryCheckListResponseItem>> ListAsync();
     Task<QlvtKyKiemKe> GetCurrentInventoryCheckAsync();
 }

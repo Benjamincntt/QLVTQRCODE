@@ -146,7 +146,7 @@ public class KiemKeService : IKiemKeService
     }
 
 
-    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, int soLuongKiemKe,
+    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, decimal soLuongKiemKe,
         ModifiedSuppliesDffRequest request)
     {
         #region Validate
@@ -258,7 +258,7 @@ public class KiemKeService : IKiemKeService
         return await _kyKiemKeChiTietDffRepository.UpdateAsync(dffToUpdate);
     }
 
-    public async Task<int> ModifySuppliesQtyAsync(int vatTuId, int kyKiemKeId, int soLuongKiemKe)
+    public async Task<int> ModifySuppliesQtyAsync(int vatTuId, int kyKiemKeId, decimal soLuongKiemKe)
     {
         if (vatTuId < 1)
         {
@@ -308,7 +308,7 @@ public class KiemKeService : IKiemKeService
         return currentInventoryCheck;
     }
 
-    public async Task<int> CreateInventoryCheckDetailAsync(int vatTuId, int kyKiemKeId, int soLuongKiemKe)
+    public async Task<int> CreateInventoryCheckDetailAsync(int vatTuId, int kyKiemKeId, decimal soLuongKiemKe)
     {
         var warehouses = await _vatTuRepository.GetWarehouseIdAsync(vatTuId);
         if (warehouses != null)

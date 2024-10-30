@@ -37,7 +37,7 @@ public class KiemKeController : ApiControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPatch("{vatTuId:int}/{kyKiemKeId:int}/{kyKiemKeChiTietId:int}/update-supplies-dff")]
-    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, int soLuongKiemKe, [FromBody] ModifiedSuppliesDffRequest request)
+    public async Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, decimal soLuongKiemKe, [FromBody] ModifiedSuppliesDffRequest request)
     {
         return await _kiemKeService.ModifySuppliesDffAsync(vatTuId, kyKiemKeId, kyKiemKeChiTietId, soLuongKiemKe, request);
     }
@@ -50,7 +50,7 @@ public class KiemKeController : ApiControllerBase
     /// <param name="soLuongKiemKe"></param>
     /// <returns></returns>
     [HttpPatch("{vatTuId:int}/{kyKiemKeId:int}/update-supplies-qty")]
-    public async Task<int> ModifySuppliesQtyAsync(int vatTuId, int kyKiemKeId, int soLuongKiemKe)
+    public async Task<int> ModifySuppliesQtyAsync(int vatTuId, int kyKiemKeId, decimal soLuongKiemKe)
     {
         return await _kiemKeService.ModifySuppliesQtyAsync(vatTuId, kyKiemKeId, soLuongKiemKe);
     }
