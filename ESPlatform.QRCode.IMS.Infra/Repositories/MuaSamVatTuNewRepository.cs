@@ -23,11 +23,13 @@ public class MuaSamVatTuNewRepository : EfCoreRepositoryBase<QlvtMuaSamVatTuNew,
         {
             VatTuId = x.VatTuNewId,
             TenVatTu = x.TenVatTu,
-            DonViTinh = x.DonViTinh,
+            MaVatTu = x.MaVatTu ?? string.Empty,
+            XuatXu = x.XuatXu ?? string.Empty,
+            DonViTinh = x.DonViTinh ?? string.Empty,
             Image = x.Image ?? string.Empty,
             IsSystemSupply = false,
-            x.DonGia,
-            ThongSoKyThuat = x.ThongSoKyThuat
+            DonGia = x.DonGia ?? 0,
+            ThongSoKyThuat = x.ThongSoKyThuat ?? string.Empty,
         })
         .OrderBy(x => x.TenVatTu);
         return await vatTuNew.ToPagedListAsync<dynamic>(pageIndex, pageSize);

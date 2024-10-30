@@ -6,6 +6,10 @@ public class SupplyListResponseItem
     
     public string TenVatTu { get; set; } = string.Empty;
     
+    public string MaVatTu { get; set; } = string.Empty;
+    
+    public string XuatXu { get; set; } = string.Empty;
+    
     public string DonViTinh { get; set; } = string.Empty;
     
     public bool IsSystemSupply { get; set; }
