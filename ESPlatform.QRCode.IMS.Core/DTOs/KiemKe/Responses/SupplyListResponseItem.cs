@@ -20,4 +20,6 @@ public class SupplyListResponseItem
     
     public string ThongSoKyThuat { get; set; } = string.Empty;
     
+    public decimal OnhandQuantity { get; set; } = 0;
+    
 }

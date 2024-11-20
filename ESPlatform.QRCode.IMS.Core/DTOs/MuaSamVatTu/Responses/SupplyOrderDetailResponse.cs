@@ -11,4 +11,6 @@ public class SupplyOrderDetailResponse
     public string GhiChu { get; set; } = string.Empty;
     
     public decimal DonGia { get; set; }
+    
+    public decimal OnhandQuantity { get; set; } = 0;
 }

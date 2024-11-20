@@ -383,9 +383,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NguoiKiemKeTen)
                 .HasMaxLength(50)
                 .HasColumnName("NguoiKiemKe_Ten");
-            entity.Property(e => e.SoLuongChenhLech).HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.SoLuongKiemKe).HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.SoLuongSoSach).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongChenhLech).HasColumnType("decimal(18, 5)");
+            entity.Property(e => e.SoLuongKiemKe).HasColumnType("decimal(18, 5)");
+            entity.Property(e => e.SoLuongSoSach).HasColumnType("decimal(18, 5)");
             entity.Property(e => e.SoThe)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -412,9 +412,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NguoiKiemKeTen)
                 .HasMaxLength(255)
                 .HasColumnName("NguoiKiemKe_Ten");
-            entity.Property(e => e.SoLuongChenhLech).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.SoLuongKiemKe).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.SoLuongSoSach).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongChenhLech).HasColumnType("decimal(18, 5)");
+            entity.Property(e => e.SoLuongKiemKe).HasColumnType("decimal(18, 5)");
+            entity.Property(e => e.SoLuongSoSach).HasColumnType("decimal(18, 5)");
             entity.Property(e => e.SoThe).HasMaxLength(255);
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
 
@@ -442,10 +442,6 @@ public partial class AppDbContext : DbContext
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("TS_KemPc_MatPc");
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
-
-            entity.HasOne(d => d.KyKiemKeChiTiet).WithMany(p => p.QlvtKyKiemKeChiTietDffs)
-                .HasForeignKey(d => d.KyKiemKeChiTietId)
-                .HasConstraintName("FK_QLVT_KyKiemKe_ChiTiet_DFF_QLVT_KyKiemKe_ChiTiet");
         });
 
         modelBuilder.Entity<QlvtKyKiemKeChiTietDffBackup>(entity =>
@@ -460,12 +456,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PhanTramDong).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.PhanTramKemPhamChat).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.PhanTramMatPhamChat).HasColumnType("decimal(5, 2)");
-            entity.Property(e => e.SoLuongDeNghiThanhLy).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.SoLuongDong).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.SoLuongKemPhamChat).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.SoLuongMatPhamChat).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.SoLuongDeNghiThanhLy).HasColumnType("decimal(18, 5)");
+            entity.Property(e => e.SoLuongDong).HasColumnType("decimal(18, 5)");
+            entity.Property(e => e.SoLuongKemPhamChat).HasColumnType("decimal(18, 5)");
+            entity.Property(e => e.SoLuongMatPhamChat).HasColumnType("decimal(18, 5)");
             entity.Property(e => e.TsKemPcMatPc)
-                .HasColumnType("decimal(18, 2)")
+                .HasColumnType("decimal(18, 5)")
                 .HasColumnName("TS_KemPc_MatPc");
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
 
@@ -489,9 +485,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NguoiKiemKeTen)
                 .HasMaxLength(50)
                 .HasColumnName("NguoiKiemKe_Ten");
-            entity.Property(e => e.SoLuongChenhLech).HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.SoLuongKiemKe).HasColumnType("numeric(18, 0)");
-            entity.Property(e => e.SoLuongSoSach).HasColumnType("numeric(18, 0)");
+            entity.Property(e => e.SoLuongChenhLech).HasColumnType("decimal(18, 5)");
+            entity.Property(e => e.SoLuongKiemKe).HasColumnType("decimal(18, 5)");
+            entity.Property(e => e.SoLuongSoSach).HasColumnType("decimal(18, 5)");
             entity.Property(e => e.SoThe)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -723,6 +719,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("Lot_Number");
             entity.Property(e => e.OnhandQuantity)
                 .HasComment("Số lượng tồn")
+                .HasColumnType("decimal(18, 5)")
                 .HasColumnName("Onhand_Quantity");
             entity.Property(e => e.SubinventoryCode)
                 .HasMaxLength(50)

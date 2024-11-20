@@ -20,7 +20,7 @@ public partial class QlvtVatTuTonKho
     /// <summary>
     /// Số lượng tồn
     /// </summary>
-    public int? OnhandQuantity { get; set; }
+    public decimal? OnhandQuantity { get; set; }
 
     /// <summary>
     /// Mã kho phụ

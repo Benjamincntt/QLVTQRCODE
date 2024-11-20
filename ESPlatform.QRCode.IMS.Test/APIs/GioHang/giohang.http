@@ -45,9 +45,9 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "tenVatTu": "Cáp điện tròn phi 18",
+  "tenVatTu": "Ống nhựa pvc tròn phi 18",
   "donViTinh": "mét",
-  "ghiChu": "200 mét, có bọc xốp",
+  "ghiChu": "ghi chú test",
   "thongSoKyThuat": "hàng loại 1",
   "maVatTu": "",
   "xuatXu": "Trung Quốc",

@@ -38,7 +38,7 @@ public class TraCuuService : ITraCuuService
         }
         var response = new LookupSuppliesResponse();
 
-        // vật tư
+        // Vật tư
         var vatTu = await _vatTuRepository.GetAsync(x => x.MaVatTu == maVatTu);
         if (vatTu == null)
         {
@@ -50,13 +50,13 @@ public class TraCuuService : ITraCuuService
         response.MaVatTu = maVatTu;
         response.TenVatTu = !string.IsNullOrWhiteSpace(vatTu.TenVatTu) ? vatTu.TenVatTu : string.Empty;
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
-        // ảnh đại diện
+        // Ảnh đại diện
         response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
         var rootPath = _imagePath.RootPath;           
         var relativeBasePath = _imagePath.RelativeBasePath;                
         var localBasePath =  (rootPath + relativeBasePath).Replace("/", "\\"); 
         var folderImagePath = $@"{localBasePath}\{vatTuId}";
-        // list ảnh
+        // Danh sách ảnh
         if (Directory.Exists(folderImagePath))
         {
             var imageFiles = Directory.GetFiles(folderImagePath);
@@ -69,14 +69,14 @@ public class TraCuuService : ITraCuuService
                 response.ImagePaths.Add(fullPath);
             }
         }
-        // vị trí kho chính và phụ
+        // Vị trí kho chính và phụ
         var warehouse = await _khoRepository.GetAsync(x => x.OrganizationId == vatTu.KhoId);
         if (warehouse != null)
         {
             if (warehouse.OrganizationCode != null) response.OrganizationCode = warehouse.OrganizationCode;
             if (warehouse.SubInventoryCode != null) response.SubInventoryCode = warehouse.SubInventoryCode;
         }
-        // vị trí chi tiết trong kho
+        // Vị trí chi tiết trong kho
         var positions = (await _vatTuRepository.GetPositionAsync(vatTuId)).Adapt<IEnumerable<SuppliesLocation>>()
             .ToList();
 
@@ -85,11 +85,12 @@ public class TraCuuService : ITraCuuService
             response.SuppliesLocation = positions;
         }
         
-        // LOT
+        // LOT, Số lượng tồn
         var wareHouse = await _vatTuRepository.GetLotNumberAsync(vatTuId, vatTu.KhoId);
         if (wareHouse == null) return response;
-        var wareHouseMapper = _mapper.Map<InventoryCheckResponse>(wareHouse);
+        var wareHouseMapper = _mapper.Map<LookupSuppliesResponse>(wareHouse);
         response.LotNumber = wareHouseMapper.LotNumber;
+        response.OnhandQuantity = wareHouseMapper.OnhandQuantity;
         return response;
     }
 }

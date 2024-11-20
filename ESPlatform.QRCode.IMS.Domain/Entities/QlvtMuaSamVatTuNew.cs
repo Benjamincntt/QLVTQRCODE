@@ -1,5 +1,8 @@
-﻿namespace ESPlatform.QRCode.IMS.Domain.Entities;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
+namespace ESPlatform.QRCode.IMS.Domain.Entities;
+[DisplayName("Vật tư mới")]
 public partial class QlvtMuaSamVatTuNew
 {
     public int VatTuNewId { get; set; }

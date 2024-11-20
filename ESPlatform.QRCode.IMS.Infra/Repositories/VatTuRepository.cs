@@ -60,7 +60,8 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
             .Where(x => x.OrganizationId == khoId)
             .Select(x => new
             {
-                x.LotNumber
+                LotNumber = x.LotNumber ?? string.Empty,
+                OnhandQuantity = x.OnhandQuantity ?? 0
             })
             .FirstOrDefaultAsync();
         return response;
@@ -91,6 +92,12 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
             .SelectMany(x => x.QlvtVatTuViTri.DefaultIfEmpty(),
                 (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
+            .GroupJoin(DbContext.QlvtVatTuTonKhos,
+                x => new { KhoId = x.QlvtVatTu.KhoId, VatTuId = x.QlvtVatTu.VatTuId},
+                y => new { KhoId = y.OrganizationId, VatTuId = y.InventoryItemId },
+                (x, y) => new { x.QlvtVatTu, x.QlvtKho, x.QlvtVatTuViTri, QlvtVatTuTonKho = y })
+            .SelectMany(x => x.QlvtVatTuTonKho.DefaultIfEmpty(),
+            (x, y) => new { x.QlvtVatTu, x.QlvtKho, x.QlvtVatTuViTri, QlvtVatTuTonKho = y })
             .Where(x => string.IsNullOrWhiteSpace(tenVatTu) || x.QlvtVatTu.TenVatTu != null && x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
             .Where(x => string.IsNullOrWhiteSpace(maVatTu) || x.QlvtVatTu.MaVatTu != null && x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
             .Where(x => idKho == 0 || x.QlvtVatTu.KhoId == idKho)
@@ -112,6 +119,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 IsSystemSupply = true,
                 DonGia = x.QlvtVatTu.DonGia ?? 0,
                 ThongSoKyThuat = x.QlvtVatTu.MoTa ?? string.Empty,
+                OnhandQuantity = x.QlvtVatTuTonKho == null ? 0 : x.QlvtVatTuTonKho.OnhandQuantity ?? 0,
             });
 
         return await vatTu.ToPagedListAsync<dynamic>(pageIndex, pageSize);

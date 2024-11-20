@@ -20,6 +20,7 @@ public class LookupSuppliesResponse
     public string DonViTinh { get; set; } = string.Empty;
 
     public string Image { get; set; } = string.Empty;
+    public decimal OnhandQuantity { get; set; }
 
     public List<string> ImagePaths { get; set; } = new List<string>();
 

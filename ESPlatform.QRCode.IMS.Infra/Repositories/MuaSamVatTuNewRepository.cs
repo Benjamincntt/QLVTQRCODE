@@ -30,6 +30,7 @@ public class MuaSamVatTuNewRepository : EfCoreRepositoryBase<QlvtMuaSamVatTuNew,
             IsSystemSupply = false,
             DonGia = x.DonGia ?? 0,
             ThongSoKyThuat = x.ThongSoKyThuat ?? string.Empty,
+            OnhandQuantity = 0
         })
         .OrderBy(x => x.TenVatTu);
         return await vatTuNew.ToPagedListAsync<dynamic>(pageIndex, pageSize);

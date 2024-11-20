@@ -2,6 +2,7 @@
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.TraCuu.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
@@ -14,6 +15,7 @@ using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
+using MapsterMapper;
 using Microsoft.Extensions.Options;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
@@ -31,6 +33,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IVatTuBoMaRepository _vatTuBoMaRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly ImagePath _imagePath;
+    private readonly IMapper _mapper;
 
     public MuaSamVatTuService(
         IVatTuRepository vatTuRepository,
@@ -43,7 +46,8 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IVatTuBoMaRepository vatTuBoMaRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork,
-        IOptions<ImagePath> imagePath)
+        IOptions<ImagePath> imagePath,
+        IMapper mapper)
     {
         _vatTuRepository = vatTuRepository;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
@@ -55,6 +59,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _vatTuBoMaRepository = vatTuBoMaRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
         _imagePath = imagePath.Value;
     }
 
@@ -123,15 +128,23 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                     response.ImagePaths.Add(fullPath);
                 }
             }
+            var wareHouse = await _vatTuRepository.GetLotNumberAsync(vatTuId, vatTu.KhoId);
+            if (wareHouse == null) return response;
+            var wareHouseMapper = _mapper.Map<LookupSuppliesResponse>(wareHouse);
+            response.OnhandQuantity = wareHouseMapper.OnhandQuantity;
             return response;
         }
         //if Id is VatTuNewId => get information from QlvtMuaSamVatTuNew table
          var vatTuNew = await _muaSamVatTuNewRepository.GetAsync(vatTuId);
-         if (vatTuNew == null) return response;
+         if (vatTuNew == null)
+         {
+             throw new NotFoundException(vatTuNew.GetTypeEx(), null);
+         }
          response.TenVatTu = vatTuNew.TenVatTu ?? string.Empty;
          response.ThongSoKyThuat = vatTuNew.ThongSoKyThuat ?? string.Empty;
          response.DonGia = vatTuNew.DonGia ?? 0;
          response.GhiChu = vatTuNew.GhiChu ?? string.Empty;
+         response.OnhandQuantity = 0;
          return response;
     }
 
