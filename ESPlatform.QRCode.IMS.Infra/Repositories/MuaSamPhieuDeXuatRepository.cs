@@ -15,7 +15,7 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
     {
     }
 
-    public async Task<PagedList<dynamic>> ListSupplyTicketAsync(string keywords, int pageIndex, int pageSize)
+    public async Task<PagedList<dynamic>> ListSupplyTicketAsync(string keywords, SupplyTicketStatus status, int pageIndex, int pageSize)
     {
         var query = DbContext.QlvtMuaSamPhieuDeXuats
             .Join(DbContext.TbCauHinhTrangThais,
@@ -23,6 +23,7 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
                 y => y.GiaTri,
                 (x, y) => new { PhieuDeXuat = x, CauHinhTrangThai = y})
             .Where(x => x.PhieuDeXuat.TrangThai != (int?)SupplyTicketStatus.Deleted)
+            .Where(x => status == SupplyTicketStatus.Unknown || x.PhieuDeXuat.TrangThai == (byte)status)
             .Where(x => string.IsNullOrWhiteSpace(keywords)
                         || x.PhieuDeXuat.TenPhieu == null 
                         || x.PhieuDeXuat.TenPhieu.ToLower().Contains(keywords)
@@ -42,5 +43,23 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
                 MaMau = x.CauHinhTrangThai.MaMau ?? string.Empty,
             });
         return await query.ToPagedListAsync<dynamic>(pageIndex, pageSize);
+    }
+
+    public async Task<IEnumerable<dynamic>> ListCreatedSupplyTicketWarningAsync(List<int> vatTuIds)
+    {
+        var query = DbContext.QlvtMuaSamPhieuDeXuatDetails
+            .Join(DbContext.QlvtMuaSamPhieuDeXuats,
+                x => x.PhieuDeXuatId,
+                y=> y.Id,
+                (x, y) => new { PhieuDeXuatDetail = x, PhieuDeXuat = y})
+            .Where(x => x.PhieuDeXuat.TrangThai == (int)SupplyTicketStatus.Unsigned)
+            .Where(x => x.PhieuDeXuatDetail.VatTuId != null && vatTuIds.Contains((int)x.PhieuDeXuatDetail.VatTuId))
+            .GroupBy(st => st.PhieuDeXuatDetail.VatTuId)
+            .Select(x => new
+            {
+                VatTuId = x.Key,
+                TotalQuantity = x.Sum(st => st.PhieuDeXuatDetail.SoLuong)
+            });
+            return await query.ToListAsync();
     }
 }

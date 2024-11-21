@@ -47,6 +47,7 @@ public static partial class Constants {
 			public static class SupplyTicket
 			{
 				public const string InvalidSupplyTicket = "Bạn chưa chọn phiếu cung ứng";
+                public const string InvalidSupplyTicketStatus = "Trạng thái phiếu cung ứng không hợp lệ";
 			}
 
 			public static class Cart

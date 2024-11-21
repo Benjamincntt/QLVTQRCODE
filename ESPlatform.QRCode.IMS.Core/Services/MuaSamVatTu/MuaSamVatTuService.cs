@@ -1,4 +1,5 @@
-﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
+﻿using System.Globalization;
+using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
@@ -190,10 +191,15 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         }
     }
 
-    public async Task<PagedList<SupplyTicketListResponseItem>> ListSupplyTicketAsync(PhraseAndPagingFilter requests)
+    public async Task<PagedList<SupplyTicketListResponseItem>> ListSupplyTicketAsync(SupplyTicketRequest requests)
     {
+        if (requests.SupplyTicketStatus is <= SupplyTicketStatus.Unknown or >= SupplyTicketStatus.Deleted)
+        {
+            throw new ArgumentException(Constants.Exceptions.Messages.SupplyTicket.InvalidSupplyTicketStatus);
+        }
         var listPhieu = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketAsync(
                 string.IsNullOrWhiteSpace(requests.Keywords) ? string.Empty : requests.Keywords.ToLower(),
+                requests.SupplyTicketStatus ?? SupplyTicketStatus.Unknown,
                 requests.GetPageIndex(),
                 requests.GetPageSize()))
             .Adapt<PagedList<SupplyTicketListResponseItem>>();
@@ -327,5 +333,29 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     public async Task<IEnumerable<QlvtVatTuBoMa>> ListGroupCodeAsync()
     {
         return await _vatTuBoMaRepository.ListAsync();
+    }
+
+    public async Task<int> CountSupplyTicketsByStatusAsync(SupplyTicketStatus status)
+    {
+        if (status is <= SupplyTicketStatus.Unknown or > SupplyTicketStatus.Deleted)
+        {
+            throw new ArgumentException(Constants.Exceptions.Messages.SupplyTicket.InvalidSupplyTicketStatus);
+        }
+        return await _muaSamPhieuDeXuatRepository.CountAsync(x => x.TrangThai == (byte)status);
+    }
+
+    public async Task<IEnumerable<CreatedSupplyTicketWarningResponseItem>> ListCreatedSupplyTicketWarningAsync(List<int> vatTuIds)
+    {
+        var existingSupplyTickets = (await _muaSamPhieuDeXuatRepository.ListCreatedSupplyTicketWarningAsync(vatTuIds)).Adapt<List<SupplyTicketWithTotalCount>>();
+        if (!existingSupplyTickets.Any())
+        {
+            return Enumerable.Empty<CreatedSupplyTicketWarningResponseItem>();
+        }
+
+        return existingSupplyTickets.Select(x => new CreatedSupplyTicketWarningResponseItem
+        {
+            VatTuId = x.VatTuId,
+            WarningMessage = $"Vật tư này đã được đề xuất với số lượng {x.TotalQuantity.ToString(CultureInfo.InvariantCulture).Replace('.', ',')} trong các phiếu khác."
+        });
     }
 }

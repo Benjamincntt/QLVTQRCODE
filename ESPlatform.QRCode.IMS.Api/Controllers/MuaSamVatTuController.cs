@@ -3,8 +3,11 @@ using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
+using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 using ESPlatform.QRCode.IMS.Domain.Entities;
+using ESPlatform.QRCode.IMS.Domain.Enums;
+using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +29,7 @@ public class MuaSamVatTuController : ApiControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync([FromQuery]SupplyListRequest request)
+    public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync([FromQuery] SupplyListRequest request)
     {
         return await _muaSamVatTuService.ListVatTuAsync(request);
     }
@@ -42,28 +45,30 @@ public class MuaSamVatTuController : ApiControllerBase
     {
         return await _muaSamVatTuService.GetSupplyOrderDetailAsync(id, isSystemSupply);
     }
-    
-    
+
+
     /// <summary>
     /// Thêm mới phiếu cung ứng
     /// </summary>
     /// <returns>Id phiếu cung ứng</returns>
-    [HttpPost("them-phieu-cung-ung")] 
-    public async Task<int> ProcessSupplyTicketCreationAsync([FromBody]ProcessSupplyTicketCreationRequest creationRequest)
+    [HttpPost("them-phieu-cung-ung")]
+    public async Task<int> ProcessSupplyTicketCreationAsync(
+        [FromBody] ProcessSupplyTicketCreationRequest creationRequest)
     {
         return await _muaSamVatTuService.ProcessSupplyTicketCreationAsync(creationRequest);
     }
-    
+
     /// <summary>
     /// Danh sách Phiếu cung ứng
     /// </summary>
     /// <returns></returns>
     [HttpGet("list-phieu-cung-ung")]
-    public async Task<PagedList<SupplyTicketListResponseItem>> ListSupplyTicketAsync([FromQuery] PhraseAndPagingFilter request )
+    public async Task<PagedList<SupplyTicketListResponseItem>> ListSupplyTicketAsync(
+        [FromQuery] SupplyTicketRequest request)
     {
         return await _muaSamVatTuService.ListSupplyTicketAsync(request);
     }
-    
+
     /// <summary>
     /// Hiển thị thông tin chi tiết phiếu cung ứng
     /// </summary>
@@ -104,5 +109,28 @@ public class MuaSamVatTuController : ApiControllerBase
     public async Task<IEnumerable<QlvtVatTuBoMa>> ListGroupCodeAsync()
     {
         return await _muaSamVatTuService.ListGroupCodeAsync();
+    }
+
+    /// <summary>
+    /// Đếm số phiếu theo trạng thái
+    /// </summary>
+    /// <param name="status"></param> 
+    /// <returns></returns>
+    [HttpGet("so-phieu")]
+    public async Task<int> CountSupplyTicketsByStatusAsync(SupplyTicketStatus status = SupplyTicketStatus.Unsigned)
+    {
+        return await _muaSamVatTuService.CountSupplyTicketsByStatusAsync(status);
+    }
+
+    [HttpGet("canh-bao-them-phieu")]
+    public async Task<ActionResult<IEnumerable<CreatedSupplyTicketWarningResponseItem>>> ListCreatedSupplyTicketWarningAsync([FromQuery] List<int> vatTuIds)
+    {
+        if (!vatTuIds.Any())
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplies);
+        }
+
+        var warnings = await _muaSamVatTuService.ListCreatedSupplyTicketWarningAsync(vatTuIds);
+        return Ok(warnings);
     }
 }
