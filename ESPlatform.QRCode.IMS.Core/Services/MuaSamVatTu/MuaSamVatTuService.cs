@@ -280,14 +280,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         {
             throw new NotFoundException(currentSupplyTicket.GetTypeEx(), null);
         }
-        // var currentSupplyTicketDetails = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => x.PhieuDeXuatId == supplyTicketId)).ToList();
-        // if (currentSupplyTicketDetails.Any())
-        // {
-        //     await _muaSamPhieuDeXuatDetailRepository.DeleteManyAsync(currentSupplyTicketDetails);
-        // }
-        currentSupplyTicket.TrangThai = (byte?)SupplyTicketStatus.Deleted;
-        currentSupplyTicket.NgaySua = DateTime.Now;
-        return await _muaSamPhieuDeXuatRepository.UpdateAsync(currentSupplyTicket);
+        var currentSupplyTicketDetails = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => x.PhieuDeXuatId == supplyTicketId)).ToList();
+        if (currentSupplyTicketDetails.Any())
+        {
+            await _muaSamPhieuDeXuatDetailRepository.DeleteManyAsync(currentSupplyTicketDetails);
+        }
+        // currentSupplyTicket.TrangThai = (byte?)SupplyTicketStatus.Deleted;
+        // currentSupplyTicket.NgaySua = DateTime.Now;
+        return await _muaSamPhieuDeXuatRepository.DeleteAsync(currentSupplyTicket);
     }
 
     public async Task<IEnumerable<WarehouseResponseItem>> ListWarehousesAsync()

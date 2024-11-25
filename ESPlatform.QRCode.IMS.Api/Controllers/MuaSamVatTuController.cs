@@ -122,6 +122,12 @@ public class MuaSamVatTuController : ApiControllerBase
         return await _muaSamVatTuService.CountSupplyTicketsByStatusAsync(status);
     }
 
+    /// <summary>
+    /// Cảnh báo số lượng vật tư trong các phiếu khác đang chờ duyệt
+    /// </summary>
+    /// <param name="vatTuIds"></param>
+    /// <returns></returns>
+    /// <exception cref="BadRequestException"></exception>
     [HttpGet("canh-bao-them-phieu")]
     public async Task<ActionResult<IEnumerable<CreatedSupplyTicketWarningResponseItem>>> ListCreatedSupplyTicketWarningAsync([FromQuery] List<int> vatTuIds)
     {
