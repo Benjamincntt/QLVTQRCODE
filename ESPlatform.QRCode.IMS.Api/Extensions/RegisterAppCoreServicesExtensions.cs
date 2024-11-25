@@ -55,11 +55,11 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IGioHangRepository, GioHangRepository>()
             .AddScoped<IVanBanKyRepository, VanBanKyRepository>()
             .AddScoped<IVatTuBoMaRepository, VatTuBoMaRepository>()
-            
             .AddScoped<IPhieuKyRepository, PhieuKyRepository>()
-            .AddScoped<IPhieuDeXuatKyRepository, PhieuDeXuatKyRepository>()
-             .AddScoped<ICauHinhVanBanKyRepository, CauHinhVanBanKyRepository>()
-              .AddScoped<IViTriCongViecRepository, ViTriCongViecRepository>()
+            .AddScoped<IMuaSamPdxKyRepository, MuaSamPdxKyRepository>()
+            .AddScoped<ICauHinhVanBanKyRepository, CauHinhVanBanKyRepository>()
+            .AddScoped<IViTriCongViecRepository, ViTriCongViecRepository>()
+            .AddScoped<IMuaSamPdxKyRepository, MuaSamPdxKyRepository>()
             .AddScoped<IUnitOfWork, UnitOfWork>()
 
             // Facades

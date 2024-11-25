@@ -3,6 +3,6 @@ using ESPlatform.QRCode.IMS.Library.Database;
 
 namespace ESPlatform.QRCode.IMS.Domain.Interfaces;
 
-public interface IPhieuDeXuatKyRepository : IRepositoryBase<QlvtMuaSamPdxKy>
+public interface IMuaSamPdxKyRepository : IRepositoryBase<QlvtMuaSamPdxKy>
 {
 }

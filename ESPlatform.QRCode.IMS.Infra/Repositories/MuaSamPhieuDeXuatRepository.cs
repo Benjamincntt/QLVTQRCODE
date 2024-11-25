@@ -25,10 +25,8 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
             .Where(x => x.PhieuDeXuat.TrangThai != (int?)SupplyTicketStatus.Deleted)
             .Where(x => status == SupplyTicketStatus.Unknown || x.PhieuDeXuat.TrangThai == (byte)status)
             .Where(x => string.IsNullOrWhiteSpace(keywords)
-                        || x.PhieuDeXuat.TenPhieu == null 
-                        || x.PhieuDeXuat.TenPhieu.ToLower().Contains(keywords)
-                        || x.PhieuDeXuat.MoTa == null
-                        || x.PhieuDeXuat.MoTa.ToLower().Contains(keywords))
+                        || (x.PhieuDeXuat.TenPhieu != null && x.PhieuDeXuat.TenPhieu.ToLower().Contains(keywords))
+                        || (x.PhieuDeXuat.MoTa != null && x.PhieuDeXuat.MoTa.ToLower().Contains(keywords)))
             .OrderByDescending(x => x.PhieuDeXuat.NgayThem)
             .ThenBy(x => x.PhieuDeXuat.TrangThai)
             .Select(x => new

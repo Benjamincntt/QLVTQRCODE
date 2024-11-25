@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace ESPlatform.QRCode.IMS.Infra.Repositories
 {
-    public class PhieuDeXuatKyRepository: EfCoreRepositoryBase<QlvtMuaSamPdxKy, AppDbContext>, IPhieuDeXuatKyRepository
+    public class MuaSamPdxKyRepository: EfCoreRepositoryBase<QlvtMuaSamPdxKy, AppDbContext>, IMuaSamPdxKyRepository
     {
-        public PhieuDeXuatKyRepository(AppDbContext dbContext) : base(dbContext)
+        public MuaSamPdxKyRepository(AppDbContext dbContext) : base(dbContext)
         {
 
         }

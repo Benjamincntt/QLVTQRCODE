@@ -30,14 +30,14 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPhieuKyRepository _phieuKyRepository;
-        private readonly IPhieuDeXuatKyRepository _deXuatKyRepository;
+        private readonly IMuaSamPdxKyRepository _deXuatKyRepository;
         private readonly ICauHinhVanBanKyRepository _cauHinhVanBanKyRepository;
         private readonly IVanBanKyRepository _vanBanKyRepository;
         private readonly IAuthorizedContextFacade _authorizedContextFacade;
         private readonly IConfiguration _configuration;
         
         public PhieuKyService(IPhieuKyRepository phieuKyRepository, IAuthorizedContextFacade authorizedContextFacade
-                , IPhieuDeXuatKyRepository deXuatKyRepository
+                , IMuaSamPdxKyRepository deXuatKyRepository
                 , ICauHinhVanBanKyRepository cauHinhVanBanKyRepository
                 , IVanBanKyRepository vanBanKyRepository
                 , IConfiguration configuration

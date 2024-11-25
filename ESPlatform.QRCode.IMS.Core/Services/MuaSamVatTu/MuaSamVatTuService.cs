@@ -32,6 +32,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IGioHangRepository _gioHangRepository;
     private readonly IVanBanKyRepository _vanBanKyRepository;
     private readonly IVatTuBoMaRepository _vatTuBoMaRepository;
+    private readonly IMuaSamPdxKyRepository _muaSamPdxKyRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly ImagePath _imagePath;
     private readonly IMapper _mapper;
@@ -45,6 +46,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IGioHangRepository gioHangRepository,
         IVanBanKyRepository vanBanKyRepository,
         IVatTuBoMaRepository vatTuBoMaRepository,
+        IMuaSamPdxKyRepository muaSamPdxKyRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork,
         IOptions<ImagePath> imagePath,
@@ -61,6 +63,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _muaSamPdxKyRepository = muaSamPdxKyRepository;
         _imagePath = imagePath.Value;
     }
 
@@ -284,6 +287,18 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         if (currentSupplyTicketDetails.Any())
         {
             await _muaSamPhieuDeXuatDetailRepository.DeleteManyAsync(currentSupplyTicketDetails);
+        }
+
+        var currentSignedDocuments = (await _vanBanKyRepository.ListAsync(x => x.PhieuId == supplyTicketId)).ToList();
+        if (currentSignedDocuments.Any())
+        {
+            await _vanBanKyRepository.DeleteManyAsync(currentSignedDocuments);
+        }
+
+        var currentSignedSupplyTickets = (await _muaSamPdxKyRepository.ListAsync(x => x.PhieuDeXuatId == supplyTicketId)).ToList();
+        if (currentSignedSupplyTickets.Any())
+        {
+            await _muaSamPdxKyRepository.DeleteManyAsync(currentSignedSupplyTickets);
         }
         // currentSupplyTicket.TrangThai = (byte?)SupplyTicketStatus.Deleted;
         // currentSupplyTicket.NgaySua = DateTime.Now;
