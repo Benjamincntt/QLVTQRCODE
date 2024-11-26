@@ -46,17 +46,23 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
     public async Task<IEnumerable<dynamic>> ListCreatedSupplyTicketWarningAsync(List<int> vatTuIds)
     {
         var query = DbContext.QlvtMuaSamPhieuDeXuatDetails
+            
             .Join(DbContext.QlvtMuaSamPhieuDeXuats,
                 x => x.PhieuDeXuatId,
                 y=> y.Id,
                 (x, y) => new { PhieuDeXuatDetail = x, PhieuDeXuat = y})
+            .Join(DbContext.QlvtVatTus,
+                x => x.PhieuDeXuatDetail.VatTuId,
+                y => y.VatTuId,
+                (x, y) => new { x.PhieuDeXuatDetail, x.PhieuDeXuat, VatTu = y })
             .Where(x => x.PhieuDeXuat.TrangThai == (int)SupplyTicketStatus.Unsigned)
             .Where(x => x.PhieuDeXuatDetail.VatTuId != null && vatTuIds.Contains((int)x.PhieuDeXuatDetail.VatTuId))
-            .GroupBy(st => st.PhieuDeXuatDetail.VatTuId)
             .Select(x => new
             {
-                VatTuId = x.Key,
-                TotalQuantity = x.Sum(st => st.PhieuDeXuatDetail.SoLuong)
+                VatTuId = x.VatTu.VatTuId,
+                TenVatTu = x.VatTu.TenVatTu ?? string.Empty,
+                TenPhieu = x.PhieuDeXuat.TenPhieu ?? string.Empty,
+                SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
             });
             return await query.ToListAsync();
     }

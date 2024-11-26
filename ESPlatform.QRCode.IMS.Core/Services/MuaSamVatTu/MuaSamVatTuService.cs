@@ -359,18 +359,16 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return await _muaSamPhieuDeXuatRepository.CountAsync(x => x.TrangThai == (byte)status);
     }
 
-    public async Task<IEnumerable<CreatedSupplyTicketWarningResponseItem>> ListCreatedSupplyTicketWarningAsync(List<int> vatTuIds)
+    public async Task<IEnumerable<string>> ListCreatedSupplyTicketWarningAsync(List<int> vatTuIds)
     {
         var existingSupplyTickets = (await _muaSamPhieuDeXuatRepository.ListCreatedSupplyTicketWarningAsync(vatTuIds)).Adapt<List<SupplyTicketWithTotalCount>>();
         if (!existingSupplyTickets.Any())
         {
-            return Enumerable.Empty<CreatedSupplyTicketWarningResponseItem>();
+            return Enumerable.Empty<string>();
         }
 
-        return existingSupplyTickets.Select(x => new CreatedSupplyTicketWarningResponseItem
-        {
-            VatTuId = x.VatTuId,
-            WarningMessage = $"Vật tư này đã được đề xuất với số lượng {x.TotalQuantity.ToString(CultureInfo.InvariantCulture).Replace('.', ',')} trong các phiếu khác."
-        });
+        return existingSupplyTickets
+            .Select(x => $"Vật tư {x.TenVatTu} đã được đề xuất với số lượng {x.SoLuong.FormatDecimal()} trong 1 phiếu khác.")
+            .ToList();
     }
 }

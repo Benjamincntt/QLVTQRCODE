@@ -85,7 +85,7 @@ public class MuaSamVatTuController : ApiControllerBase
     /// </summary>
     /// <param name="supplyTicketId"></param>
     /// <returns></returns>
-    [HttpPatch("{supplyTicketId:int}/xoa-phieu-cung-ung")]
+    [HttpDelete("{supplyTicketId:int}/xoa-phieu-cung-ung")]
     public async Task<int> DeleteSupplyTicketAsync(int supplyTicketId)
     {
         return await _muaSamVatTuService.DeleteSupplyTicketAsync(supplyTicketId);
@@ -129,7 +129,7 @@ public class MuaSamVatTuController : ApiControllerBase
     /// <returns></returns>
     /// <exception cref="BadRequestException"></exception>
     [HttpGet("canh-bao-them-phieu")]
-    public async Task<ActionResult<IEnumerable<CreatedSupplyTicketWarningResponseItem>>> ListCreatedSupplyTicketWarningAsync([FromQuery] List<int> vatTuIds)
+    public async Task<ActionResult<IEnumerable<string>>> ListCreatedSupplyTicketWarningAsync([FromQuery] List<int> vatTuIds)
     {
         if (!vatTuIds.Any())
         {
