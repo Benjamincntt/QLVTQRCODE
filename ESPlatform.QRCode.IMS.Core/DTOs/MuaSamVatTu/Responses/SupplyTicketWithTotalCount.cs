@@ -2,7 +2,7 @@
 
 public class SupplyTicketWithTotalCount
 {
-    public int VatTuId { get; set; }
+    // public int VatTuId { get; set; }
     public string TenVatTu { get; set; } = string.Empty;
     public string TenPhieu { get; set; } = string.Empty;
     public decimal SoLuong { get; set; }

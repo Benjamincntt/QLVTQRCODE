@@ -16,5 +16,7 @@ public class CreatedSupplyRequestValidation : AbstractValidator<CreatedSupplyReq
         RuleFor(x => x.GhiChu).ValidateStringDefault()
             .MaximumLength(250).WithMessage(RequireMaximumLength);
         RuleFor(x => x.ThongSoKyThuat).ValidateStringDefault();
+        RuleFor(x => x.DonGia).GreaterThanOrEqualTo(0)
+            .WithMessage(MustGreaterThanOrEqual);
     }
 }

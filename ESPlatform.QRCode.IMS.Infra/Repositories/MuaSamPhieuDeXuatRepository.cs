@@ -45,7 +45,7 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
 
     public async Task<IEnumerable<dynamic>> ListCreatedSupplyTicketWarningAsync(List<int> vatTuIds)
     {
-        var query = DbContext.QlvtMuaSamPhieuDeXuatDetails
+        var listSupplies = DbContext.QlvtMuaSamPhieuDeXuatDetails
             
             .Join(DbContext.QlvtMuaSamPhieuDeXuats,
                 x => x.PhieuDeXuatId,
@@ -56,14 +56,39 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
                 y => y.VatTuId,
                 (x, y) => new { x.PhieuDeXuatDetail, x.PhieuDeXuat, VatTu = y })
             .Where(x => x.PhieuDeXuat.TrangThai == (int)SupplyTicketStatus.Unsigned)
+            .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == true)
             .Where(x => x.PhieuDeXuatDetail.VatTuId != null && vatTuIds.Contains((int)x.PhieuDeXuatDetail.VatTuId))
             .Select(x => new
             {
-                VatTuId = x.VatTu.VatTuId,
                 TenVatTu = x.VatTu.TenVatTu ?? string.Empty,
                 TenPhieu = x.PhieuDeXuat.TenPhieu ?? string.Empty,
                 SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
             });
-            return await query.ToListAsync();
+        
+        var listSuppliesNew = DbContext.QlvtMuaSamPhieuDeXuatDetails
+            
+            .Join(DbContext.QlvtMuaSamPhieuDeXuats,
+                x => x.PhieuDeXuatId,
+                y=> y.Id,
+                (x, y) => new { PhieuDeXuatDetail = x, PhieuDeXuat = y})
+            .Join(DbContext.QlvtMuaSamVatTuNews,
+                x => x.PhieuDeXuatDetail.VatTuId,
+                y => y.VatTuNewId,
+                (x, y) => new { x.PhieuDeXuatDetail, x.PhieuDeXuat, VatTuNew = y })
+            .Where(x => x.PhieuDeXuat.TrangThai == (int)SupplyTicketStatus.Unsigned)
+            .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == false)
+            .Where(x => x.PhieuDeXuatDetail.VatTuId != null && vatTuIds.Contains((int)x.PhieuDeXuatDetail.VatTuId))
+            .Select(x => new
+            {
+                TenVatTu = x.VatTuNew.TenVatTu ?? string.Empty,
+                TenPhieu = x.PhieuDeXuat.TenPhieu ?? string.Empty,
+                SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
+            });
+        
+        var combinedQuery = listSupplies
+                .Union(listSuppliesNew)
+                .OrderBy(x => x.TenVatTu)
+            ;
+        return await combinedQuery.ToListAsync();
     }
 }
