@@ -190,8 +190,14 @@ public class GioHangService : IGioHangService
     public async Task<int> CreateCartSupplyNewAsync(CreatedSupplyRequest request)
     {   
         await ValidationHelper.ValidateAsync(request, new CreatedSupplyRequestValidation());
-        var existVatTuNew = await _muaSamVatTuNewRepository.ExistsAsync(x => x.TenVatTu.ToLower() == request.TenVatTu.ToLower());
-        if (existVatTuNew)
+        var existedVatTuNew = await _muaSamVatTuNewRepository.ExistsAsync(x => x.TenVatTu.ToLower() == request.TenVatTu.ToLower());
+        if (existedVatTuNew)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.DuplicatedSupplyName);
+        }
+
+        var existedVatTu = await _vatTuRepository.ExistsAsync(x => x.TenVatTu != null && x.TenVatTu.ToLower() == request.TenVatTu.ToLower());
+        if (existedVatTu)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.DuplicatedSupplyName);
         }
