@@ -9,7 +9,7 @@ namespace ESPlatform.QRCode.IMS.Api.Extensions;
 public static class RegisterOtherServicesExtensions {
 	public static IServiceCollection RegisterOtherServices(this IServiceCollection services) {
 		// Mapper config
-		TypeAdapterConfig.GlobalSettings.Scan(AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName?.StartsWith("Hemera") ?? false).ToArray());
+		TypeAdapterConfig.GlobalSettings.Scan(AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName?.StartsWith("ESPlatform") ?? false).ToArray());
 
 		services.AddSingleton(TypeAdapterConfig.GlobalSettings)
 				.AddScoped<IMapper, ServiceMapper>();

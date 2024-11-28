@@ -26,7 +26,6 @@
 {
 	"dev": {
 		"host": "https://localhost:7273/api/v1/",
-		//"host": "https://dbnd.c.hemera.com.vn/api/v1/",
 		"token": "YOUR_TOKEN_HERE",
 		"siteId": "8f39e1c8-9b2b-499b-be9d-133b786c3ec8",
 		"contentId": "728d7d52-3652-4ef6-8044-af449bf6db20"
