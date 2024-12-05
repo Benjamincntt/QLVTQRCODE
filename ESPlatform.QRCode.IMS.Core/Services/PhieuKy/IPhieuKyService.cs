@@ -1,6 +1,7 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
 using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using System;
@@ -20,5 +21,8 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         Task <string> GetFullFilePath(string filePath);
         Task<string> GetRelativePath();
         Task<object> UpdateThongTinKyAsync(UpdateFileRequest request);
+        Task SignViettelCA(SignMobileCaInputDto request);
+        Task<object> UpdateKySimCaAsync(UpdateFileRequest request);
+        
     }
 }

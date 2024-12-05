@@ -1,6 +1,7 @@
 ﻿using ESPlatform.QRCode.IMS.Api.Controllers.Base;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
 using ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 using ESPlatform.QRCode.IMS.Core.Services.PhieuKy;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
@@ -12,7 +13,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Transactions;
 using static MassTransit.ValidationResultExtensions;
-
+using ViettelFileSigner;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
+using ESPlatform.QRCode.IMS.Library.Extensions;
 
 namespace ESPlatform.QRCode.IMS.Api.Controllers
 {
@@ -28,6 +32,7 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
             _unitOfWork = unitOfWork;
         }
         [HttpGet("danh-sach-phieu")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<PhieuKyModel>>> DanhSachPhieuKyAsync([FromQuery] DanhSachPhieuKyFilter request)
         {
             try
@@ -216,6 +221,98 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
             {
                 // Xử lý lỗi, có thể log lại hoặc trả về thông báo lỗi
                 return StatusCode(500, new { message = "Đã xảy ra lỗi", error = ex.Message });
+            }
+        }
+
+
+        [HttpPost("sign-viettel")]
+        public async Task<IActionResult> SignViettelCA([FromBody] SignMobileCaInputDto input, int? phieuId)
+        {
+            if (input?.ChuKyRequest == null)
+            {
+                return BadRequest(new { message = "Dữ liệu đầu vào không hợp lệ." });
+            }
+
+            if (input.ChuKyRequest.VanBanId <= 0)
+            {
+                return BadRequest(new { message = "VanBanId không được để trống." });
+            }
+
+            if (input.PdfPath == null)
+            {
+                return BadRequest(new { message = "PdfPath trống." });
+            }
+            try
+            {
+                // Kiểm tra file PDF đầu vào
+                var fullPath = await _phieuKyService.GetFullFilePath(input.PdfPath);
+                if (string.IsNullOrEmpty(fullPath))
+                {
+                    return BadRequest(new { message = "Không có file nào được tải lên." });
+                }
+
+                input.PdfPath = fullPath;
+                input.PdfPathSigned = fullPath;
+
+                // Kiểm tra file tồn tại trên hệ thống
+                var checkFileResult = await CheckFileExistsAsync(input.ChuKyRequest.VanBanId);
+                if (checkFileResult is ObjectResult errorResult && errorResult.StatusCode != (int)HttpStatusCode.OK)
+                {
+                    return errorResult;
+                }
+
+                // Cập nhật path ảnh chữ ký vào request
+                // Thực hiện ký số
+                await _phieuKyService.SignViettelCA(input);
+
+                // Cập nhật trạng thái chữ ký
+                var updateFileRequest = new UpdateFileRequest
+                {
+                    PhieuId = input.ChuKyRequest.PhieuId,
+                    VanBanId = input.ChuKyRequest.VanBanId,
+                    SignUserId = input.ChuKyRequest.NguoiKyId ?? 0,
+                    MaDoiTuongKy = input.ChuKyRequest.MaDoiTuongKy ?? "Unknown",
+                    ThuTuKy = input.ChuKyRequest.ThuTuKy ?? 0,
+                    ChuKyId = input.ChuKyRequest.ChuKyId
+                };
+
+                await _phieuKyService.UpdateKySimCaAsync(updateFileRequest);
+
+                // Xóa file ảnh chữ ký sau khi đã ký và cập nhật trạng thái
+                if (!string.IsNullOrEmpty(input.SignFileInfo.pathImage))
+                {
+                    try
+                    {
+                        if (string.IsNullOrEmpty(input.SignFileInfo.pathImage) || !System.IO.File.Exists(input.SignFileInfo.pathImage))
+                        {
+                            return NotFound(new { message = "File không tồn tại." });
+                        }
+
+                        // Thực hiện xóa file
+                        System.IO.File.Delete(input.SignFileInfo.pathImage);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log lỗi nếu việc xóa file gặp sự cố
+                        Console.Error.WriteLine($"Error deleting signature image: {ex.Message}");
+                    }
+                }
+                return Ok(new { success = true, message = "Ký thành công." });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log chi tiết lỗi
+                Console.Error.WriteLine($"Error during signing: {ex}");
+                return StatusCode(500, new { message = "Ký số thất bại.", error = ex.Message });
             }
         }
 
