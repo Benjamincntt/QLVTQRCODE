@@ -57,6 +57,33 @@
 	  <Folder Include="wwwroot\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Reference Include="itextsharp">
+	    <HintPath>SignSimLib\itextsharp.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+	    <HintPath>SignSimLib\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+	  </Reference>
+	  <Reference Include="MobileCA.Application">
+	    <HintPath>SignSimLib\MobileCA.Application.dll</HintPath>
+	  </Reference>
+	  <Reference Include="MobileCA.Domain">
+	    <HintPath>SignSimLib\MobileCA.Domain.dll</HintPath>
+	  </Reference>
+	  <Reference Include="MobileCA.Infrastructure">
+	    <HintPath>SignSimLib\MobileCA.Infrastructure.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Newtonsoft.Json">
+	    <HintPath>SignSimLib\Newtonsoft.Json.dll</HintPath>
+	  </Reference>
+	  <Reference Include="System.Text.Encoding.CodePages">
+	    <HintPath>SignSimLib\System.Text.Encoding.CodePages.dll</HintPath>
+	  </Reference>
+	  <Reference Include="ViettelFileSigner">
+	    <HintPath>SignSimLib\ViettelFileSigner.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 	<Target Name="PublishCleanup" AfterTargets="Publish">
 		<Delete Files="$(PublishDir)/appsettings.Development.json" />
 	</Target>

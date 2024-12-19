@@ -14,10 +14,10 @@
 
 
     <ItemGroup>
-        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
-        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0"/>
-        <PackageReference Include="Mapster" Version="7.4.0"/>
-        <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1"/>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+        <PackageReference Include="Mapster" Version="7.4.0" />
+        <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
         <PackageReference Include="MassTransit" Version="8.2.2" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.2.2" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.30" />
@@ -25,9 +25,9 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
         <PackageReference Include="Otp.NET" Version="1.4.0" />
         <PackageReference Include="QRCoder" Version="1.5.1" />
-        <PackageReference Include="Serilog" Version="3.1.1"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1"/>
-        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0"/>
+        <PackageReference Include="Serilog" Version="3.1.1" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.2" />
     </ItemGroup>
 
@@ -37,6 +37,34 @@
       <Folder Include="DTOs\ViTris\Requests\" />
       <Folder Include="DTOs\TraCuu\Requests\" />
       <Folder Include="DTOs\NguoiDungs\Responses\" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Reference Include="itextsharp">
+        <HintPath>..\ESPlatform.QRCode.IMS.Api\SignSimLib\itextsharp.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+        <HintPath>..\ESPlatform.QRCode.IMS.Api\SignSimLib\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      </Reference>
+      <Reference Include="MobileCA.Application">
+        <HintPath>..\ESPlatform.QRCode.IMS.Api\SignSimLib\MobileCA.Application.dll</HintPath>
+      </Reference>
+      <Reference Include="MobileCA.Domain">
+        <HintPath>..\ESPlatform.QRCode.IMS.Api\SignSimLib\MobileCA.Domain.dll</HintPath>
+      </Reference>
+      <Reference Include="MobileCA.Infrastructure">
+        <HintPath>..\ESPlatform.QRCode.IMS.Api\SignSimLib\MobileCA.Infrastructure.dll</HintPath>
+      </Reference>
+      <Reference Include="Newtonsoft.Json">
+        <HintPath>..\ESPlatform.QRCode.IMS.Api\SignSimLib\Newtonsoft.Json.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Text.Encoding.CodePages">
+        <HintPath>..\ESPlatform.QRCode.IMS.Api\SignSimLib\System.Text.Encoding.CodePages.dll</HintPath>
+      </Reference>
+      <Reference Include="ViettelFileSigner">
+        <HintPath>..\ESPlatform.QRCode.IMS.Api\SignSimLib\ViettelFileSigner.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
