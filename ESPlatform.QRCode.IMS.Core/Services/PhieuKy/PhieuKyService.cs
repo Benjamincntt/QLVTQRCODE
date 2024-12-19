@@ -1,6 +1,7 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
+using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
@@ -17,12 +18,15 @@ using MassTransit;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using MobileCA.Application.Services.Viettel;
+using MobileCA.Application.Services.Viettel.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ViettelFileSigner;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 {
@@ -35,13 +39,14 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         private readonly IVanBanKyRepository _vanBanKyRepository;
         private readonly IAuthorizedContextFacade _authorizedContextFacade;
         private readonly IConfiguration _configuration;
-        
+        private readonly IViettelMobileCAService _viettelCAService;
         public PhieuKyService(IPhieuKyRepository phieuKyRepository, IAuthorizedContextFacade authorizedContextFacade
                 , IMuaSamPdxKyRepository deXuatKyRepository
                 , ICauHinhVanBanKyRepository cauHinhVanBanKyRepository
                 , IVanBanKyRepository vanBanKyRepository
                 , IConfiguration configuration
                 , IUnitOfWork unitOfWork
+                , IViettelMobileCAService viettelCAService
                )
         {
             _phieuKyRepository = phieuKyRepository;
@@ -51,7 +56,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _cauHinhVanBanKyRepository = cauHinhVanBanKyRepository;
             _vanBanKyRepository = vanBanKyRepository;
             _configuration = configuration;
-
+            this._viettelCAService = viettelCAService;
         }
 
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
@@ -408,6 +413,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             // Không cần bắt đầu transaction ở đây nếu transaction đã được bắt đầu ở nơi gọi
             try
             {
+                var userId = _authorizedContextFacade.AccountId;
                 // Lấy thông tin phiếu mua sắm ký từ database dựa trên Id
                 var phieuMuaSam = await _phieuKyRepository.GetAsync(x => x.Id == request.PhieuId);
                 var maDoiTuongKy = request.MaDoiTuongKy; // request.MaDoiTuongKy?.ToLower() ?? "";
@@ -445,7 +451,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 
 
                 phieuMuaSamKy.NgayKy = DateTime.Now;
-                phieuMuaSamKy.NguoiKyId = request.SignUserId;
+                phieuMuaSamKy.NguoiKyId = userId; //request.SignUserId;
                 phieuMuaSamKy.UsbSerial = request.SignType;
                 phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
 
@@ -478,6 +484,124 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 };
             }
         }
+
+
+
+        #region ký simCA
+
+        public async Task SignViettelCA(SignMobileCaInputDto input)
+        {
+            ParamDto param = BuildParamModel(input);
+            ConfigDto config = GetViettelCaConfig();
+            await _viettelCAService.SignMobileCA(param, config, 0, 2);
+        }
+
+        private ParamDto BuildParamModel(SignMobileCaInputDto input)
+        {
+            ParamDto param = new ParamDto
+            {
+                MobilePhone = input.MobilePhone,
+                CertSerial = input.CertSerial,
+                DataToDisplayed = input.DataToDisplayed,
+                PdfPath = input.PdfPath,
+                PdfPathSigned = input.PdfPathSigned,
+                SignFileInfo = BuildSignViettelFileInfo(input.SignFileInfo)
+            };
+
+            return param;
+        }
+
+        private ISignFileDto BuildSignViettelFileInfo(DTOs.Viettel.SignFileImgDto? signFileInfo)
+        {
+            if (signFileInfo == null)
+            {
+                throw new ArgumentNullException(nameof(signFileInfo), "SignFileInfo cannot be null.");
+            }
+
+            MobileCA.Application.Services.Viettel.Dtos.SignFileImgDto signFile = new MobileCA.Application.Services.Viettel.Dtos.SignFileImgDto
+            {
+                numberPageSign = signFileInfo.numberPageSign,
+                coorX = signFileInfo.coorX,
+                coorY = signFileInfo.coorY,
+                width = signFileInfo.width,
+                height = signFileInfo.height,
+                pathImage = signFileInfo.pathImage
+            };
+            return signFile;
+        }
+        private ConfigDto GetViettelCaConfig()
+        {
+            string ws = Constants.ViettelCa.ws;
+            string apId = Constants.ViettelCa.ApId;
+            string privateKey = Constants.ViettelCa.PrivateKey;
+
+            ConfigDto item = new ConfigDto(ws, apId, privateKey);
+            return item;
+        }
+
+
+        public async Task<object> UpdateKySimCaAsync(UpdateFileRequest request)
+        {
+            using (var transaction = _unitOfWork.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Lấy thông tin phiếu
+                    var phieuMuaSam = await _phieuKyRepository.GetAsync(x => x.Id == request.PhieuId);
+                    if (phieuMuaSam == null)
+                    {
+                        return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} không tồn tại." };
+                    }
+
+                    var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
+                    if (phieuMuaSamKy == null)
+                    {
+                        return new ErrorResponse { Message = "Chưa có cấu hình chữ ký cho người ký này." };
+                    }
+
+                    if (phieuMuaSamKy.TrangThai == Constants.Exceptions.Messages.KyCungUng.DaKy)
+                    {
+                        return new ErrorResponse { Message = "Chữ ký này đã được ký." };
+                    }
+                    var userId = _authorizedContextFacade.AccountId;
+                    // Cập nhật trạng thái chữ ký
+                    phieuMuaSamKy.NgayKy = DateTime.Now;
+                    phieuMuaSamKy.NguoiKyId = userId;
+                    phieuMuaSamKy.UsbSerial = request.SignType;
+                    phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
+                    await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
+
+                    // Cập nhật trạng thái phiếu
+                    phieuMuaSam.TrangThai = request.MaDoiTuongKy switch
+                    {
+                        MaDoiTuongKyConstants.NguoiLap => TrangThaiPhieu.TrongQuaTrinhKy,
+                        MaDoiTuongKyConstants.TongGiamDoc => TrangThaiPhieu.TongGiamDoc,
+                        _ => TrangThaiPhieu.TrongQuaTrinhKy
+                    };
+                    await _phieuKyRepository.UpdateAsync(phieuMuaSam);
+
+                    // Commit transaction nếu mọi thứ thành công
+                    await _unitOfWork.CommitAsync();
+                    return new { PhieuId = request.PhieuId, Message = "Cập nhật thông tin thành công." };
+                }
+                catch (Exception ex)
+                {
+                    // Rollback nếu có lỗi xảy ra
+                    await _unitOfWork.RollbackAsync();
+
+                    // Log lỗi chi tiết
+                    return new ErrorResponse
+                    {
+                        Message = "Cập nhật thông tin không thành công.",
+                        Details = ex.Message
+                    };
+                }
+            }
+        }
+
+
+        #endregion
+
 
     }
 }

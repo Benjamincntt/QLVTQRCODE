@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ESPlatform.QRCode.IMS.Core.Engine
+{
+    public partial class Constants
+    {
+        public static class ViettelCa
+        {
+            public const string ws = "http://mobilepki.viettel.vn:80/apws.asmx";
+            public const string MobilePki = "http://mobilepki.viettel-ca.vn:8080/apws.asmx?wsdl";
+            public const string ApId = "T02";
+            public const string PrivateKey = "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBALhrHRACD4HditIrALvjCifPfA8SXB5o1d7c/zDW3t4jzlCfvjWXz9EjEx6tr7Q35NUS630CjZlBhQhJyWQUMMZMQEUHYzMnJNsFtobgK31MBgd5hnz/Ip9mGW+86H/M7PLgbBABSKJxvxl5wNoA1YGTv+GwKY7GEq6BoVWY57cNAgMBAAECgYBPvqmjiXCRNG5Z8RRxKnzyuAqqLcM9txF8PE3xHYjjv9HwFRNX81x+z87tviczI9REutivhtIaCjXvXpDCQOTRrKviv0QAwHqlw/OCeVYQ3dQZwcuL0TjodoC5HTBc/Ue1KBTUpvL6t7lSDOyk2oP0ZjLF9NpwhttnRyeWapDYlQJBAPuCbX6wrmjJutFah0k0ZbMRdagVwnuLNcGopBcs/2T96LuZDI6OkRTsRX7p/1npk5lIp1THNWDEMn7WT+5CATMCQQC7tgiAzehse1rmEptD42yoYoUZlDvSSy6Rk7aglDs9Y4XCjuBT8/wJhoGS++lWy9o60+j+56A3MPY1/K7fF+a/AkEA3aAjCF58cc5BlzWkvPc1HsQl34W9KMyVBB+s6Nc3/jBYIudMz1oFsmA5JQrhfsN60rnY6bXY7Xo13NrQ+GylTQJBAKR1oU+QmCFrlkFbbfN17z48SxcVG7BstFlRjMF1/c0URB4o5fxIGLsTwLTRxyeHpSTDgzDKKUIRwLWeNGw72asCQQDwEkrGcefxW5JOqWbVCRStRTbL82MykrrH63voHt5LWSlwopIpqrBgqlsjvr03vEIe4T0zJ+5e5PlZA2fzCYRI";
+
+            public const string CertViettelCARoot = "MIIGFzCCA/+gAwIBAgIRAJxj3ISVUUiiR/E3ZS+f6/YwDQYJKoZIhvcNAQELBQAw\r\ngaMxCzAJBgNVBAYTAlZOMTMwMQYDVQQKDCpNaW5pc3RyeSBvZiBJbmZvcm1hdGlv\r\nbiBhbmQgQ29tbXVuaWNhdGlvbnMxPDA6BgNVBAsMM05hdGlvbmFsIENlbnRyZSBv\r\nZiBEaWdpdGFsIFNpZ25hdHVyZSBBdXRoZW50aWNhdGlvbjEhMB8GA1UEAwwYVmll\r\ndG5hbSBOYXRpb25hbCBSb290IENBMB4XDTI0MDQxNzA4NTAwM1oXDTI5MDQxNzA4\r\nNTAwNFowPzEYMBYGA1UEAwwPVmlldHRlbC1DQSBTSEEyMRYwFAYDVQQKDA1WaWV0\r\ndGVsIEdyb3VwMQswCQYDVQQGEwJWTjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC\r\nAQoCggEBANk6+buBCU+zjLf3ES+5I913oKmFC7jcQjyqr6ba6H8ZHp7bKv7xjJO9\r\nPPhdoeTBccRj9zlwl6QP0FzzSWFM5hp5QzYtO8X7EWN3tEVvTVSy/bU92xpMVki1\r\niNmr9g8zQKxrdfb8oOa3Cb4ysqSPd3dQrCtCBFL1auvO+p+RYIfXBOvkxLDIftNv\r\n8USHv7hZPhK39Cu8Ywlw5elsyXHvWkxiM1t7Z7zVTN3sgWTWERUq98Aw8GTEmJ6p\r\nFEz7xoRy+lCzCR5AEe56hxJkvHCSRfREo3sGQAViVVRRf7PUVEyPBDI+uQsTiMji\r\nFbuNZrFRy4q55G+WoVHzaXnfddK9pgECAwEAAaOCAacwggGjMEIGCCsGAQUFBwEB\r\nBDYwNDAyBggrBgEFBQcwAoYmaHR0cHM6Ly9yb290Y2EuZ292LnZuL2NydC92bnJj\r\nYTI1Ni5wN2IwgeAGA1UdIwSB2DCB1YAUfvCH7bG4nfsIg2+kFv3xuKximwGhgamk\r\ngaYwgaMxCzAJBgNVBAYTAlZOMTMwMQYDVQQKDCpNaW5pc3RyeSBvZiBJbmZvcm1h\r\ndGlvbiBhbmQgQ29tbXVuaWNhdGlvbnMxPDA6BgNVBAsMM05hdGlvbmFsIENlbnRy\r\nZSBvZiBEaWdpdGFsIFNpZ25hdHVyZSBBdXRoZW50aWNhdGlvbjEhMB8GA1UEAwwY\r\nVmlldG5hbSBOYXRpb25hbCBSb290IENBghEAlZK7jO6tWiSmuPcdfTI7WjAOBgNV\r\nHQ8BAf8EBAMCAYYwHQYDVR0OBBYEFEPVNQCLvge6403mHiRZVohbvsxKMBIGA1Ud\r\nEwEB/wQIMAYBAf8CAQAwNwYDVR0fBDAwLjAsoCqgKIYmaHR0cHM6Ly9yb290Y2Eu\r\nZ292LnZuL2NybC92bnJjYTI1Ni5jcmwwDQYJKoZIhvcNAQELBQADggIBAC56fhlh\r\nK/ZWl1Nb9/WKn4WQP6bX4eXcI7TjV5hwEWHt0IyQh6PmVVhDIbtA8lGstXTcbIQf\r\nCKve2cd2RTq7zr82uRIeZSRA6jHM+B8S59HaYCViS4MAu0hUCGSFKPmF6FuMnNDY\r\nWDbsKHVs2em73dLhJN5T/D1RThhBJfIDNgaPzdlYZBAnCYMdhOlAvl75BVyyimVf\r\nbybqpSYbkreuwMbfBj+UwH2r0XLMRH0rDiuQwZumcaDJOp8al9+tp17bFZF/RiWU\r\njR3RmC9IXFmtull8hVwNeBJeUf9J5y9WWtCyxvD9s6gOYzrZ1445tbLfJVcT1QTk\r\nevqmE8N3vAbbgDmkRwOcP7sw8TI+FSBj0jQsS4QEN5zTmmgpxiNQ2tOVy3e8Pp09\r\nMCbyuhu2ZqDog7YCp4PxQGO82z/K6KkShLo+xYR1q0TGM0pJVm2dZkpZ9DAuA4b/\r\n3gr36D/fhkYGl2BFGk7zTARcgANxBI56B3hIXjMvKNoauvtdYyKyRYhW0mj8iYgQ\r\nURXCr0jo48caFw1z4hIaRYQ4WKj32MF1eIZiNIcihHdMrqnLUXHsZxIYje2DeDQy\r\nWdrlzVpqLmGTzG5LdHeM8HEkHASDTClX8ZhLY11UhQCV+6lxs84+Y1gKmKOvIGL+\r\nxDaZetUNbpIktUmFdk2x5H52wZvYMdbCeu+Y";
+
+        }
+    }
+}

@@ -18,4 +18,5 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests
         public int? ThuTuKy { get; set; }
         public int? ChuKyId { get; set; }
     }
+    
 }

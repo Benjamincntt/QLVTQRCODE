@@ -1,4 +1,4 @@
-using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
+﻿using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Services.Accounts;
 using ESPlatform.QRCode.IMS.Core.Services.Authentication;
@@ -61,7 +61,6 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IViTriCongViecRepository, ViTriCongViecRepository>()
             .AddScoped<IMuaSamPdxKyRepository, MuaSamPdxKyRepository>()
             .AddScoped<IUnitOfWork, UnitOfWork>()
-
             // Facades
             .AddScoped<IAuthorizedContextFacade, AuthorizedContextFacade>()
 
@@ -76,6 +75,9 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<IGioHangService, GioHangService>()
             .AddScoped<IPhieuKyService, PhieuKyService>()
             ;
+
+        MobileCA.Infrastructure.DependencyInjection.AddInfrastructureServices(services);
+
 
         return services;
     }
