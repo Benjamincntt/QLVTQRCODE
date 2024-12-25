@@ -36,4 +36,18 @@ public partial class QlvtVatTuTonKho
     /// Ngày tạo
     /// </summary>
     public DateTime? CreationDate { get; set; }
+
+    public string? MaVatTu { get; set; }
+
+    public string? TenVatTu { get; set; }
+
+    public string? DonViTinh { get; set; }
+
+    public short? TrangThaiInQr { get; set; }
+
+    public int? VatTuId { get; set; }
+
+    public int? KhoId { get; set; }
+
+    public string? MaKho { get; set; }
 }

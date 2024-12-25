@@ -56,6 +56,5 @@ public partial class QlvtKyKiemKe
 
     public short? KyKiemKeChinh { get; set; }
 
-    public virtual ICollection<QlvtKyKiemKeChiTiet> QlvtKyKiemKeChiTiets { get; set; } = new List<QlvtKyKiemKeChiTiet>();
+    public DateTime? NgayDongBo { get; set; }
 }
-
