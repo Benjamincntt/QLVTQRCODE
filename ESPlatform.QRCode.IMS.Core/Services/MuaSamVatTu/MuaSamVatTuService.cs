@@ -168,10 +168,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                     response.ImagePaths.Add(fullPath);
                 }
             }
-            var wareHouse = await _vatTuRepository.GetLotNumberAsync(vatTuId, vatTu.KhoId);
-            if (wareHouse == null) return response;
-            var wareHouseMapper = _mapper.Map<LookupSuppliesResponse>(wareHouse);
-            response.OnhandQuantity = wareHouseMapper.OnhandQuantity;
+
+            var existedTonKho = await _vatTuTonKhoRepository.ExistsAsync(x => x.VatTuId == vatTuId);
+            response.Is007A = existedTonKho ? Is007A.TonKho : Is007A.KhongTonKho;
+            var inventory = await _vatTuRepository.GetLotNumberAsync(vatTuId, vatTu.KhoId);
+            if (inventory == null) return response;
+               
+            var inventoryMapper = _mapper.Map<LookupSuppliesResponse>(inventory);
+            response.OnhandQuantity = inventoryMapper.OnhandQuantity;
             return response;
         }
         //if Id is VatTuNewId => get information from QlvtMuaSamVatTuNew table
@@ -185,6 +189,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
          response.DonGia = vatTuNew.DonGia ?? 0;
          response.GhiChu = vatTuNew.GhiChu ?? string.Empty;
          response.OnhandQuantity = 0;
+         response.Is007A = Is007A.KhongTonKho;
          return response;
     }
 

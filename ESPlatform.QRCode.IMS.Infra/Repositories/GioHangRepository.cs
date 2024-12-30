@@ -1,4 +1,5 @@
 ﻿using ESPlatform.QRCode.IMS.Domain.Entities;
+using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Library.Database.EfCore;
@@ -32,6 +33,7 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
                 GhiChu = x.QlvtGioHang.GhiChu ?? string.Empty,
                 SoLuong = x.QlvtGioHang.SoLuong ?? 0,
                 x.QlvtGioHang.GioHangId,
+                Is007a = x.QlvtGioHang.Is007a ?? (short)Is007A.KhongTonKho,
             });
         //return await vatTu.ToListAsync();
         // lấy thông tin từ bảng vật tư mới tạo
@@ -52,7 +54,8 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
                 ThongSoKyThuat = x.QlvtGioHang.ThongSoKyThuat ?? string.Empty,
                 GhiChu = x.QlvtGioHang.GhiChu ?? string.Empty,
                 SoLuong = x.QlvtGioHang.SoLuong ?? 0,
-                x.QlvtGioHang.GioHangId
+                x.QlvtGioHang.GioHangId,
+                Is007a = x.QlvtGioHang.Is007a ?? (short)Is007A.KhongTonKho,
             });
         var combinedQuery = vatTu
                 .Union(vatTuNew)

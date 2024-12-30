@@ -6,6 +6,7 @@ using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
+using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
@@ -19,6 +20,7 @@ public class GioHangService : IGioHangService
 {
     private readonly IGioHangRepository _gioHangRepository;
     private readonly IVatTuRepository _vatTuRepository;
+    private readonly IVatTuTonKhoRepository _vatTuTonKhoRepository;
     private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IMapper _mapper;
@@ -28,6 +30,7 @@ public class GioHangService : IGioHangService
         IGioHangRepository gioHangRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IVatTuRepository vatTuRepository,
+        IVatTuTonKhoRepository vatTuTonKhoRepository,
         IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
         IMapper mapper,
         IOptions<ImagePath> imagePath)
@@ -36,6 +39,7 @@ public class GioHangService : IGioHangService
         _authorizedContextFacade = authorizedContextFacade;
         _vatTuRepository = vatTuRepository;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
+        _vatTuTonKhoRepository = vatTuTonKhoRepository;
         _mapper = mapper;
         _imagePath = imagePath.Value;
     }
@@ -162,8 +166,8 @@ public class GioHangService : IGioHangService
             supplyInCart.ThoiGianCapNhat = DateTime.Now;
             return await _gioHangRepository.UpdateAsync(supplyInCart);
         }
-        
-        // thêm mới giỏ hàng
+         
+        // t hêm mới giỏ hàng
         var supplyToAdd = _mapper.Map<QlvtGioHang>(request);
         if (request.IsSystemSupply)
         {
@@ -181,7 +185,8 @@ public class GioHangService : IGioHangService
                 throw new BadRequestException(Constants.Exceptions.Messages.Supplies.SupplyNotExist);
             }
         }
-        
+        var existedTonKho = await _vatTuTonKhoRepository.ExistsAsync(x => x.VatTuId == vatTuId);
+        supplyToAdd.Is007a = existedTonKho ? (short)Is007A.TonKho : (short)Is007A.KhongTonKho;
         supplyToAdd.VatTuId = vatTuId;
         supplyToAdd.UserId = userId;
         supplyToAdd.ThoiGianTao = DateTime.Now;

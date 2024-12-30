@@ -1,4 +1,6 @@
-﻿namespace ESPlatform.QRCode.IMS.Core.DTOs.GioHang.Responses;
+﻿using ESPlatform.QRCode.IMS.Domain.Enums;
+
+namespace ESPlatform.QRCode.IMS.Core.DTOs.GioHang.Responses;
 
 public class CartSupplyResponse
 {
@@ -11,4 +13,5 @@ public class CartSupplyResponse
     public string GhiChu { get; set; } = string.Empty;
     public int GioHangId { get; set; }
     public decimal DonGia { get; set; } = 0;
+    public Is007A Is007A { get; set; } 
 }

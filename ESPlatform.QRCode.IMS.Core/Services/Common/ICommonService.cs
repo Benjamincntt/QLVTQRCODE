@@ -6,7 +6,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.Common;
 
 public interface ICommonService
 {
-    Task<int> ModifySuppliesLocationAsync(int vatTuId, ModifiedSuppliesLocationRequest request);
+    Task<int> ModifySuppliesLocationAsync(int vatTuId, int khoId, ModifiedSuppliesLocationRequest request);
     
     Task<string> ModifySuppliesImageAsync(int vatTuId, string inputPath, IFormFile file);
     

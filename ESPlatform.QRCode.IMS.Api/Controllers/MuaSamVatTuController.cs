@@ -48,7 +48,7 @@ public class MuaSamVatTuController : ApiControllerBase
 
 
     /// <summary>
-    /// Thêm mới phiếu cung ứng
+    /// Lập mới phiếu cung ứng
     /// </summary>
     /// <returns>Id phiếu cung ứng</returns>
     [HttpPost("them-phieu-cung-ung")]

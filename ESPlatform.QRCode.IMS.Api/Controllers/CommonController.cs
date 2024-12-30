@@ -19,12 +19,13 @@ public class CommonController: ApiControllerBase
     /// Cập nhật vị trí vật tư
     /// </summary>
     /// <param name="vatTuId"></param>
-    /// <param name="idViTri"></param>
+    /// <param name="khoId"></param>
     /// <param name="request"></param>
+    /// <param name="idViTri"></param>
     /// <returns></returns>
-    [HttpPatch("{vatTuId:int}/update-supply-location")]
-    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, [FromBody]ModifiedSuppliesLocationRequest request) {
-        return await _commonService.ModifySuppliesLocationAsync(vatTuId, request);
+    [HttpPatch("{vatTuId:int}/{khoId:int}/update-supply-location")]
+    public async Task<int> ModifySuppliesLocationAsync(int vatTuId, int khoId, [FromBody]ModifiedSuppliesLocationRequest request) {
+        return await _commonService.ModifySuppliesLocationAsync(vatTuId, khoId, request);
     }
 
     /// <summary>

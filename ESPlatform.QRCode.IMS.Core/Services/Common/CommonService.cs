@@ -34,7 +34,9 @@ public class CommonService : ICommonService
         _imagePath = imagePath.Value;
     }
 
-    public async Task<int> ModifySuppliesLocationAsync(int vatTuId,
+    public async Task<int> ModifySuppliesLocationAsync(
+        int vatTuId,
+        int khoId,
         ModifiedSuppliesLocationRequest request)
     {
         #region validate
@@ -44,8 +46,13 @@ public class CommonService : ICommonService
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply,
                 new List<string> { nameof(vatTuId) + " is invalid" });
         }
+        if (khoId < 1)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply,
+                new List<string> { nameof(khoId) + " is invalid" });
+        }
 
-        var vatTu = await _vatTuRepository.GetAsync(vatTuId);
+        var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId && x.KhoId == khoId);
         if (vatTu == null)
         {
             throw new NotFoundException(vatTu.GetTypeEx(), null);
@@ -74,7 +81,7 @@ public class CommonService : ICommonService
             string.IsNullOrEmpty(maGiaKe) ? null : $"{maGiaKe}",
             string.IsNullOrEmpty(maNgan) ? null : $"{maNgan}",
         };
-        var vitri = await _vatTuViTriRepository.GetAsync(x => x.IdVatTu == vatTuId);
+        var vitri = await _vatTuViTriRepository.GetAsync(x => x.IdVatTu == vatTuId && x.IdKhoErp == khoId);
         // nếu chưa có vị trí => tạo vị trí mới 
         // trong case này nếu vị trí không được tìm thấy và có IdViTri => vẫn phải thêm mới vì trong db, bảng QLVT_VatTu_ViTri có IdViTri là key và là duy nhất
         if (vitri == null)
