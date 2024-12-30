@@ -28,6 +28,7 @@ public static partial class Constants {
 				public const string SupplyNotExist = "Vật tư không còn trong hệ thống";
 				public const string FailedToInsertSupply = "Thêm vật tư không thành công";
 				public const string DuplicatedSupplyName = "Vật tư có cùng tên đã tồn tại";
+                public const string InvalidOrganization = "Bạn chưa chọn kho";
 			}
 
 			public static class Login {

@@ -13,7 +13,6 @@ using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.Options;
-using QRCoder;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 
@@ -23,6 +22,7 @@ public class KiemKeService : IKiemKeService
     private readonly IKyKiemKeChiTietDffRepository _kyKiemKeChiTietDffRepository;
     private readonly IKyKiemKeChiTietRepository _kyKiemKeChiTietRepository;
     private readonly IKyKiemKeRepository _kyKiemKeRepository;
+    private readonly IVatTuTonKhoRepository _vatTuTonKhoRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IKhoRepository _khoRepository;
     private readonly IMapper _mapper;
@@ -34,6 +34,7 @@ public class KiemKeService : IKiemKeService
         IKhoRepository khoRepository,
         IKyKiemKeChiTietRepository kyKiemKeChiTietRepository,
         IKyKiemKeRepository kyKiemKeRepository,
+        IVatTuTonKhoRepository vatTuTonKhoRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IMapper mapper,
         IOptions<ImagePath> imagePath)
@@ -43,37 +44,48 @@ public class KiemKeService : IKiemKeService
         _khoRepository = khoRepository;
         _kyKiemKeChiTietRepository = kyKiemKeChiTietRepository;
         _kyKiemKeRepository = kyKiemKeRepository;
+        _vatTuTonKhoRepository = vatTuTonKhoRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _mapper = mapper;
         _imagePath = imagePath.Value;
     }
 
-    public async Task<InventoryCheckResponse> GetAsync(string maVatTu)
+    public async Task<InventoryCheckResponse> GetAsync(string maVatTu, int organizationId)
     {
         if (string.IsNullOrWhiteSpace(maVatTu))
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplyCode);
+        }
+        if (organizationId <= 0)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidOrganization);
         }
 
         var response = new InventoryCheckResponse();
 
         // KyKiemKeId
         var kiKiemKeChinh = await _kyKiemKeRepository.GetAsync(x => x.KyKiemKeChinh == 1);
-        if (kiKiemKeChinh != null) response.KyKiemKeId = kiKiemKeChinh.Id;
-        // vật tư 
-        var vatTu = await _vatTuRepository.GetAsync(x => x.MaVatTu == maVatTu);
-        if (vatTu == null)
+        if (kiKiemKeChinh != null)
         {
-            throw new NotFoundException(vatTu.GetTypeEx(), maVatTu);
+            response.KyKiemKeId = kiKiemKeChinh.Id;
+            response.PhysicalInventoryName = string.IsNullOrWhiteSpace(kiKiemKeChinh.PhysicalInventoryName)? string.Empty : kiKiemKeChinh.PhysicalInventoryName;
+        }
+        // vật tư 
+        var vatTuTonKho = await _vatTuTonKhoRepository.GetAsync(x => x.MaVatTu == maVatTu && x.OrganizationId == organizationId);
+        if (vatTuTonKho == null)
+        {
+            throw new NotFoundException(vatTuTonKho.GetTypeEx(), maVatTu);
         }
 
-        var vatTuId = vatTu.VatTuId;
+        var vatTuId = vatTuTonKho.VatTuId; 
         response.VatTuId = vatTuId;
         response.MaVatTu = maVatTu;
-        response.TenVatTu = !string.IsNullOrWhiteSpace(vatTu.TenVatTu) ? vatTu.TenVatTu : string.Empty;
-        response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
+        response.TenVatTu = !string.IsNullOrWhiteSpace(vatTuTonKho.TenVatTu) ? vatTuTonKho.TenVatTu : string.Empty;
+        response.DonViTinh = !string.IsNullOrWhiteSpace(vatTuTonKho.DonViTinh) ? vatTuTonKho.DonViTinh : string.Empty;
         // ảnh đại diện
-        response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
+        var vatTu = await _vatTuRepository.GetAsync(x => x.MaVatTu == maVatTu);
+
+        response.Image = vatTu is null ? string.Empty : string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image ;
         var rootPath = _imagePath.RootPath;                               // "D:"
         var relativeBasePath = _imagePath.RelativeBasePath;               // "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin/IMGVatTu"
         var localBasePath =  (rootPath + relativeBasePath).Replace("/", "\\");
@@ -116,16 +128,22 @@ public class KiemKeService : IKiemKeService
         // DFF
         response.SupplyDff =
             (await _kyKiemKeChiTietDffRepository.GetAsync(x =>
-                x.VatTuId == vatTu.VatTuId && x.KyKiemKeChiTietId == response.KyKiemKeChiTietId))
+                x.VatTuId == vatTuTonKho.VatTuId && x.KyKiemKeChiTietId == response.KyKiemKeChiTietId))
             .Adapt<SupplyDffResponse>();
 
         // vị trí kho chính và phụ
-        var warehouse = await _khoRepository.GetAsync(x => x.OrganizationId == vatTu.KhoId);
-        if (warehouse != null)
+
+        response.OrganizationCode = vatTuTonKho.MaKho ?? string.Empty ;
+        var subInventoryCode = vatTuTonKho.SubinventoryCode ?? string.Empty ;
+        response.SubInventoryCode = subInventoryCode;
+        if (subInventoryCode == string.Empty)
         {
-            if (warehouse.OrganizationCode != null) response.OrganizationCode = warehouse.OrganizationCode;
-            if (warehouse.SubInventoryCode != null) response.SubInventoryCode = warehouse.SubInventoryCode;
-            if (warehouse.SubInventoryName != null) response.SubInventoryName = warehouse.SubInventoryName;
+            response.SubInventoryName = string.Empty ;
+        }
+        else
+        {
+            var subInventory = await _khoRepository.GetAsync(x => x.OrganizationId == vatTuTonKho.OrganizationId);
+            response.SubInventoryName = subInventory is null ? string.Empty : string.IsNullOrWhiteSpace(subInventory.OrganizationName) ? string.Empty : subInventory.OrganizationName;
         }
 
         // vị trí chi tiết trong kho
@@ -138,10 +156,9 @@ public class KiemKeService : IKiemKeService
         }
 
         // LOT
-        var inventory = await _vatTuRepository.GetLotNumberAsync(vatTuId, vatTu.KhoId);
-        if (inventory == null) return response;
-        var inventoryMapper = _mapper.Map<InventoryCheckResponse>(inventory);
-        response.LotNumber = inventoryMapper.LotNumber;
+        response.LotNumber = string.IsNullOrWhiteSpace(vatTuTonKho.LotNumber) ? string.Empty : vatTuTonKho.LotNumber;
+        // Số lượng tồn kho
+        response.OnhandQuantity = vatTuTonKho.OnhandQuantity ?? 0;
         return response;
     }
 
@@ -307,6 +324,7 @@ public class KiemKeService : IKiemKeService
 
         return currentInventoryCheck;
     }
+    
 
     public async Task<int> CreateInventoryCheckDetailAsync(int vatTuId, int kyKiemKeId, decimal soLuongKiemKe)
     {
@@ -332,4 +350,5 @@ public class KiemKeService : IKiemKeService
         };
         return await _kyKiemKeChiTietRepository.InsertAsync(qtyToCreate);
     }
+    
 }

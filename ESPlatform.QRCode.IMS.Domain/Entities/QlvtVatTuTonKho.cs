@@ -45,9 +45,9 @@ public partial class QlvtVatTuTonKho
 
     public short? TrangThaiInQr { get; set; }
 
-    public int? VatTuId { get; set; }
+    public int VatTuId { get; set; }
 
-    public int? KhoId { get; set; }
+    public int KhoId { get; set; }
 
     public string? MaKho { get; set; }
 }

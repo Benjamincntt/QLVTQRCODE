@@ -5,7 +5,7 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 public class InventoryCheckResponse
 {
     //public int Tag { get; set; }
-    
+
     public int KyKiemKeId { get; set; }
     public int KyKiemKeChiTietId { get; set; }
 
@@ -14,17 +14,23 @@ public class InventoryCheckResponse
 
     public string TenVatTu { get; set; } = string.Empty;
 
-    [DisplayName("Tên kỳ kiểm kê")] public string PhysicalInventoryName { get; set; } = string.Empty;
-    [DisplayName("Mã kho")] public string OrganizationCode { get; set; } = string.Empty;
+    [DisplayName("Tên kỳ kiểm kê")] 
+    public string PhysicalInventoryName { get; set; } = string.Empty;
+    [DisplayName("Mã kho")] 
+    public string OrganizationCode { get; set; } = string.Empty;
 
     public short TrangThai { get; set; }
-    [DisplayName("Mã kho phụ")] public string SubInventoryCode { get; set; } = string.Empty;
-    [DisplayName("Tên kho phụ")] public string SubInventoryName { get; set; } = string.Empty;
+    
+    [DisplayName("Mã kho phụ")] 
+    public string SubInventoryCode { get; set; } = string.Empty;
+    
+    [DisplayName("Tên kho phụ")] 
+    public string SubInventoryName { get; set; } = string.Empty;
 
     public string LotNumber { get; set; } = string.Empty;
 
     public string DonViTinh { get; set; } = string.Empty;
-    
+
     public decimal SoLuongSoSach { get; set; }
 
     public decimal SoLuongKiemKe { get; set; }
@@ -36,13 +42,14 @@ public class InventoryCheckResponse
     public List<string> ImagePaths { get; set; } = new List<string>();
 
     public List<SuppliesLocation> SuppliesLocation { get; set; } = new List<SuppliesLocation>();
-    
+
     public SupplyDffResponse SupplyDff { get; set; } = new SupplyDffResponse();
 
     public string SoThe { get; set; } = string.Empty;
 
     public string TinhTrang_text { get; set; } = "Chưa kiểm kê";
-
+    
+    public decimal OnhandQuantity { get; set; }
 }
 
 public class SuppliesLocation

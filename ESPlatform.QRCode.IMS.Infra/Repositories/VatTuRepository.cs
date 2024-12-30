@@ -75,37 +75,26 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         List<int>? listIdGiaKe,
         List<int>? listIdNgan,
         List<string>? listMaNhom,
+        List<int>? listVatTuTonKhoIds,
         string relativeBasePath,
         int pageIndex,
         int pageSize)
     {
         var vatTu = DbContext.QlvtVatTus
-            .GroupJoin(DbContext.QlvtKhos,
-                x => x.KhoId,
-                y => y.OrganizationId,
-                (x, y) => new { QlvtVatTu = x, QlvtKho = y })
-            .SelectMany(x => x.QlvtKho.DefaultIfEmpty(),
-                (x, y) => new { x.QlvtVatTu, QlvtKho = y })
             .GroupJoin(DbContext.QlvtVatTuViTris,
-                x => x.QlvtVatTu.VatTuId,
+                x => x.VatTuId,
                 y => y.IdVatTu,
-                (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
+                (x, y) => new { QlvtVatTu = x, QlvtVatTuViTri = y })
             .SelectMany(x => x.QlvtVatTuViTri.DefaultIfEmpty(),
-                (x, y) => new { x.QlvtVatTu, x.QlvtKho, QlvtVatTuViTri = y })
-            .GroupJoin(DbContext.QlvtVatTuTonKhos,
-                x => new { KhoId = x.QlvtVatTu.KhoId, VatTuId = x.QlvtVatTu.VatTuId},
-                y => new { KhoId = y.OrganizationId, VatTuId = y.InventoryItemId },
-                (x, y) => new { x.QlvtVatTu, x.QlvtKho, x.QlvtVatTuViTri, QlvtVatTuTonKho = y })
-            .SelectMany(x => x.QlvtVatTuTonKho.DefaultIfEmpty(),
-            (x, y) => new { x.QlvtVatTu, x.QlvtKho, x.QlvtVatTuViTri, QlvtVatTuTonKho = y })
+                (x, y) => new { x.QlvtVatTu, QlvtVatTuViTri = y })
             .Where(x => string.IsNullOrWhiteSpace(tenVatTu) || x.QlvtVatTu.TenVatTu != null && x.QlvtVatTu.TenVatTu.ToLower().Contains(tenVatTu))
             .Where(x => string.IsNullOrWhiteSpace(maVatTu) || x.QlvtVatTu.MaVatTu != null && x.QlvtVatTu.MaVatTu.ToLower().Contains(maVatTu))
-            .Where(x => idKho == 0 || x.QlvtVatTu.KhoId == idKho)
+            .Where(x => x.QlvtVatTu.KhoId == idKho)
             .Where(x => listMaNhom == null || !listMaNhom.Any() || x.QlvtVatTu.MaVatTu != null && listMaNhom.Contains(x.QlvtVatTu.MaVatTu.Substring(0,7)))
             .Where(x => listIdToMay == null || !listIdToMay.Any() || x.QlvtVatTuViTri != null && listIdToMay.Contains((int)x.QlvtVatTuViTri.IdToMay!))
             .Where(x => listIdGiaKe == null ||!listIdGiaKe.Any() || x.QlvtVatTuViTri != null && listIdGiaKe.Contains((int)x.QlvtVatTuViTri.IdGiaKe!))
             .Where(x => listIdNgan == null ||!listIdNgan.Any() || x.QlvtVatTuViTri != null && listIdNgan.Contains((int)x.QlvtVatTuViTri.IdNgan!))
-            
+            .Where(x => listVatTuTonKhoIds == null || !listVatTuTonKhoIds.Any() || !listVatTuTonKhoIds.Contains(x.QlvtVatTu.VatTuId))
             .OrderBy(x => x.QlvtVatTu.MaVatTu)
             .ThenBy(x => x.QlvtVatTu.TenVatTu)
             .Select(x => new 
@@ -119,7 +108,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
                 IsSystemSupply = true,
                 DonGia = x.QlvtVatTu.DonGia ?? 0,
                 ThongSoKyThuat = x.QlvtVatTu.MoTa ?? string.Empty,
-                OnhandQuantity = x.QlvtVatTuTonKho == null ? 0 : x.QlvtVatTuTonKho.OnhandQuantity ?? 0,
+                OnhandQuantity = 0
             });
 
         return await vatTu.ToPagedListAsync<dynamic>(pageIndex, pageSize);

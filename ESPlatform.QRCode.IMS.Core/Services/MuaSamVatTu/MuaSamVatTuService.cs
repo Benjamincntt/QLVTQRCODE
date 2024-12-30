@@ -18,6 +18,7 @@ using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.Options;
+using WarehouseResponseItem = ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses.WarehouseResponseItem;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 
@@ -33,6 +34,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IVanBanKyRepository _vanBanKyRepository;
     private readonly IVatTuBoMaRepository _vatTuBoMaRepository;
     private readonly IMuaSamPdxKyRepository _muaSamPdxKyRepository;
+    private readonly IVatTuTonKhoRepository _vatTuTonKhoRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly ImagePath _imagePath;
     private readonly IMapper _mapper;
@@ -47,6 +49,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IVanBanKyRepository vanBanKyRepository,
         IVatTuBoMaRepository vatTuBoMaRepository,
         IMuaSamPdxKyRepository muaSamPdxKyRepository,
+        IVatTuTonKhoRepository vatTuTonKhoRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork,
         IOptions<ImagePath> imagePath,
@@ -60,6 +63,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _gioHangRepository = gioHangRepository;
         _vanBanKyRepository = vanBanKyRepository;
         _vatTuBoMaRepository = vatTuBoMaRepository;
+        _vatTuTonKhoRepository = vatTuTonKhoRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -69,31 +73,63 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 
     public async Task<PagedList<SupplyListResponseItem>> ListVatTuAsync(SupplyListRequest request)
     {
+        // Validate
         await ValidationHelper.ValidateAsync(request, new SupplyListRequestValidation());
         var relativeBasePath = _imagePath.RelativeBasePath;
-        var listVatTu = (await _vatTuRepository.ListAsync(
-                string.IsNullOrWhiteSpace(request.TenVatTu) ? string.Empty : request.TenVatTu.ToLower(),
-                string.IsNullOrWhiteSpace(request.MaVatTu) ? string.Empty : request.MaVatTu.ToLower(),
-                request.IdKho,
-                request.ListIdToMay,
-                request.ListIdGiaKe,
-                request.ListIdNgan,
-                request.ListMaNhom,
-                relativeBasePath,
-                request.GetPageIndex(),
-                request.GetPageSize()))
-            .Adapt<PagedList<SupplyListResponseItem>>();
-        if (listVatTu.Total == 0 || request.IsSystemSupply == false)
+        // Nhập thông tin kho là bắt buộc
+        if (request.IdKho == 0)
         {
-            var listVatTuNew = (await _muaSamVatTuNewRepository.ListAsync(
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidOrganization);
+        }
+        // Mặc định khi load trang => lấy vật tư từ bảng tồn kho theo khoId
+        if (request.Is007A == false)
+        {
+            var listVatTuTonKho = (await _vatTuTonKhoRepository.ListAsync(
                     string.IsNullOrWhiteSpace(request.TenVatTu) ? string.Empty : request.TenVatTu.ToLower(),
                     string.IsNullOrWhiteSpace(request.MaVatTu) ? string.Empty : request.MaVatTu.ToLower(),
+                    request.IdKho,
+                    request.ListIdToMay,
+                    request.ListIdGiaKe,
+                    request.ListIdNgan,
+                    request.ListMaNhom,
+                    relativeBasePath,
                     request.GetPageIndex(),
                     request.GetPageSize()))
                 .Adapt<PagedList<SupplyListResponseItem>>();
-            return listVatTuNew;
+            return listVatTuTonKho;
         }
-        return listVatTu;
+        // Case lọc theo filter => lấy các vật tư trong bảng vật tư/ vật tư mới mà không có trong bảng tồn kho 
+        else
+        {
+            var listVatTuTonKhoIds = (await _vatTuTonKhoRepository.ListVatTuIdAsync()).ToList();
+            // Case vật tư có trong hệ thống => vật tư
+            var listVatTu = (await _vatTuRepository.ListAsync(
+                    string.IsNullOrWhiteSpace(request.TenVatTu) ? string.Empty : request.TenVatTu.ToLower(),
+                    string.IsNullOrWhiteSpace(request.MaVatTu) ? string.Empty : request.MaVatTu.ToLower(),
+                    request.IdKho,
+                    request.ListIdToMay,
+                    request.ListIdGiaKe,
+                    request.ListIdNgan,
+                    request.ListMaNhom,
+                    listVatTuTonKhoIds,
+                    relativeBasePath,
+                    request.GetPageIndex(),
+                    request.GetPageSize()))
+                .Adapt<PagedList<SupplyListResponseItem>>();
+            // Case vật tư không có trong hệ thống => vật tư mới
+            if (listVatTu.Total == 0 || request.IsSystemSupply == false)
+            {
+                var listVatTuNew = (await _muaSamVatTuNewRepository.ListAsync(
+                        string.IsNullOrWhiteSpace(request.TenVatTu) ? string.Empty : request.TenVatTu.ToLower(),
+                        string.IsNullOrWhiteSpace(request.MaVatTu) ? string.Empty : request.MaVatTu.ToLower(),
+                        request.GetPageIndex(),
+                        request.GetPageSize()))
+                    .Adapt<PagedList<SupplyListResponseItem>>();
+                return listVatTuNew;
+            }
+
+            return listVatTu;
+        }
     }
 
     public async Task<SupplyOrderDetailResponse> GetSupplyOrderDetailAsync(int vatTuId, bool isSystemSupply)

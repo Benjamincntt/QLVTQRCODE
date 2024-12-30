@@ -60,6 +60,7 @@ public static class RegisterAppCoreServicesExtensions
             .AddScoped<ICauHinhVanBanKyRepository, CauHinhVanBanKyRepository>()
             .AddScoped<IViTriCongViecRepository, ViTriCongViecRepository>()
             .AddScoped<IMuaSamPdxKyRepository, MuaSamPdxKyRepository>()
+            .AddScoped<IVatTuTonKhoRepository, VatTuTonKhoRepository>()
             .AddScoped<IUnitOfWork, UnitOfWork>()
             // Facades
             .AddScoped<IAuthorizedContextFacade, AuthorizedContextFacade>()

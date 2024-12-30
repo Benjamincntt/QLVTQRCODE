@@ -8,6 +8,17 @@ public interface IVatTuRepository : IRepositoryBase<QlvtVatTu> {
     Task<dynamic?> GetInventoryCheckInformationAsync(int vatTuId, int kyKiemKeId);
     Task<IEnumerable<dynamic>> GetPositionAsync(int vatTuId);
     Task<dynamic?> GetLotNumberAsync(int vatTuId, int khoId);
-    Task<PagedList<dynamic>> ListAsync( string tenVatTu, string maVatTu, int idKho, List<int>? idToMay, List<int>? idGiaKe, List<int>? idNgan, List<string>? listMaNhom, string relativeBasePath, int pageIndex, int pageSize);
+    Task<PagedList<dynamic>> ListAsync( 
+        string tenVatTu, 
+        string maVatTu, 
+        int idKho,
+        List<int>? idToMay,
+        List<int>? idGiaKe,
+        List<int>? idNgan,
+        List<string>? listMaNhom,
+        List<int>? listVatTuTonKhoIds,
+        string relativeBasePath,
+        int pageIndex,
+        int pageSize);
     Task<dynamic?> GetWarehouseIdAsync(int vatTuId);
 }
