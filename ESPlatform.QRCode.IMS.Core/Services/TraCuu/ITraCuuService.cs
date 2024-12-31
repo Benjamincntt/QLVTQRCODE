@@ -4,5 +4,5 @@ namespace ESPlatform.QRCode.IMS.Core.Services.TraCuu;
 
 public interface ITraCuuService
 {
-    Task<LookupSuppliesResponse> GetAsync(string maVatTu);
+    Task<LookupSuppliesResponse> GetAsync(int khoId, string maVatTu);
 }

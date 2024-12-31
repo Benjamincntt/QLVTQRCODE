@@ -15,36 +15,40 @@ public class TraCuuService : ITraCuuService
 {
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IKhoRepository _khoRepository;
+    private readonly IVatTuTonKhoRepository _vatTuTonKhoRepository;
     private readonly IMapper _mapper;
     private readonly ImagePath _imagePath;
 
     public TraCuuService(
         IVatTuRepository vatTuRepository,
         IKhoRepository khoRepository,
+        IVatTuTonKhoRepository vatTuTonKhoRepository,
         IMapper mapper,
         IOptions<ImagePath> imagePath)
     {
         _vatTuRepository = vatTuRepository;
         _khoRepository = khoRepository;
+        _vatTuTonKhoRepository = vatTuTonKhoRepository;
         _mapper = mapper;
         _imagePath = imagePath.Value;
     }
 
-    public async Task<LookupSuppliesResponse> GetAsync(string maVatTu)
+    public async Task<LookupSuppliesResponse> GetAsync(int khoId, string maVatTu)
     {
         if (string.IsNullOrWhiteSpace(maVatTu))
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplyCode);
         }
+
         var response = new LookupSuppliesResponse();
 
         // Vật tư
-        var vatTu = await _vatTuRepository.GetAsync(x => x.MaVatTu == maVatTu);
+        var vatTu = await _vatTuRepository.GetAsync(x => x.KhoId == khoId && x.MaVatTu == maVatTu);
         if (vatTu == null)
         {
             throw new NotFoundException(vatTu.GetTypeEx(), maVatTu);
         }
-        
+
         var vatTuId = vatTu.VatTuId;
         response.VatTuId = vatTuId;
         response.MaVatTu = maVatTu;
@@ -52,9 +56,9 @@ public class TraCuuService : ITraCuuService
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
         // Ảnh đại diện
         response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
-        var rootPath = _imagePath.RootPath;           
-        var relativeBasePath = _imagePath.RelativeBasePath;                
-        var localBasePath =  (rootPath + relativeBasePath).Replace("/", "\\"); 
+        var rootPath = _imagePath.RootPath;
+        var relativeBasePath = _imagePath.RelativeBasePath;
+        var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\");
         var folderImagePath = $@"{localBasePath}\{vatTuId}";
         // Danh sách ảnh
         if (Directory.Exists(folderImagePath))
@@ -69,28 +73,25 @@ public class TraCuuService : ITraCuuService
                 response.ImagePaths.Add(fullPath);
             }
         }
-        // Vị trí kho chính và phụ
-        var warehouse = await _khoRepository.GetAsync(x => x.OrganizationId == vatTu.KhoId);
-        if (warehouse != null)
-        {
-            if (warehouse.OrganizationCode != null) response.OrganizationCode = warehouse.OrganizationCode;
-            if (warehouse.SubInventoryCode != null) response.SubInventoryCode = warehouse.SubInventoryCode;
-        }
+
+        // Vị trí kho chính và phụ,
+        var warehouse = await _khoRepository.GetAsync(x => x.OrganizationId == khoId);
+        response.OrganizationCode = warehouse == null ? string.Empty : warehouse.OrganizationCode ?? string.Empty;
+
+        // LOT, Số lượng tồn
+        var inventory = await _vatTuTonKhoRepository.GetAsync(x => x.VatTuId == vatTuId && x.KhoId == khoId);
+        if (inventory == null) return response;
+        response.LotNumber = inventory.LotNumber ?? string.Empty;
+        response.OnhandQuantity = inventory.OnhandQuantity ?? 0;
+        response.SubInventoryCode = inventory.SubinventoryCode ?? string.Empty;
+
         // Vị trí chi tiết trong kho
         var positions = (await _vatTuRepository.GetPositionAsync(vatTuId)).Adapt<IEnumerable<SuppliesLocation>>()
             .ToList();
-
         if (positions.Count > 0)
         {
             response.SuppliesLocation = positions;
         }
-        
-        // LOT, Số lượng tồn
-        var wareHouse = await _vatTuRepository.GetLotNumberAsync(vatTuId, vatTu.KhoId);
-        if (wareHouse == null) return response;
-        var wareHouseMapper = _mapper.Map<LookupSuppliesResponse>(wareHouse);
-        response.LotNumber = wareHouseMapper.LotNumber;
-        response.OnhandQuantity = wareHouseMapper.OnhandQuantity;
         return response;
     }
 }
