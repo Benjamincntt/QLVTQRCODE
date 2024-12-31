@@ -167,7 +167,7 @@ public class GioHangService : IGioHangService
             return await _gioHangRepository.UpdateAsync(supplyInCart);
         }
          
-        // t hêm mới giỏ hàng
+        // thêm mới giỏ hàng
         var supplyToAdd = _mapper.Map<QlvtGioHang>(request);
         if (request.IsSystemSupply)
         {

@@ -38,12 +38,13 @@ public class MuaSamVatTuController : ApiControllerBase
     /// Chi tiết vật tư mua sắm
     /// </summary>
     /// <param name="id"> VatTuId / VatTuNewId </param>
+    /// <param name="khoId"></param>
     /// <param name="isSystemSupply"></param>
     /// <returns></returns>
-    [HttpGet("{id:int}/chi-tiet-vat-tu")]
-    public async Task<SupplyOrderDetailResponse> GetSupplyOrderDetailAsync(int id, bool isSystemSupply = true)
+    [HttpGet("{id:int}/{khoId:int}/chi-tiet-vat-tu")]
+    public async Task<SupplyOrderDetailResponse> GetSupplyOrderDetailAsync(int id, int khoId, bool isSystemSupply = true)
     {
-        return await _muaSamVatTuService.GetSupplyOrderDetailAsync(id, isSystemSupply);
+        return await _muaSamVatTuService.GetSupplyOrderDetailAsync(id, khoId, isSystemSupply);
     }
 
 

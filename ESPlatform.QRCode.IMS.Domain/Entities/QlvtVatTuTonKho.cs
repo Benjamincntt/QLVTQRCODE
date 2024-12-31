@@ -1,6 +1,9 @@
-﻿namespace ESPlatform.QRCode.IMS.Domain.Entities;
+﻿using System.ComponentModel;
 
+namespace ESPlatform.QRCode.IMS.Domain.Entities;
+[DisplayName("Vật tư tồn kho")]
 public partial class QlvtVatTuTonKho
+
 {
     /// <summary>
     /// Id vật tư

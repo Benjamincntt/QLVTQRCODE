@@ -132,7 +132,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         }
     }
 
-    public async Task<SupplyOrderDetailResponse> GetSupplyOrderDetailAsync(int vatTuId, bool isSystemSupply)
+    public async Task<SupplyOrderDetailResponse> GetSupplyOrderDetailAsync(int vatTuId, int khoId, bool isSystemSupply)
     {
         if (vatTuId <= 0 )
         {
@@ -143,7 +143,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         // if Id is VatTuId => get information from QlvtVatTu table
         if (isSystemSupply)
         {
-            var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
+            var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId && x.KhoId == khoId);
             if (vatTu == null)
             {
                 throw new NotFoundException(vatTu.GetTypeEx(), null);

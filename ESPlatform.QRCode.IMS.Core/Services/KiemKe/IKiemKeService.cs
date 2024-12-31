@@ -6,7 +6,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 
 public interface IKiemKeService
 {
-    Task<InventoryCheckResponse> GetAsync(string maVatTu, int organizationId);
+    Task<InventoryCheckResponse> GetAsync(string maVatTu, int khoId);
 
     Task<int> ModifySuppliesDffAsync(int vatTuId, int kyKiemKeId, int kyKiemKeChiTietId, decimal soLuongKiemKe,
         ModifiedSuppliesDffRequest request);

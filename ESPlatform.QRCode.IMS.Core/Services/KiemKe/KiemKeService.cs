@@ -50,13 +50,13 @@ public class KiemKeService : IKiemKeService
         _imagePath = imagePath.Value;
     }
 
-    public async Task<InventoryCheckResponse> GetAsync(string maVatTu, int organizationId)
+    public async Task<InventoryCheckResponse> GetAsync(string maVatTu, int khoId)
     {
         if (string.IsNullOrWhiteSpace(maVatTu))
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplyCode);
         }
-        if (organizationId <= 0)
+        if (khoId <= 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidOrganization);
         }
@@ -71,7 +71,7 @@ public class KiemKeService : IKiemKeService
             response.PhysicalInventoryName = string.IsNullOrWhiteSpace(kiKiemKeChinh.PhysicalInventoryName)? string.Empty : kiKiemKeChinh.PhysicalInventoryName;
         }
         // vật tư 
-        var vatTuTonKho = await _vatTuTonKhoRepository.GetAsync(x => x.MaVatTu == maVatTu && x.OrganizationId == organizationId);
+        var vatTuTonKho = await _vatTuTonKhoRepository.GetAsync(x => x.MaVatTu == maVatTu && x.OrganizationId == khoId);
         if (vatTuTonKho == null)
         {
             throw new NotFoundException(vatTuTonKho.GetTypeEx(), maVatTu);

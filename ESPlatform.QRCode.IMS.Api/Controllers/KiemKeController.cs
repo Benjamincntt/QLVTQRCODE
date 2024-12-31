@@ -20,12 +20,12 @@ public class KiemKeController : ApiControllerBase
     /// Hiển thị chi tiết kiểm kê: Quét QR Code kiểm kê/ Nhập mã tay
     /// </summary>
     /// <param name="maVatTu"></param>
-    /// <param name="organizationId"></param>
+    /// <param name="khoId"></param>
     /// <returns></returns>
-    [HttpGet("{maVatTu}/{organizationId:int}")]
-    public async Task<InventoryCheckResponse> GetAsync(string maVatTu, int organizationId)
+    [HttpGet("{maVatTu}/{khoId:int}")]
+    public async Task<InventoryCheckResponse> GetAsync(string maVatTu, int khoId)
     {
-        return await _kiemKeService.GetAsync(maVatTu, organizationId);
+        return await _kiemKeService.GetAsync(maVatTu, khoId);
     }
 
     /// <summary>
