@@ -6,6 +6,8 @@ public class JwtSettings {
 	public string Audience { get; set; } = null!;
 
 	public string Key { get; set; } = null!;
+    
+    public string Subject { get; set; } = null!;
 
 	public int AccessTokenLifetimeMinutes { get; set; }
 

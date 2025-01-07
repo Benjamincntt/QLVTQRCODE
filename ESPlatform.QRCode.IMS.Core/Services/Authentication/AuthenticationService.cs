@@ -18,30 +18,22 @@ namespace ESPlatform.QRCode.IMS.Core.Services.Authentication;
 
 public class AuthenticationService : IAuthenticationService
 {
-    private readonly IAccountRepository _accountRepository;
-    private readonly IDonViSuDungRepository _donViSuDungRepository;
     private readonly INguoiDungRepository _nguoiDungRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly JwtFacade _jwtFacade;
-    private readonly OtpFacade _otpFacade;
     private readonly IDistributedCache _distributedCache;
     private readonly IViTriCongViecRepository _viTriCongViecRepository;
 
-    public AuthenticationService(IAccountRepository accountRepository,
+    public AuthenticationService(
         IAuthorizedContextFacade authorizedContextFacade,
-        IDonViSuDungRepository donViSuDungRepository,
         INguoiDungRepository nguoiDungRepository,
         JwtFacade jwtFacade,
-        OtpFacade otpFacade,
         IDistributedCache distributedCache,
         IViTriCongViecRepository viTriCongViecRepository)
     {
-        _accountRepository = accountRepository;
         _authorizedContextFacade = authorizedContextFacade;
-        _donViSuDungRepository = donViSuDungRepository;
         _nguoiDungRepository = nguoiDungRepository;
         _jwtFacade = jwtFacade;
-        _otpFacade = otpFacade;
         _distributedCache = distributedCache;
         _viTriCongViecRepository = viTriCongViecRepository;
     }
