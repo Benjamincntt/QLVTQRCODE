@@ -87,4 +87,5 @@ public static class StringExtensions {
 		fileName = fileName.ToUrlSlug();
 		return ticks + fileName + "." + fileType;
 	}
+    
 }

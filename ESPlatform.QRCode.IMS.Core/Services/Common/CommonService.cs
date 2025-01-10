@@ -9,7 +9,6 @@ using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
-using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
@@ -123,7 +122,7 @@ public class CommonService : ICommonService
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.NoSupplyImageSelected);
         }
 
-        var vatTu = await _vatTuRepository.GetAsync(vatTuId);
+        var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
         if (vatTu == null)
         {
             throw new NotFoundException(vatTu.GetTypeEx(), null);
@@ -163,17 +162,17 @@ public class CommonService : ICommonService
         {
             await file.CopyToAsync(stream);
         }
-
-        // Lấy ảnh đầu tiên trong thư mục làm ảnh đại diện
-        var imageFiles = Directory.GetFiles(localFolder)
-            .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
-            .ToList();
-        if (imageFiles.Count > 0)
-        {
-            var firstImageFile = imageFiles.First();
-            vatTu.Image = Path.Combine("/", vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/"); 
-            await _vatTuRepository.UpdateAsync(vatTu);
-        }
+        
+        // Lấy ảnh đầu tiên trong thư mục làm ảnh đại diện => bỏ ngày 09/01/2025 do bảng vật tư không còn khóa chính
+        // var imageFiles = Directory.GetFiles(localFolder)
+        //     .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
+        //     .ToList();
+        // if (imageFiles.Count > 0)
+        // {
+        //     var firstImageFile = imageFiles.First();
+        //     vatTu.Image = Path.Combine("/", vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/"); 
+        //     await _vatTuRepository.UpdateAsync(vatTu);
+        // }
 
         return Path.Combine(_imagePath.RelativeBasePath, vatTuId.ToString(), fileName)
             .Replace("\\", "/");                                                                                       
@@ -193,10 +192,10 @@ public class CommonService : ICommonService
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.NoSupplyImageSelected);
         }
 
-        var vatTu = await _vatTuRepository.GetAsync(vatTuId);
-        if (vatTu == null)
+        var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
+        if (vatTu is null)
         {
-            throw new NotFoundException(vatTu.GetTypeEx(), null);
+            throw new NotFoundException(Constants.Exceptions.Messages.Supplies.EmptySupplies);
         }
 
         string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
@@ -228,16 +227,16 @@ public class CommonService : ICommonService
         {
             await file.CopyToAsync(stream);
         }
-        // Lấy ảnh đầu tiên trong thư mục làm ảnh đại diện
-        var imageFiles = Directory.GetFiles(pathUpload)
-            .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
-            .ToList();
-        if (imageFiles.Count > 0)
-        {
-            var firstImageFile = imageFiles.First();
-            vatTu.Image = Path.Combine("/", vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/"); 
-            await _vatTuRepository.UpdateAsync(vatTu);
-        }
+        // Lấy ảnh đầu tiên trong thư mục làm ảnh đại diện => bỏ ngày 09/01/2025 do bảng vật tư không còn khóa chính
+        // var imageFiles = Directory.GetFiles(pathUpload)
+        //     .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
+        //     .ToList();
+        // if (imageFiles.Count > 0)
+        // {
+        //     var firstImageFile = imageFiles.First();
+        //     vatTu.Image = Path.Combine("/", vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/"); 
+        //     await _vatTuRepository.UpdateAsync(vatTu);
+        // }
 
         var urlResult = Path.Combine(relativeBasePath, vatTuId.ToString(), fileName).Replace("\\", "/");
         return urlResult;
@@ -250,7 +249,7 @@ public class CommonService : ICommonService
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidSupply);
         }
 
-        var vatTu = await _vatTuRepository.GetAsync(vatTuId);
+        var vatTu = await _vatTuRepository.GetAsync(x => x.VatTuId == vatTuId);
         if (vatTu == null)
         {
             throw new NotFoundException(vatTu.GetTypeEx(), null);
@@ -267,20 +266,20 @@ public class CommonService : ICommonService
             return default;
         }
         File.Delete(localPath);
-        // Lấy ảnh đầu tiên trong thư mục làm ảnh đại diện
-        var localFolder = Path.Combine(localBasePath, vatTuId.ToString()); 
-        var imageFiles = Directory.GetFiles(localFolder)
-            .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
-            .ToList();
-        if (imageFiles.Count <= 0)
-        {
-            vatTu.Image = string.Empty;
-            await _vatTuRepository.UpdateAsync(vatTu);
-            return 1;
-        }
-        var firstImageFile = imageFiles.First();
-        vatTu.Image = Path.Combine("/", vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/"); 
-        await _vatTuRepository.UpdateAsync(vatTu);
+        // Lấy ảnh đầu tiên trong thư mục làm ảnh đại diện => bỏ ngày 09/01/2025 do bảng vật tư không còn khóa chính
+        // var localFolder = Path.Combine(localBasePath, vatTuId.ToString()); 
+        // var imageFiles = Directory.GetFiles(localFolder)
+        //     .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
+        //     .ToList();
+        // if (imageFiles.Count <= 0)
+        // {
+        //     vatTu.Image = string.Empty;
+        //     await _vatTuRepository.UpdateAsync(vatTu);
+        //     return 1;
+        // }
+        // var firstImageFile = imageFiles.First();
+        // vatTu.Image = Path.Combine("/", vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/"); 
+        // await _vatTuRepository.UpdateAsync(vatTu);
         return 1;
     }
 

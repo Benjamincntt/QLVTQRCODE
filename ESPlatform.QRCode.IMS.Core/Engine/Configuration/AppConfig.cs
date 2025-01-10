@@ -8,8 +8,7 @@ public class AppConfig {
 	public ConnectionStrings ConnectionStrings { get; set; } = new();
 
 	public IEnumerable<string> AllowedDomains { get; set; } = Enumerable.Empty<string>();
-
-	//public RabbitMqSettings RabbitMq { get; set; } = new();
+    
 
 	public JwtSettings JwtSettings { get; set; } = new();
 

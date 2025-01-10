@@ -13,4 +13,5 @@ public interface IGioHangService
     Task<int> ModifyInformationAsync(int gioHangId, ModifiedCartSupplyRequest request);
     Task<int> CreateCartSupplyAsync(int vatTuId, CreatedCartSupplyRequest request);
     Task<int> CreateCartSupplyNewAsync(CreatedSupplyRequest request);
+    string GetSupplyImage(int vatTuId);
 }

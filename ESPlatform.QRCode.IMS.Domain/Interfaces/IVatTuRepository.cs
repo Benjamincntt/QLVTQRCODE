@@ -17,7 +17,6 @@ public interface IVatTuRepository : IRepositoryBase<QlvtVatTu> {
         List<int>? idNgan,
         List<string>? listMaNhom,
         List<int>? listVatTuTonKhoIds,
-        string relativeBasePath,
         int pageIndex,
         int pageSize);
     Task<dynamic?> GetWarehouseIdAsync(int vatTuId);

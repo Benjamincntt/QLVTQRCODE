@@ -53,7 +53,16 @@ public class GioHangService : IGioHangService
     public async Task<IEnumerable<CartSupplyResponse>> ListSupplyAsync()
     {
         var userId = _authorizedContextFacade.AccountId;
-        return (await _gioHangRepository.ListSupplyAsync(userId, _imagePath.RelativeBasePath)).Adapt<IEnumerable<CartSupplyResponse>>();
+        var vatTus = (await _gioHangRepository.ListSupplyAsync(userId, _imagePath.RelativeBasePath)).Adapt<IEnumerable<CartSupplyResponse>>().ToList();
+        if (!vatTus.Any())
+        {
+            return new List<CartSupplyResponse>();
+        }
+        foreach (var item in vatTus.Where(item => item.IsSystemSupply))
+        {
+            item.Image = GetSupplyImage(item.VatTuId);
+        }
+        return vatTus;
     }
 
     public async Task<int> ModifyQuantityAsync(int gioHangId, decimal quantity)
@@ -67,14 +76,14 @@ public class GioHangService : IGioHangService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Cart.InvalidQuantity);
         }
-        var vatTu = await _gioHangRepository.GetAsync(x => x.GioHangId == gioHangId);
-        if (vatTu == null)
+        var supplyInCart = await _gioHangRepository.GetAsync(x => x.GioHangId == gioHangId);
+        if (supplyInCart == null)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Cart.SupplyNotExist);
         }
-        vatTu.SoLuong = quantity;
-        vatTu.ThoiGianCapNhat = DateTime.Now;
-        return await _gioHangRepository.UpdateAsync(vatTu);
+        supplyInCart.SoLuong = quantity;
+        supplyInCart.ThoiGianCapNhat = DateTime.Now;
+        return await _gioHangRepository.UpdateAsync(supplyInCart);
     }
 
     public async Task<int> DeleteSupplyAsync(int gioHangId)
@@ -224,5 +233,27 @@ public class GioHangService : IGioHangService
             IsSystemSupply = false
         };
         return await CreateCartSupplyAsync(vatTuAdded.VatTuNewId, createdCartSupplyRequest);
+    }
+
+    public string GetSupplyImage(int vatTuId)
+    {
+        // Các đuôi file được phép
+        string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" }; 
+        // Xây dựng dường dẫn đến folder hoàn chỉnh
+        var rootPath = _imagePath.RootPath; 
+        var relativeBasePath = _imagePath.RelativeBasePath; 
+        var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\"); 
+        var localFolder = Path.Combine(localBasePath, vatTuId.ToString());
+        if (!Directory.Exists(localFolder)) return string.Empty;
+        
+        // lấy danh sách các file trong folder có đuôi ảnh
+        var imageFiles = Directory.GetFiles(localFolder)
+            .Where(x => allowedExtensions.Contains(Path.GetExtension(x).ToLower()))
+            .ToList();
+        
+        if (imageFiles.Count == 0) return string.Empty;
+        //lấy ảnh đầu tiên trong file làm ảnh đại diện
+        var firstImageFile = imageFiles.First();
+        return Path.Combine(relativeBasePath, vatTuId.ToString(), Path.GetFileName(firstImageFile)).Replace("\\", "/");
     }
 }

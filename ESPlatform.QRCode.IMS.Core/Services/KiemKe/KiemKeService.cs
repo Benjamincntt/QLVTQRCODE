@@ -3,6 +3,7 @@ using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
+using ESPlatform.QRCode.IMS.Core.Services.GioHang;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
@@ -18,6 +19,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 
 public class KiemKeService : IKiemKeService
 {
+    private readonly IGioHangService _gioHangService;
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IKyKiemKeChiTietDffRepository _kyKiemKeChiTietDffRepository;
     private readonly IKyKiemKeChiTietRepository _kyKiemKeChiTietRepository;
@@ -29,6 +31,7 @@ public class KiemKeService : IKiemKeService
     private readonly ImagePath _imagePath;
 
     public KiemKeService(
+        IGioHangService gioHangService,
         IVatTuRepository vatTuRepository,
         IKyKiemKeChiTietDffRepository kyKiemKeChiTietDffRepository,
         IKhoRepository khoRepository,
@@ -39,6 +42,7 @@ public class KiemKeService : IKiemKeService
         IMapper mapper,
         IOptions<ImagePath> imagePath)
     {
+        _gioHangService = gioHangService;
         _vatTuRepository = vatTuRepository;
         _kyKiemKeChiTietDffRepository = kyKiemKeChiTietDffRepository;
         _khoRepository = khoRepository;
@@ -82,10 +86,7 @@ public class KiemKeService : IKiemKeService
         response.MaVatTu = maVatTu;
         response.TenVatTu = !string.IsNullOrWhiteSpace(vatTuTonKho.TenVatTu) ? vatTuTonKho.TenVatTu : string.Empty;
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTuTonKho.DonViTinh) ? vatTuTonKho.DonViTinh : string.Empty;
-        // ảnh đại diện
-        var vatTu = await _vatTuRepository.GetAsync(x => x.MaVatTu == maVatTu);
-
-        response.Image = vatTu is null ? string.Empty : string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image ;
+        
         var rootPath = _imagePath.RootPath;                               // "D:"
         var relativeBasePath = _imagePath.RelativeBasePath;               // "/4.Dev/NMD.24.TMQRCODE.5031-5035/WebAdmin/IMGVatTu"
         var localBasePath =  (rootPath + relativeBasePath).Replace("/", "\\");
@@ -107,6 +108,11 @@ public class KiemKeService : IKiemKeService
                 // Thêm vào danh sách đường dẫn
                 response.ImagePaths.Add(fullPath);
             }
+        }
+        // ảnh đại diện
+        if (response.ImagePaths.Any())
+        {
+            response.Image = response.ImagePaths.First();
         }
         
         // kỳ kiểm kê

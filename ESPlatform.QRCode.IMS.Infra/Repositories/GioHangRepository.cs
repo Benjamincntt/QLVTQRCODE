@@ -26,7 +26,7 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
             {
                 TenVatTu = x.VatTu.TenVatTu ?? string.Empty,
                 DonGia = x.VatTu.DonGia ?? 0,
-                Image = x.VatTu.Image != null ? (relativeBasePath + x.VatTu.Image) : string.Empty,
+                //Image = x.VatTu.Image != null ? (relativeBasePath + x.VatTu.Image) : string.Empty,
                 x.QlvtGioHang.VatTuId,
                 IsSystemSupply = x.QlvtGioHang.IsSystemSupply ?? true,
                 ThongSoKyThuat = x.VatTu.MoTa ?? string.Empty,
@@ -48,7 +48,7 @@ public class GioHangRepository : EfCoreRepositoryBase<QlvtGioHang, AppDbContext>
             {
                 TenVatTu = x.VatTuNew.TenVatTu ?? string.Empty,
                 DonGia = x.VatTuNew.DonGia ?? 0,
-                Image = x.VatTuNew.Image ?? string.Empty,
+                //Image = x.VatTuNew.Image ?? string.Empty,
                 x.QlvtGioHang.VatTuId,
                 IsSystemSupply = x.QlvtGioHang.IsSystemSupply ?? false,
                 ThongSoKyThuat = x.QlvtGioHang.ThongSoKyThuat ?? string.Empty,

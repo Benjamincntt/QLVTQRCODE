@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
+﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
@@ -7,6 +6,7 @@ using ESPlatform.QRCode.IMS.Core.DTOs.TraCuu.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
+using ESPlatform.QRCode.IMS.Core.Services.GioHang;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
@@ -25,6 +25,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 public class MuaSamVatTuService : IMuaSamVatTuService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IGioHangService _gioHangService;
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
     private readonly IMuaSamPhieuDeXuatRepository _muaSamPhieuDeXuatRepository;
@@ -40,6 +41,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IMapper _mapper;
 
     public MuaSamVatTuService(
+        IGioHangService gioHangService,
         IVatTuRepository vatTuRepository,
         IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
         IMuaSamPhieuDeXuatRepository muaSamPhieuDeXuatRepository,
@@ -55,6 +57,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IOptions<ImagePath> imagePath,
         IMapper mapper)
     {
+        _gioHangService = gioHangService;
         _vatTuRepository = vatTuRepository;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
         _muaSamPhieuDeXuatRepository = muaSamPhieuDeXuatRepository;
@@ -75,12 +78,12 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     {
         // Validate
         await ValidationHelper.ValidateAsync(request, new SupplyListRequestValidation());
-        var relativeBasePath = _imagePath.RelativeBasePath;
         // Nhập thông tin kho là bắt buộc
         if (request.IdKho == 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidOrganization);
         }
+
         // Mặc định khi load trang => lấy vật tư từ bảng tồn kho theo khoId
         if (request.Is007A == false)
         {
@@ -92,10 +95,15 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                     request.ListIdGiaKe,
                     request.ListIdNgan,
                     request.ListMaNhom,
-                    relativeBasePath,
                     request.GetPageIndex(),
                     request.GetPageSize()))
                 .Adapt<PagedList<SupplyListResponseItem>>();
+            var updatedItems = listVatTuTonKho.Items.ToList();
+            foreach (var item in updatedItems)
+            {
+                item.Image = _gioHangService.GetSupplyImage(item.VatTuId);
+            }
+            listVatTuTonKho.Items = updatedItems; 
             return listVatTuTonKho;
         }
         // Case lọc theo filter => lấy các vật tư trong bảng vật tư/ vật tư mới mà không có trong bảng tồn kho 
@@ -112,7 +120,6 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                     request.ListIdNgan,
                     request.ListMaNhom,
                     listVatTuTonKhoIds,
-                    relativeBasePath,
                     request.GetPageIndex(),
                     request.GetPageSize()))
                 .Adapt<PagedList<SupplyListResponseItem>>();
@@ -127,7 +134,12 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                     .Adapt<PagedList<SupplyListResponseItem>>();
                 return listVatTuNew;
             }
-
+            var updatedItems = listVatTu.Items.ToList();
+            foreach (var item in updatedItems)
+            {
+                item.Image = _gioHangService.GetSupplyImage(item.VatTuId);
+            }
+            listVatTu.Items = updatedItems; 
             return listVatTu;
         }
     }
@@ -184,7 +196,8 @@ public class MuaSamVatTuService : IMuaSamVatTuService
          {
              throw new NotFoundException(vatTuNew.GetTypeEx(), null);
          }
-         response.TenVatTu = vatTuNew.TenVatTu ?? string.Empty;
+
+         response.TenVatTu = vatTuNew.TenVatTu;
          response.ThongSoKyThuat = vatTuNew.ThongSoKyThuat ?? string.Empty;
          response.DonGia = vatTuNew.DonGia ?? 0;
          response.GhiChu = vatTuNew.GhiChu ?? string.Empty;
@@ -247,6 +260,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 requests.GetPageIndex(),
                 requests.GetPageSize()))
             .Adapt<PagedList<SupplyTicketListResponseItem>>();
+        
         return listPhieu;
     }
 
@@ -300,13 +314,9 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             return response;
         }
         
-        var relativeBasePath = _imagePath.RelativeBasePath;
-        foreach (var supply in listSupplies)
+        foreach (var supply in listSupplies.Where(supply => supply.IsSystemSupply))
         {
-            if (!string.IsNullOrWhiteSpace(supply.Image))
-            {
-                supply.Image = relativeBasePath + supply.Image;
-            }
+            supply.Image = _gioHangService.GetSupplyImage(supply.VatTuId);
         }
         response.DanhSachVatTu = listSupplies;
         response.Tong = response.DanhSachVatTu.Count;
@@ -341,8 +351,6 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         {
             await _muaSamPdxKyRepository.DeleteManyAsync(currentSignedSupplyTickets);
         }
-        // currentSupplyTicket.TrangThai = (byte?)SupplyTicketStatus.Deleted;
-        // currentSupplyTicket.NgaySua = DateTime.Now;
         return await _muaSamPhieuDeXuatRepository.DeleteAsync(currentSupplyTicket);
     }
 

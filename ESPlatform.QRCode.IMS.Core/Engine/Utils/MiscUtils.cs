@@ -16,20 +16,5 @@ public static class MiscUtils {
 	public static string GetUsername(this HttpContext context) {
 		return context.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value ?? string.Empty;
 	}
-
-	// public static string BuildContentUrl(string urlSlug, string redirectUrl = "") {
-	// 	return string.IsNullOrWhiteSpace(redirectUrl) ? $"/{urlSlug}.tpo" : redirectUrl;
-	// }
-	//
-	// public static string BuildCategoryUrl(string urlSlug, string redirectUrl = "") {
-	// 	return string.IsNullOrWhiteSpace(redirectUrl) ? $"/c/{urlSlug}.tpo" : redirectUrl;
-	// }
-	//
-	// public static string BuildTopicUrl(string urlSlug, string redirectUrl = "") {
-	// 	return string.IsNullOrWhiteSpace(redirectUrl) ? $"/t/{urlSlug}.tpo" : redirectUrl;
-	// }
-	//
-	// public static string BuildEMagazineUrl(string urlSlug, string redirectUrl = "") {
-	// 	return string.IsNullOrWhiteSpace(redirectUrl) ? $"/em/{urlSlug}.tpo" : redirectUrl;
-	//}
+    
 }

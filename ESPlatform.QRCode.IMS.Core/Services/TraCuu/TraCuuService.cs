@@ -54,8 +54,6 @@ public class TraCuuService : ITraCuuService
         response.MaVatTu = maVatTu;
         response.TenVatTu = !string.IsNullOrWhiteSpace(vatTu.TenVatTu) ? vatTu.TenVatTu : string.Empty;
         response.DonViTinh = !string.IsNullOrWhiteSpace(vatTu.DonViTinh) ? vatTu.DonViTinh : string.Empty;
-        // Ảnh đại diện
-        response.Image = string.IsNullOrWhiteSpace(vatTu.Image) ? string.Empty : vatTu.Image;
         var rootPath = _imagePath.RootPath;
         var relativeBasePath = _imagePath.RelativeBasePath;
         var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\");
@@ -72,6 +70,11 @@ public class TraCuuService : ITraCuuService
                 var fullPath = Path.Combine(relativeBasePath, vatTuId.ToString(), fileName).Replace("\\", "/");
                 response.ImagePaths.Add(fullPath);
             }
+        }
+        // Ảnh đại diện
+        if (response.ImagePaths.Any())
+        {
+            response.Image = response.ImagePaths.First();
         }
 
         // Vị trí kho chính và phụ,

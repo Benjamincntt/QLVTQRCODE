@@ -24,14 +24,14 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
             .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == true)
             .Select(x => new
             {
+                VatTuId = x.VatTu.VatTuId,
+                IsSystemSupply = true,
                 TenVatTu = x.VatTu.TenVatTu ?? string.Empty,
                 ThongSoKyThuat = x.PhieuDeXuatDetail.ThongSoKyThuat ?? string.Empty,
                 GhiChu = x.PhieuDeXuatDetail.GhiChu ?? string.Empty,
                 SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
-                Image = x.VatTu.Image ?? string.Empty,
                 DonGia = x.VatTu.DonGia ?? 0
             });
-        //return await vatTu.ToListAsync();
         // lấy thông tin từ bảng vật tư mới tạo
          var vatTuNew = DbContext.QlvtMuaSamPhieuDeXuatDetails
              .Join(DbContext.QlvtMuaSamVatTuNews,
@@ -42,11 +42,12 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
              .Where(x => x.PhieuDeXuatDetail.IsSystemSupply == false)
              .Select(x => new
              {
+                 VatTuId = x.VatTuNew.VatTuNewId,
+                 IsSystemSupply = false,
                  TenVatTu = x.VatTuNew.TenVatTu ?? string.Empty,
                  ThongSoKyThuat = x.PhieuDeXuatDetail.ThongSoKyThuat ?? string.Empty,
                  GhiChu = x.PhieuDeXuatDetail.GhiChu ?? string.Empty,
                  SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
-                 Image = x.VatTuNew.Image ?? string.Empty,
                  DonGia = x.VatTuNew.DonGia ?? 0
              });
          var combinedQuery = vatTu

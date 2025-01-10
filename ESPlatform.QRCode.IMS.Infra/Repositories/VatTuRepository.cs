@@ -76,7 +76,6 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         List<int>? listIdNgan,
         List<string>? listMaNhom,
         List<int>? listVatTuTonKhoIds,
-        string relativeBasePath,
         int pageIndex,
         int pageSize)
     {
@@ -99,12 +98,11 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
             .ThenBy(x => x.QlvtVatTu.TenVatTu)
             .Select(x => new 
             {
-                VatTuId = x.QlvtVatTu.VatTuId,
+                x.QlvtVatTu.VatTuId,
                 TenVatTu = x.QlvtVatTu.TenVatTu ?? string.Empty,
                 MaVatTu = x.QlvtVatTu.MaVatTu ?? string.Empty,
                 DonViTinh = x.QlvtVatTu.DonViTinh ?? string.Empty,
                 XuatXu = string.Empty,
-                Image = x.QlvtVatTu.Image != null ? (relativeBasePath + x.QlvtVatTu.Image) : string.Empty,
                 IsSystemSupply = true,
                 DonGia = x.QlvtVatTu.DonGia ?? 0,
                 ThongSoKyThuat = x.QlvtVatTu.MoTa ?? string.Empty,
