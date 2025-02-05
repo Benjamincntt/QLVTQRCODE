@@ -295,24 +295,26 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                     catch (Exception ex)
                     {
                         // Log lỗi nếu việc xóa file gặp sự cố
-                        Console.Error.WriteLine($"Error deleting signature image: {ex.Message}");
+                        Serilog.Log.Error($"Error deleting signature image: {ex.Message}");
                     }
                 }
                 return Ok(new { success = true, message = "Ký thành công." });
             }
             catch (NotFoundException ex)
             {
+                Serilog.Log.Error($"NotFoundException: {ex.Message}");
                 return NotFound(new { message = ex.Message });
             }
             catch (BadRequestException ex)
             {
+                Serilog.Log.Error($"BadRequestException: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
                 // Log chi tiết lỗi
-                Console.Error.WriteLine($"Error during signing: {ex}");
-                return StatusCode(500, new { message = "Ký số thất bại.", error = ex.Message });
+                Serilog.Log.Error("Ký số thất bại: ", ex);
+                return StatusCode(500, new { message = "Ký số thất bại.", error = ex.ToString() });
             }
         }
 
