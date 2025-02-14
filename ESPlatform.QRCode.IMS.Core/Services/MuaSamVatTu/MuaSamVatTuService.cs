@@ -78,10 +78,22 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     {
         // Validate
         await ValidationHelper.ValidateAsync(request, new SupplyListRequestValidation());
-        // Nhập thông tin kho là bắt buộc
-        if (request.IdKho == 0)
+        // Nhập thông tin kho là bắt buộc với các trường hợp vật tư trong hệ thống
+        if (request.IsSystemSupply is true && request.IdKho == 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidOrganization);
+        }
+        
+        // Nếu là vật tư ngoài hệ thống thì show kết quả luôn
+        if (request.IsSystemSupply is false)
+        {
+            var listVatTuNew = (await _muaSamVatTuNewRepository.ListAsync(
+                    string.IsNullOrWhiteSpace(request.TenVatTu) ? string.Empty : request.TenVatTu.ToLower(),
+                    string.IsNullOrWhiteSpace(request.MaVatTu) ? string.Empty : request.MaVatTu.ToLower(),
+                    request.GetPageIndex(),
+                    request.GetPageSize()))
+                .Adapt<PagedList<SupplyListResponseItem>>();
+            return listVatTuNew;
         }
 
         // Mặc định khi load trang => lấy vật tư từ bảng tồn kho theo khoId
@@ -364,7 +376,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     {
         var supplyTicket = new QlvtMuaSamPhieuDeXuat
         {
-            TenPhieu = $"Phiếu yêu cầu cung ứng vật tư {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
+            TenPhieu = $"Phiếu đề xuất cung ứng VTTB - {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
             MoTa = description,
             TrangThai = (byte?)SupplyTicketStatus.Unsigned,
             NgayThem = DateTime.Now,
