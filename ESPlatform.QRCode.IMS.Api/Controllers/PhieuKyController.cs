@@ -314,7 +314,7 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
             {
                 // Log chi tiết lỗi
                 Serilog.Log.Error("Ký số thất bại: ", ex);
-                return StatusCode(500, new { message = "Ký số thất bại.", error = ex.ToString() });
+                return StatusCode(500, new { message = "Ký số thất bại.", error = ex.Message });
             }
         }
 
