@@ -18,7 +18,7 @@ public class KyKiemKeRepository : EfCoreRepositoryBase<QlvtKyKiemKe, AppDbContex
             .OrderBy(x => x.PhysicalInventoryName)
             .Select(x => new
             {
-                KyKiemKeId = x.Id,
+                KyKiemKeId = x.PhysicalInventoryId ?? 0,
                 TenKyKiemKe = x.PhysicalInventoryName
             })
             .ToListAsync();

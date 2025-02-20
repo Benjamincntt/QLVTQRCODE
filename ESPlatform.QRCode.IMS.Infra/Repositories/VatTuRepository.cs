@@ -19,7 +19,7 @@ public class VatTuRepository : EfCoreRepositoryBase<QlvtVatTu, AppDbContext>, IV
         var response = await DbContext.QlvtKyKiemKeChiTiets
             .Join(DbContext.QlvtKyKiemKes,
                 x => x.KyKiemKeId,
-                y => y.Id,
+                y => y.PhysicalInventoryId,
                 (x, y) => new { QlvtKyKiemKeChiTiet = x, QlvtKyKiemKe = y })
             .Where(x => x.QlvtKyKiemKeChiTiet.VatTuId == vatTuId)
             .Where(x => x.QlvtKyKiemKeChiTiet.KyKiemKeId == kykiemkeId)

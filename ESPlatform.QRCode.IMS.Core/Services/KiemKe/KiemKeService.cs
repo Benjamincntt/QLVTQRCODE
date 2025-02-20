@@ -71,7 +71,7 @@ public class KiemKeService : IKiemKeService
         var kiKiemKeChinh = await _kyKiemKeRepository.GetAsync(x => x.KyKiemKeChinh == 1);
         if (kiKiemKeChinh != null)
         {
-            response.KyKiemKeId = kiKiemKeChinh.Id;
+            response.KyKiemKeId = kiKiemKeChinh.PhysicalInventoryId ?? 0;
             response.PhysicalInventoryName = string.IsNullOrWhiteSpace(kiKiemKeChinh.PhysicalInventoryName)? string.Empty : kiKiemKeChinh.PhysicalInventoryName;
         }
         // vật tư 
