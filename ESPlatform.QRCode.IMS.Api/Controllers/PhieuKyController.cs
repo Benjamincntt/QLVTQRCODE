@@ -17,6 +17,7 @@ using ViettelFileSigner;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using ESPlatform.QRCode.IMS.Library.Extensions;
+using System.Diagnostics;
 
 namespace ESPlatform.QRCode.IMS.Api.Controllers
 {
@@ -268,7 +269,14 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
 
                 input.PdfPath = fullPath;
                 input.PdfPathSigned = fullPath;
+
+                input.DataToDisplayed = "PhieuMS";
                 Serilog.Log.Debug("Đường dẫn file PDF đầy đủ: {FullPath}", fullPath);
+
+                string directoryPath =  Path.GetDirectoryName(fullPath);
+                string fileName = Path.GetFileName(fullPath);
+
+                input.PdfPathSigned = Path.Combine(directoryPath, "Sign_" + fileName);
 
                 // Kiểm tra file tồn tại trên hệ thống
                 var checkFileResult = await CheckFileExistsAsync(input.ChuKyRequest.VanBanId);
@@ -284,6 +292,22 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                 Serilog.Log.Information("Bắt đầu quá trình ký số - VanBanId: {VanBanId}", input.ChuKyRequest.VanBanId);
 
                 await _phieuKyService.SignViettelCA(input);
+
+                foreach (var process in Process.GetProcessesByName("Acrobat"))//đóng hết file pdf
+                {
+                    process.Kill();
+                }
+                //xóa file 
+                if (System.IO.File.Exists(fullPath))//xóa file gốc
+                {
+                    System.IO.File.Delete(fullPath);
+
+                }
+                if (System.IO.File.Exists(input.PdfPathSigned))//đổi tên file về tên file gốc
+                {
+                    System.IO.File.Move(input.PdfPathSigned, input.PdfPath);
+
+                }
 
                 // Cập nhật trạng thái chữ ký
                 var updateFileRequest = new UpdateFileRequest
