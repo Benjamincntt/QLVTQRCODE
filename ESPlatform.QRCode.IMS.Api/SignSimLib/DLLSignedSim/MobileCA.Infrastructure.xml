@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MobileCA.Infrastructure</name>
+    </assembly>
+    <members>
+        <member name="T:ViettelServiceReference.transactionInfo">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.additionData">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.apId">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.apURL">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.batchCode">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.batchCount">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.batchCountSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.batchExpireDate">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.billCode">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.certId">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.certIdSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.certInfo">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.certList">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.certSerial">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.dataDisplay">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.dataSign">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.errorCode">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.errorDesc">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.forcePIN">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.forcePINSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.isBatchSigningSupported">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.isBatchSigningSupportedSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.isSHA2Supported">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.isSHA2SupportedSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.keyHash">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.keyValue">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.mac">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.manufacturer">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.msgMode">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.msisdn">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.mssFormat">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.msspId">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.orgErrCode">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.orgErrDesc">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.orgRequestApId">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.orgRequestId">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.orgRequestIdSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.processCode">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.reqDate">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.requestId">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.requestIdSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.resDate">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.runImm">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.runImmSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.sigType">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.sigTypeSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.signature">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.timeout">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.timeoutSpecified">
+            <remarks/>
+        </member>
+        <member name="P:ViettelServiceReference.transactionInfo.userId">
+            <remarks/>
+        </member>
+    </members>
+</doc>

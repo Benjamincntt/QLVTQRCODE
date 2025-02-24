@@ -542,6 +542,9 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 
         public async Task<object> UpdateKySimCaAsync(UpdateFileRequest request)
         {
+            Serilog.Log.Information("Bắt đầu cập nhật trạng thái ký số - PhieuId: {PhieuId}, ChuKyId: {ChuKyId}",
+        request.PhieuId, request.ChuKyId);
+
             using (var transaction = _unitOfWork.BeginTransactionAsync())
             {
                 try
@@ -550,20 +553,26 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     var phieuMuaSam = await _phieuKyRepository.GetAsync(x => x.Id == request.PhieuId);
                     if (phieuMuaSam == null)
                     {
+                        Serilog.Log.Warning("Không tìm thấy phiếu - PhieuId: {PhieuId}", request.PhieuId);
                         return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} không tồn tại." };
                     }
 
                     var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
                     if (phieuMuaSamKy == null)
                     {
+                        Serilog.Log.Warning("Không tìm thấy cấu hình chữ ký - ChuKyId: {ChuKyId}", request.ChuKyId);
                         return new ErrorResponse { Message = "Chưa có cấu hình chữ ký cho người ký này." };
                     }
 
                     if (phieuMuaSamKy.TrangThai == Constants.Exceptions.Messages.KyCungUng.DaKy)
                     {
+                        Serilog.Log.Warning("Chữ ký đã được ký trước đó - ChuKyId: {ChuKyId}", request.ChuKyId);
                         return new ErrorResponse { Message = "Chữ ký này đã được ký." };
                     }
                     var userId = _authorizedContextFacade.AccountId;
+                    Serilog.Log.Information("Cập nhật thông tin ký - UserId: {UserId}, ChuKyId: {ChuKyId}",
+               userId, request.ChuKyId);
+
                     // Cập nhật trạng thái chữ ký
                     phieuMuaSamKy.NgayKy = DateTime.Now;
                     phieuMuaSamKy.NguoiKyId = userId;
@@ -580,15 +589,20 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     };
                     await _phieuKyRepository.UpdateAsync(phieuMuaSam);
 
+                    Serilog.Log.Information(
+                "Cập nhật trạng thái phiếu thành công - PhieuId: {PhieuId}, TrangThaiMoi: {TrangThai}",
+                request.PhieuId, phieuMuaSam.TrangThai);
+
                     // Commit transaction nếu mọi thứ thành công
                     await _unitOfWork.CommitAsync();
                     return new { PhieuId = request.PhieuId, Message = "Cập nhật thông tin thành công." };
                 }
                 catch (Exception ex)
                 {
-                    // Rollback nếu có lỗi xảy ra
                     await _unitOfWork.RollbackAsync();
 
+                    Serilog.Log.Error(ex, "Lỗi khi cập nhật trạng thái ký số - PhieuId: {PhieuId}, ChuKyId: {ChuKyId}",
+              request.PhieuId, request.ChuKyId);
                     // Log lỗi chi tiết
                     return new ErrorResponse
                     {

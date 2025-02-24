@@ -61,28 +61,25 @@
 
 	<ItemGroup>
 	  <Reference Include="itextsharp">
-	    <HintPath>SignSimLib\MobileCA.Application\itextsharp.dll</HintPath>
-	  </Reference>
-	  <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-	    <HintPath>SignSimLib\MobileCA.Application\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+	    <HintPath>SignSimLib\DLLSignedSim\itextsharp.dll</HintPath>
 	  </Reference>
 	  <Reference Include="MobileCA.Application">
-	    <HintPath>SignSimLib\MobileCA.Application\MobileCA.Application.dll</HintPath>
+	    <HintPath>SignSimLib\DLLSignedSim\MobileCA.Application.dll</HintPath>
 	  </Reference>
 	  <Reference Include="MobileCA.Domain">
-	    <HintPath>SignSimLib\MobileCA.Application\MobileCA.Domain.dll</HintPath>
+	    <HintPath>SignSimLib\DLLSignedSim\MobileCA.Domain.dll</HintPath>
 	  </Reference>
 	  <Reference Include="MobileCA.Infrastructure">
-	    <HintPath>SignSimLib\MobileCA.Application\MobileCA.Infrastructure.dll</HintPath>
+	    <HintPath>SignSimLib\DLLSignedSim\MobileCA.Infrastructure.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Newtonsoft.Json">
-	    <HintPath>SignSimLib\MobileCA.Application\Newtonsoft.Json.dll</HintPath>
+	    <HintPath>SignSimLib\DLLSignedSim\Newtonsoft.Json.dll</HintPath>
 	  </Reference>
 	  <Reference Include="System.Text.Encoding.CodePages">
-	    <HintPath>SignSimLib\MobileCA.Application\System.Text.Encoding.CodePages.dll</HintPath>
+	    <HintPath>SignSimLib\System.Text.Encoding.CodePages.dll</HintPath>
 	  </Reference>
 	  <Reference Include="ViettelFileSigner">
-	    <HintPath>SignSimLib\MobileCA.Application\ViettelFileSigner.dll</HintPath>
+	    <HintPath>SignSimLib\DLLSignedSim\ViettelFileSigner.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 

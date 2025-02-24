@@ -228,41 +228,61 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
         [HttpPost("sign-viettel")]
         public async Task<IActionResult> SignViettelCA([FromBody] SignMobileCaInputDto input, int? phieuId)
         {
+            Serilog.Log.Information("Bắt đầu ký số Viettel CA - PhieuId: {PhieuId}, VanBanId: {VanBanId}",
+        phieuId, input?.ChuKyRequest?.VanBanId);
+
             if (input?.ChuKyRequest == null)
             {
+                Serilog.Log.Warning("Dữ liệu đầu vào không hợp lệ");
                 return BadRequest(new { message = "Dữ liệu đầu vào không hợp lệ." });
             }
 
             if (input.ChuKyRequest.VanBanId <= 0)
             {
+                Serilog.Log.Warning("VanBanId không hợp lệ: {VanBanId}", input.ChuKyRequest.VanBanId);
                 return BadRequest(new { message = "VanBanId không được để trống." });
             }
 
             if (input.PdfPath == null)
             {
+                Serilog.Log.Warning("PdfPath trống cho VanBanId: {VanBanId}", input.ChuKyRequest.VanBanId);
                 return BadRequest(new { message = "PdfPath trống." });
             }
             try
             {
+                // Log thông tin chi tiết về request
+                Serilog.Log.Information(
+                    "Thông tin ký số - NguoiKyId: {NguoiKyId}, MaDoiTuongKy: {MaDoiTuongKy}, ThuTuKy: {ThuTuKy}",
+                    input.ChuKyRequest.NguoiKyId,
+                    input.ChuKyRequest.MaDoiTuongKy,
+                    input.ChuKyRequest.ThuTuKy
+                );
+
                 // Kiểm tra file PDF đầu vào
                 var fullPath = await _phieuKyService.GetFullFilePath(input.PdfPath);
                 if (string.IsNullOrEmpty(fullPath))
                 {
+                    Serilog.Log.Warning("Không tìm thấy file PDF tại đường dẫn: {PdfPath}", input.PdfPath);
                     return BadRequest(new { message = "Không có file nào được tải lên." });
                 }
 
                 input.PdfPath = fullPath;
                 input.PdfPathSigned = fullPath;
+                Serilog.Log.Debug("Đường dẫn file PDF đầy đủ: {FullPath}", fullPath);
 
                 // Kiểm tra file tồn tại trên hệ thống
                 var checkFileResult = await CheckFileExistsAsync(input.ChuKyRequest.VanBanId);
                 if (checkFileResult is ObjectResult errorResult && errorResult.StatusCode != (int)HttpStatusCode.OK)
                 {
+                    Serilog.Log.Warning("Kiểm tra file thất bại - VanBanId: {VanBanId}, StatusCode: {StatusCode}",
+                input.ChuKyRequest.VanBanId, errorResult.StatusCode);
                     return errorResult;
                 }
 
                 // Cập nhật path ảnh chữ ký vào request
                 // Thực hiện ký số
+                Serilog.Log.Information("Bắt đầu quá trình ký số - VanBanId: {VanBanId}", input.ChuKyRequest.VanBanId);
+
                 await _phieuKyService.SignViettelCA(input);
 
                 // Cập nhật trạng thái chữ ký
@@ -275,45 +295,52 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
                     ThuTuKy = input.ChuKyRequest.ThuTuKy ?? 0,
                     ChuKyId = input.ChuKyRequest.ChuKyId
                 };
+                Serilog.Log.Information("Cập nhật trạng thái ký số - PhieuId: {PhieuId}, VanBanId: {VanBanId}",
+            updateFileRequest.PhieuId, updateFileRequest.VanBanId);
 
                 await _phieuKyService.UpdateKySimCaAsync(updateFileRequest);
 
                 // Xóa file ảnh chữ ký sau khi đã ký và cập nhật trạng thái
-                if (!string.IsNullOrEmpty(input.SignFileInfo.pathImage))
+                if (!string.IsNullOrEmpty(input.SignFileInfo?.pathImage))
                 {
                     try
                     {
                         if (string.IsNullOrEmpty(input.SignFileInfo.pathImage) || !System.IO.File.Exists(input.SignFileInfo.pathImage))
                         {
+                            Serilog.Log.Warning("Không tìm thấy file ảnh chữ ký: {ImagePath}", input.SignFileInfo.pathImage);
                             return NotFound(new { message = "File không tồn tại." });
                         }
 
                         // Thực hiện xóa file
                         System.IO.File.Delete(input.SignFileInfo.pathImage);
+                        Serilog.Log.Information("Đã xóa file ảnh chữ ký: {ImagePath}", input.SignFileInfo.pathImage);
 
                     }
                     catch (Exception ex)
                     {
                         // Log lỗi nếu việc xóa file gặp sự cố
-                        Serilog.Log.Error($"Error deleting signature image: {ex.Message}");
+                        Serilog.Log.Error(ex, "Lỗi khi xóa file ảnh chữ ký: {ImagePath}", input.SignFileInfo.pathImage);
                     }
                 }
                 return Ok(new { success = true, message = "Ký thành công." });
             }
             catch (NotFoundException ex)
             {
-                Serilog.Log.Error($"NotFoundException: {ex.Message}");
+                Serilog.Log.Error(ex, "NotFoundException khi ký số - PhieuId: {PhieuId}, VanBanId: {VanBanId}",
+            phieuId, input?.ChuKyRequest?.VanBanId);
                 return NotFound(new { message = ex.Message });
             }
             catch (BadRequestException ex)
             {
-                Serilog.Log.Error($"BadRequestException: {ex.Message}");
+                Serilog.Log.Error(ex, "BadRequestException khi ký số - PhieuId: {PhieuId}, VanBanId: {VanBanId}",
+             phieuId, input?.ChuKyRequest?.VanBanId);
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                // Log chi tiết lỗi
-                Serilog.Log.Error("Ký số thất bại: ", ex);
+                Serilog.Log.Error(ex, "Lỗi không xác định khi ký số - PhieuId: {input?.ChuKyRequest?.PhieuId}, VanBanId: {VanBanId}",
+             phieuId, input?.ChuKyRequest?.VanBanId);
+
                 return StatusCode(500, new { message = "Ký số thất bại.", error = ex.Message });
             }
         }

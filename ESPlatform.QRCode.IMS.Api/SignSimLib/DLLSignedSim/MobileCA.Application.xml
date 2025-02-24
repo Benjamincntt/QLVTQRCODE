@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MobileCA.Application</name>
+    </assembly>
+    <members>
+        <member name="P:MobileCA.Application.Services.Viettel.Dtos.ConfigDto.CertViettelCARoot">
+            <summary>
+            là chứng thư số gốc của NCC dịch vụ (base 64).
+            khi hết hạn thì cần NCC dịch vụ cung cấp mới.
+            </summary>
+        </member>
+        <member name="P:MobileCA.Application.Services.Viettel.Dtos.ParamDto.MobilePhone">
+            <summary>
+            Số điện thoại của khách hàng sử dụng chữ ký số trong giao dịch. 
+            Định dạng 84xxxxx. 
+            Ví dụ: 84984012500
+            </summary>
+        </member>
+        <member name="P:MobileCA.Application.Services.Viettel.Dtos.ParamDto.CertSerial">
+            <summary>
+            CertSerial của từng tài khoản ký số mà NCC cung cấp cho từng tài khoản
+            </summary>
+        </member>
+        <member name="P:MobileCA.Application.Services.Viettel.Dtos.ParamDto.DataToDisplayed">
+            <summary>
+            Tiêu đề hiển thị khi ký số
+            </summary>
+        </member>
+        <member name="P:MobileCA.Application.Services.Viettel.Dtos.ParamDto.PdfPath">
+            <summary>
+            Đường dẫn file Pdf trước khi ký
+            </summary>
+        </member>
+        <member name="P:MobileCA.Application.Services.Viettel.Dtos.ParamDto.PdfPathSigned">
+            <summary>
+            Đường dẫn file Pdf sau khi ký số
+            </summary>
+        </member>
+        <member name="P:MobileCA.Application.Services.Viettel.Dtos.ParamDto.TimeOut">
+            <summary>
+            Thời gian chờ ký
+            </summary>
+        </member>
+        <member name="P:MobileCA.Application.Services.Viettel.Dtos.ParamDto.SignFileInfo">
+            <summary>
+            Thông tin file ký
+            </summary>
+        </member>
+        <member name="P:MobileCA.Application.Services.Viettel.Dtos.SignFileImgDto.pathImage">
+            <summary>
+            Dùng cho ký chèn ảnh 
+            </summary>
+        </member>
+        <member name="M:MobileCA.Application.Services.Viettel.IViettelMobileCAService.SignMobileCA(MobileCA.Application.Services.Viettel.Dtos.ParamDto,MobileCA.Application.Services.Viettel.Dtos.ConfigDto,System.Int32,System.Int32)">
+            <summary>
+            Thực hiện quy trình ký số
+            </summary>
+            <param name="param">input data</param>
+            <param name="config">config của bên ncc, mặc định là config test</param>
+            <param name="transType">Loại ký, mặc định = Văn bản</param>
+            <param name="signatureType">Loại chữ ký, mặc định = ảnh chữ ký</param>
+            <returns></returns>
+        </member>
+        <member name="M:MobileCA.Application.Services.Viettel.SignProvider.SignProviderBase.BuildSignFileInfoDefault">
+            <summary>
+            Build giá tri mặc định khi ko có thông tin chữ ký
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MobileCA.Application.Services.Viettel.SignProvider.SignProviderBase.GenerateDisplayConfig(MobileCA.Application.Services.Viettel.Dtos.ISignFileDto,Org.BouncyCastle.X509.X509Certificate)">
+            <summary>
+            xác định vị trí và format ký số
+            </summary>
+            <param name="signFileInfo"></param>
+            <param name="x509Cert"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MobileCA.Application.Services.Viettel.SignProvider.SignProviderBase.SignMobileCA(MobileCA.Application.Services.Viettel.Dtos.ParamDto,MobileCA.Application.Services.Viettel.Dtos.ConfigDto,System.Int32)">
+            <summary>
+            Thực hiện quy trình ký số
+            </summary>
+            <param name="param">input data</param>
+            <param name="config">config của bên ncc, mặc định là config test</param>
+            <param name="transType">Loại ký, mặc định = Văn bản</param>
+            <param name="messagingMode">Cơ chế ký, mặc định = SYNC đồng bộ</param>
+            <returns></returns>
+        </member>
+        <member name="M:MobileCA.Application.Services.Viettel.ViettelMobileCAService.SignMobileCA(MobileCA.Application.Services.Viettel.Dtos.ParamDto,MobileCA.Application.Services.Viettel.Dtos.ConfigDto,System.Int32,System.Int32)">
+            <summary>
+            Thực hiện quy trình ký số
+            </summary>
+            <param name="param">input data</param>
+            <param name="config">config của bên ncc, mặc định là config test</param>
+            <param name="transType">Loại ký, mặc định = Văn bản</param>
+            <param name="messagingMode">Cơ chế ký, mặc định = SYNC đồng bộ</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

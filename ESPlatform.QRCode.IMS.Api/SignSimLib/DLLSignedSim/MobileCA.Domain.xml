@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MobileCA.Domain</name>
+    </assembly>
+    <members>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.ForcePin.Yes">
+            <summary>
+            Bắt buộc nhập PIN
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.ForcePin.No">
+            <summary>
+            Ko bắt buộc nhập PIN
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.MSSFormat.PKCS7">
+            <summary>
+            Định dạng chữ ký trả về bao gồm cả thông tin CTS
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.MSSFormat.PKCS10">
+            <summary>
+            Định dạng chữ ký trả về không gồm thông tin CTS
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.MessagingMode.SYNC">
+            <summary>
+            Cơ chế đồng bộ
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.MessagingMode.CS">
+            <summary>
+            Cơ chế bất đồng bộ, client-server mode.
+            Gửi request, sau đó liên tục check trạng thái giao dịch
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.MessagingMode.SS">
+            <summary>
+            Cơ chế bất đồng bộ, Server-server mode.
+            Gửi request, khi ký xong thì MSSP báo kq qua API Notifice
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.RunImm.Yes">
+            <summary>
+            Yc ký ngay
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.RunImm.No">
+            <summary>
+            Ko Yc ký ngay
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.TransType.GiaoDich">
+            <summary>
+            Ký giao dịch
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.TransType.VanBan">
+            <summary>
+            Ký văn bản
+            </summary>
+        </member>
+        <member name="T:MobileCA.Domain.Utils.ExtViettel.SignatureType">
+            <summary>
+            Loại chữ ký
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.SignatureType.Text">
+            <summary>
+             chèn chữ ký Text
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.SignatureType.Img">
+            <summary>
+            chèn chữ ký Ảnh 
+            </summary>
+        </member>
+        <member name="F:MobileCA.Domain.Utils.ExtViettel.SignatureType.Table">
+            <summary>
+            chèn chữ ký Table 
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.TransId">
+            <summary>
+            YYMMDDxxxxxx trong đó xxxxxx tự tăng
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.MAC">
+            <summary>
+            Chữ ký điện tử của bản tin để xác thực AP
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.ReqDate">
+            <summary>
+            YYYYMMDDHHMISS
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.ApURL">
+            <summary>
+            Địa chỉ webservice của AP để MSSP gửi kết quả ký điện tử về trong mode server-server. 
+            Trường hợp mode server-server nếu không nhập trường này thì sử dụng URL mặc định được khai báo khi AP đăng ký
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.Msisdn">
+            <summary>
+            Số điện thoại của khách hàng sử dụng chữ ký số trong giao dịch
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.DataToDisplayed">
+            <summary>
+            Trường hợp ký giao dịch (TransType = 1)  thì trường này không cần giá trị.
+            Tài liệu ghi size là 107, nhưng thử nghiệm thì size là 11.
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.MSSFormat">
+            <summary>
+            Định dạng chữ ký trả về, được khởi tạo với các giá trị sau:
+            -	“PKCS#7” (Định dạng chữ ký trả về bao gồm cả thông tin chứng thư số).
+            -	“PKCS#10” (Định dạng chữ ký trả về không gồm thông tin CTS)
+            Mặc định khi không đặt giá trị cho trường này là PKCS#10.
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.TimeOut">
+            <summary>
+            Thời gian (giây) MSSP phải đợi chữ ký từ Mobile user trước khi hồi đáp về cho AP. Mặc định là 300s (5 phút).
+            Chỉ sử dụng trong mode SYNC(gửi nhận đồng bộ, các mode khác không sử dụng giá trị này).
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.MessagingMode">
+            <summary>
+            Cơ chế gửi nhận bản tin giữa AP và MSSP:
+            -	“SYNC”: Cơ chế đồng bộ
+            -	“CS”: Cơ chế bất đồng bộ, client-server mode
+            -	“SS”: Cơ chế bất đồng bộ, Server-server mode
+            Trả về mã lỗi 18 nếu sử dụng cơ chế gửi nhận không được hỗ trợ
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureReqDto.TransType">
+            <summary>
+            Loại giao dịch ký điện tử:
+            1 - Ký giao dịch
+            0 - Ký văn bản
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureRespDto.TransId">
+            <summary>
+            YYMMDDxxxxxx trong đó xxxxxx tự tăng
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureRespDto.ResDate">
+            <summary>
+            YYYYMMDDHHMISS
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureRespDto.ApURL">
+            <summary>
+            Địa chỉ webservice của AP để MSSP gửi kết quả ký điện tử về trong mode server-server. 
+            Trường hợp mode server-server nếu không nhập trường này thì sử dụng URL mặc định được khai báo khi AP đăng ký
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureRespDto.Msisdn">
+            <summary>
+            Số điện thoại của khách hàng sử dụng chữ ký số trong giao dịch
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureRespDto.MSSFormat">
+            <summary>
+            Định dạng chữ ký trả về, được khởi tạo với các giá trị sau:
+            -	“PKCS#7” (Định dạng chữ ký trả về bao gồm cả thông tin chứng thư số).
+            -	“PKCS#10” (Định dạng chữ ký trả về không gồm thông tin CTS)
+            Mặc định khi không đặt giá trị cho trường này là PKCS#10.
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureRespDto.TimeOut">
+            <summary>
+            Thời gian (giây) MSSP phải đợi chữ ký từ Mobile user trước khi hồi đáp về cho AP. Mặc định là 300s (5 phút).
+            Chỉ sử dụng trong mode SYNC(gửi nhận đồng bộ, các mode khác không sử dụng giá trị này).
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureRespDto.Signature">
+            <summary>
+            Chữ ký của người sử dụng
+            </summary>
+        </member>
+        <member name="P:MobileCA.Domain.Entities.Viettel.SignatureRespDto.CertId">
+            <summary>
+            ID của CTS trên SIM
+            </summary>
+        </member>
+        <member name="M:MobileCA.Domain.Repositories.Viettel.IViettelMobileCARepository.Signature(MobileCA.Domain.Entities.Viettel.SignatureReqDto)">
+            <summary>
+            AP YC ký số
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MobileCA.Domain.Repositories.Viettel.IViettelMobileCARepository.MSSStatusQuery(MobileCA.Domain.Entities.Viettel.MSSStatusQueryReqDto)">
+            <summary>
+            Check trạng thái giao dịch
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MobileCA.Domain.Repositories.Viettel.IViettelMobileCARepository.MSSReceipt(MobileCA.Domain.Entities.Viettel.MSSReceiptReqDto)">
+            <summary>
+            AP gửi biên nhận
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MobileCA.Domain.Repositories.Viettel.IViettelMobileCARepository.MSSCancelSignature(MobileCA.Domain.Entities.Viettel.MSSCancelSignatureReqDto)">
+            <summary>
+            AP hủy giao dịch chưa ký
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MobileCA.Domain.Repositories.Viettel.IViettelMobileCARepository.MSSNotification(MobileCA.Domain.Entities.Viettel.MSSNotificationReqDto)">
+            <summary>
+            MSSP gọi đến service của AP để thông báo kết quả ký điện tử
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MobileCA.Domain.Repositories.Viettel.IViettelMobileCARepository.MSSCertificateQuery(MobileCA.Domain.Entities.Viettel.MSSCertificateQueryReqDto)">
+            <summary>
+            Truy vấn thông tin chứng thư số
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
