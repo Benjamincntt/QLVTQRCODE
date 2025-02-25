@@ -38,6 +38,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         private readonly ICauHinhVanBanKyRepository _cauHinhVanBanKyRepository;
         private readonly IVanBanKyRepository _vanBanKyRepository;
         private readonly IAuthorizedContextFacade _authorizedContextFacade;
+        private readonly INguoiDungRepository _nguoiDungRepository;
         private readonly IConfiguration _configuration;
         private readonly IViettelMobileCAService _viettelCAService;
         public PhieuKyService(IPhieuKyRepository phieuKyRepository, IAuthorizedContextFacade authorizedContextFacade
@@ -46,8 +47,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 , IVanBanKyRepository vanBanKyRepository
                 , IConfiguration configuration
                 , IUnitOfWork unitOfWork
-                , IViettelMobileCAService viettelCAService
-               )
+                , IViettelMobileCAService viettelCAService, INguoiDungRepository nguoiDungRepository)
         {
             _phieuKyRepository = phieuKyRepository;
             _authorizedContextFacade = authorizedContextFacade;
@@ -57,14 +57,21 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _vanBanKyRepository = vanBanKyRepository;
             _configuration = configuration;
             this._viettelCAService = viettelCAService;
+            _nguoiDungRepository = nguoiDungRepository;
         }
 
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
         {
 
-            var userId = _authorizedContextFacade.AccountId;
-
-            var lstPhieuKy = (await _phieuKyRepository.DanhSachPhieuDeXuatKy(requests, userId))
+            //var userId = _authorizedContextFacade.AccountId;
+            var username = _authorizedContextFacade.Username;
+            var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+            if (currentUser is null)
+            {
+                throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+            }
+            var currentUserId = currentUser.MaNguoiDung;
+            var lstPhieuKy = (await _phieuKyRepository.DanhSachPhieuDeXuatKy(requests, currentUserId))
                 .Adapt<IEnumerable<PhieuKyModel>>().ToList();
             // Chuyển đổi lstPhieuKy thành DanhSachPhieuKyResponse
             var response = lstPhieuKy.Select(p => new PhieuKyModel
@@ -115,7 +122,14 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.EmptyPhieuIds);
             }
 
-            var userId = _authorizedContextFacade.AccountId;
+            var username = _authorizedContextFacade.Username;
+            var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+            if (currentUser is null)
+            {
+                throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+            }
+            var userId = currentUser.MaNguoiDung;
+            //var userId = _authorizedContextFacade.AccountId;
             List<int> DanhSachIdPhieuDaKy = new List<int>();
             var lstMuaSamPdxKy = new List<QlvtMuaSamPdxKy>();
             var danhSachLoi = new List<string>(); // Danh sách để lưu trữ các lỗi
@@ -200,7 +214,15 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     Message = $"Phiếu có Id: {request.PhieuId} {Constants.Exceptions.Messages.KyCungUng.InvalidPdx}."
                 };
             }
-            var userId = _authorizedContextFacade.AccountId;
+            //var userId = _authorizedContextFacade.AccountId;
+            var username = _authorizedContextFacade.Username;
+            var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+            if (currentUser is null)
+            {
+                throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+            }
+
+            var userId = currentUser.MaNguoiDung;
             using (var transaction = _unitOfWork.BeginTransactionAsync())
             {
                 try
@@ -413,7 +435,15 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             // Không cần bắt đầu transaction ở đây nếu transaction đã được bắt đầu ở nơi gọi
             try
             {
-                var userId = _authorizedContextFacade.AccountId;
+                //var userId = _authorizedContextFacade.AccountId;
+                var username = _authorizedContextFacade.Username;
+                var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+                if (currentUser is null)
+                {
+                    throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+                }
+
+                var userId = currentUser.MaNguoiDung;
                 // Lấy thông tin phiếu mua sắm ký từ database dựa trên Id
                 var phieuMuaSam = await _phieuKyRepository.GetAsync(x => x.Id == request.PhieuId);
                 var maDoiTuongKy = request.MaDoiTuongKy; // request.MaDoiTuongKy?.ToLower() ?? "";
@@ -544,7 +574,14 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         {
             Serilog.Log.Information("Bắt đầu cập nhật trạng thái ký số - PhieuId: {PhieuId}, ChuKyId: {ChuKyId}",
         request.PhieuId, request.ChuKyId);
-
+            var username = _authorizedContextFacade.Username;
+            var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+            if (currentUser is null)
+            {
+                throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+            }
+            var userId = currentUser.MaNguoiDung;
+            
             using (var transaction = _unitOfWork.BeginTransactionAsync())
             {
                 try
@@ -569,7 +606,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         Serilog.Log.Warning("Chữ ký đã được ký trước đó - ChuKyId: {ChuKyId}", request.ChuKyId);
                         return new ErrorResponse { Message = "Chữ ký này đã được ký." };
                     }
-                    var userId = _authorizedContextFacade.AccountId;
+                    // var userId = _authorizedContextFacade.AccountId;
                     Serilog.Log.Information("Cập nhật thông tin ký - UserId: {UserId}, ChuKyId: {ChuKyId}",
                userId, request.ChuKyId);
 

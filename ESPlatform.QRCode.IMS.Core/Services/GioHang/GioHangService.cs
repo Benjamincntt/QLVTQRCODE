@@ -8,6 +8,7 @@ using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
+using ESPlatform.QRCode.IMS.Infra.Repositories;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
@@ -22,6 +23,7 @@ public class GioHangService : IGioHangService
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IVatTuTonKhoRepository _vatTuTonKhoRepository;
     private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
+    private readonly INguoiDungRepository _nguoiDungRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IMapper _mapper;
     private readonly ImagePath _imagePath;
@@ -32,6 +34,7 @@ public class GioHangService : IGioHangService
         IVatTuRepository vatTuRepository,
         IVatTuTonKhoRepository vatTuTonKhoRepository,
         IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
+        INguoiDungRepository nguoiDungRepository,
         IMapper mapper,
         IOptions<ImagePath> imagePath)
     {
@@ -40,19 +43,35 @@ public class GioHangService : IGioHangService
         _vatTuRepository = vatTuRepository;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
         _vatTuTonKhoRepository = vatTuTonKhoRepository;
+        _nguoiDungRepository = nguoiDungRepository;
         _mapper = mapper;
         _imagePath = imagePath.Value;
     }
 
     public async Task<int> GetSupplyCountAsync()
     {
-        var userId = _authorizedContextFacade.AccountId;
-        return await _gioHangRepository.CountAsync(x => x.UserId == userId);
+        var username = _authorizedContextFacade.Username;
+        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        if (currentUser is null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+        }
+
+        var currentUserId = currentUser.MaNguoiDung;
+        return await _gioHangRepository.CountAsync(x => x.UserId == currentUserId);
     }
 
     public async Task<IEnumerable<CartSupplyResponse>> ListSupplyAsync()
     {
-        var userId = _authorizedContextFacade.AccountId;
+        var username = _authorizedContextFacade.Username;
+        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        if (currentUser is null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+        }
+
+        var userId = currentUser.MaNguoiDung;
+        //var userId = _authorizedContextFacade.AccountId;
         var vatTus = (await _gioHangRepository.ListSupplyAsync(userId, _imagePath.RelativeBasePath)).Adapt<IEnumerable<CartSupplyResponse>>().ToList();
         if (!vatTus.Any())
         {
@@ -167,7 +186,13 @@ public class GioHangService : IGioHangService
     }
     public async Task<int> CreateCartSupplyAsync(int vatTuId, CreatedCartSupplyRequest request)
     {
-        var userId = _authorizedContextFacade.AccountId;
+        var username = _authorizedContextFacade.Username;
+        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        if (currentUser is null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+        }
+        var userId = currentUser.MaNguoiDung;
         var supplyInCart = await _gioHangRepository.GetAsync(x => x.VatTuId == vatTuId && x.UserId == userId && x.IsSystemSupply == request.IsSystemSupply);
         if (supplyInCart != null)
         {

@@ -33,7 +33,10 @@ public static partial class Constants {
 
 			public static class Login {
 				public const string DuplicatedAccountName = "Tên đăng nhập này đã tồn tại";
-			}
+
+                public const string FirstTimeLogin =
+                    "Tài khoản của bạn chưa được đồng bộ trên hệ thống kiểm kê vật tư qua QRCode. Vui lòng đăng nhập trên trang website của hệ thống trước";
+            }
 			//Kỳ kiểm kê
 			public static class InventoryCheck {
 				public const string InvalidKyKiemKe = "Kỳ kiểm kê không hợp lệ";

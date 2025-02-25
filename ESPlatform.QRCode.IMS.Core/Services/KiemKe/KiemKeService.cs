@@ -25,6 +25,7 @@ public class KiemKeService : IKiemKeService
     private readonly IKyKiemKeChiTietRepository _kyKiemKeChiTietRepository;
     private readonly IKyKiemKeRepository _kyKiemKeRepository;
     private readonly IVatTuTonKhoRepository _vatTuTonKhoRepository;
+    private readonly INguoiDungRepository _nguoiDungRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IKhoRepository _khoRepository;
     private readonly IMapper _mapper;
@@ -38,6 +39,7 @@ public class KiemKeService : IKiemKeService
         IKyKiemKeChiTietRepository kyKiemKeChiTietRepository,
         IKyKiemKeRepository kyKiemKeRepository,
         IVatTuTonKhoRepository vatTuTonKhoRepository,
+        INguoiDungRepository nguoiDungRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IMapper mapper,
         IOptions<ImagePath> imagePath)
@@ -49,6 +51,7 @@ public class KiemKeService : IKiemKeService
         _kyKiemKeChiTietRepository = kyKiemKeChiTietRepository;
         _kyKiemKeRepository = kyKiemKeRepository;
         _vatTuTonKhoRepository = vatTuTonKhoRepository;
+        _nguoiDungRepository = nguoiDungRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _mapper = mapper;
         _imagePath = imagePath.Value;
@@ -334,6 +337,14 @@ public class KiemKeService : IKiemKeService
 
     public async Task<int> CreateInventoryCheckDetailAsync(int vatTuId, int kyKiemKeId, decimal soLuongKiemKe)
     {
+        var username = _authorizedContextFacade.Username;
+        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        if (currentUser is null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+        }
+
+        var accountId = currentUser.MaNguoiDung;
         var warehouses = await _vatTuRepository.GetWarehouseIdAsync(vatTuId);
         if (warehouses != null)
         {
@@ -348,7 +359,7 @@ public class KiemKeService : IKiemKeService
             SoLuongSoSach = soLuongKiemKe,
             SoLuongChenhLech = 0,
             NgayKiemKe = DateTime.Now,
-            NguoiKiemKeId = _authorizedContextFacade.AccountId,
+            NguoiKiemKeId = accountId,
             NguoiKiemKeTen = _authorizedContextFacade.Username,
             TrangThai = (short?)TrangThaiKyKiemKeChiTiet.DaKiemKe,
             KhoChinhId = warehouses != null? warehouses.KhoChinhId : null,

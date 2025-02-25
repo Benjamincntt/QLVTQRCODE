@@ -5,7 +5,7 @@ namespace ESPlatform.QRCode.IMS.Core.Facades.Context;
 public interface IAuthorizedContextFacade {
 	int KyKiemKeId { get; set; }
 
-	int AccountId { get; set; }
+	//int AccountId { get; set; }
 
 	string Username { get; set; }
 

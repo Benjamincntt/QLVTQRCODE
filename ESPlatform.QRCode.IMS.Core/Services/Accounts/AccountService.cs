@@ -10,19 +10,23 @@ namespace ESPlatform.QRCode.IMS.Core.Services.Accounts;
 
 public class AccountService : IAccountService {
 	private readonly IAccountRepository _accountRepository;
-	//private readonly ILogFacade _logFacade;
+
+    private readonly INguoiDungRepository _nguoiDungRepository;
 	private readonly IAuthorizedContextFacade _authorizedContextFacade;
 	private readonly IMapper _mapper;
 
-	public AccountService(IAccountRepository accountRepository,
-		//ILogFacade logFacade,
+	public AccountService(
+        IAccountRepository accountRepository,
+        INguoiDungRepository nguoiDungRepository,
 		IAuthorizedContextFacade authorizedContextFacade,
-		IMapper mapper) {
+		IMapper mapper) 
+    {
 		_accountRepository = accountRepository;
-		//_logFacade = logFacade;
+        _nguoiDungRepository = nguoiDungRepository;
 		_authorizedContextFacade = authorizedContextFacade;
 		_mapper = mapper;
-	}
+       
+    }
 
 	// public async Task<int> CreateAsync(AccountCreatedRequest request) {
 	// 	await ValidationHelper.ValidateAsync(request, new AccountInsertModelValidation());
@@ -104,10 +108,17 @@ public class AccountService : IAccountService {
 	// }
 
 	public async Task<int> UpdatePassWordAsync(ModifiedUserPasswordRequest request) {
-		var accountId = _authorizedContextFacade.AccountId;
-		var account = await _accountRepository.GetAsync(accountId);
+        var username = _authorizedContextFacade.Username;
+        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        if (currentUser is null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+        }
+
+        var currentUserId = currentUser.MaNguoiDung;
+		var account = await _accountRepository.GetAsync(currentUserId);
 		if (account == null) {
-			throw new NotFoundException(account.GetTypeEx(), accountId.ToString());
+			throw new NotFoundException(account.GetTypeEx(), currentUserId.ToString());
 		}
 
 		if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, account.Password)) {

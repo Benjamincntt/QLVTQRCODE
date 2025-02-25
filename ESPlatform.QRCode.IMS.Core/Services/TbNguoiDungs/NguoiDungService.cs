@@ -64,11 +64,11 @@ public class NguoiDungService : INguoiDungService
 
     public async Task<int> UpdatePassWordAsync(ModifiedUserPasswordRequest request)
     {
-        var maNguoiDung = _authorizedContextFacade.AccountId;
-        var nguoiDung = await _nguoiDungRepository.GetAsync(maNguoiDung);
-        if (nguoiDung == null)
+        var username = _authorizedContextFacade.Username;
+        var nguoiDung = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        if (nguoiDung is null)
         {
-            throw new NotFoundException(nguoiDung.GetTypeEx(), null);
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
         }
 
         var inputPasswordHash = GetPassword.GetMD5(nguoiDung.Salt + request.CurrentPassword);
@@ -97,7 +97,7 @@ public class NguoiDungService : INguoiDungService
         nguoiDung.TenDangNhap = nguoiDung.TenDangNhap;
         nguoiDung.KichHoat = false;
         nguoiDung.Salt = GetPassword.GetRandomLetters(5);
-        nguoiDung.MatKhau = GetPassword.GetMD5(nguoiDung.Salt + nguoiDung.Salt);
+        nguoiDung.MatKhau = GetPassword.GetMD5(nguoiDung.Salt + userRequest.MatKhau);
         nguoiDung.NgayTao = DateTime.UtcNow;
         nguoiDung.CoChoPhepHienThi = true;
         nguoiDung.MaKieuNguoiDung = 4223;
