@@ -9,4 +9,6 @@ public class SupplyTicketDetailResponse
     public List<SupplyResponse> DanhSachVatTu { get; set; } = new ();
 
     public int Tong { get; set; }
+    
+    public bool IsEditable  { get; set; }
 }

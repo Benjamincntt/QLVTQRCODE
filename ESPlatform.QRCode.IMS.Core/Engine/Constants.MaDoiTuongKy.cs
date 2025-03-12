@@ -8,8 +8,8 @@ public static partial class Constants
         public const string NguoiLap = "NguoiLap";
         public const string KiemSoatAT = "KiemSoatAT";
         public const string TruongDonVi = "TruongDonVi";
-        public const string Ph_KHVT = "Ph_KHVT";
         public const string Ph_KTAT = "Ph_KTAT";
+        public const string Ph_KHVT = "Ph_KHVT";
         public const string TongGiamDoc = "TongGiamDoc";
     }
 }

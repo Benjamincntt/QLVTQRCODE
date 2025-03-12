@@ -418,7 +418,17 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 
     public async Task<SupplyTicketDetailResponse> GetSupplyTicketDetailAsync(int supplyTicketId)
     {
+        #region Lấy thông tin user hiện tại
+        var username = _authorizedContextFacade.Username;
+        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        if (currentUser is null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+        }
+        #endregion
+
         var response = new SupplyTicketDetailResponse();
+        response.IsEditable = false;
         if (supplyTicketId <= 0)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.SupplyTicket.InvalidSupplyTicket,
@@ -431,6 +441,22 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         }
         response.TenPhieu = supplyTicket.TenPhieu ?? string.Empty;
         response.MoTa = supplyTicket.MoTa ?? string.Empty;
+        
+        #region Cho phép hiển thị nút sửa
+        
+        // nếu người ký là người số 4(Ph_KHVT) và trạng thái phiếu là huỷ duyệt => cho phép sửa
+        var viTriCongViecHienTai = await _viTriCongViecRepository.GetAsync(x => x.Id == currentUser.ViTri);
+        if (viTriCongViecHienTai is not null)
+        {
+            var maDoiTuongKyHienTai = viTriCongViecHienTai.MaDoiTuongKy;
+            if (supplyTicket.TrangThai == (byte)SupplyTicketStatus.CancelledApproval && 
+                maDoiTuongKyHienTai== Constants.MaDoiTuongKy.Ph_KTAT)
+            {
+                response.IsEditable = true;
+            }
+        }
+        #endregion
+        #region Danh sách vật tư
         var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId)).Adapt<IEnumerable<SupplyResponse>>().ToList();
         if (!listSupplies.Any())
         {
@@ -443,6 +469,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         {
             supply.Image = _gioHangService.GetSupplyImage(supply.VatTuId);
         }
+        #endregion
         response.DanhSachVatTu = listSupplies;
         response.Tong = response.DanhSachVatTu.Count;
         return response;

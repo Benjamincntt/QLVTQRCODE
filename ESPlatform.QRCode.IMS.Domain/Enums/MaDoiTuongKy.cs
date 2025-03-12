@@ -6,7 +6,7 @@ public enum MaDoiTuongKy
     NguoiLap = 1,
     KiemSoatAT = 2,
     TruongDonVi = 3,
-    Ph_KHVT = 4,
-    Ph_KTAT = 5,
+    Ph_KTAT = 4,
+    Ph_KHVT = 5,
     TongGiamDoc = 6
 }
