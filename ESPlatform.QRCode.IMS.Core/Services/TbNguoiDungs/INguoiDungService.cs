@@ -12,4 +12,6 @@ public interface INguoiDungService
     Task<int> UpdatePassWordAsync(ModifiedUserPasswordRequest request);
     
     Task<int> CreateAsync(CreatedUserRequest userRequest);
+
+    Task<int> GetCurrentUserId();
 }

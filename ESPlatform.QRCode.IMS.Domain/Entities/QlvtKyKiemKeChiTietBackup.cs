@@ -30,7 +30,11 @@ public partial class QlvtKyKiemKeChiTietBackup
 
     public int? KiemKeIdGoc { get; set; }
 
-    public virtual QlvtKyKiemKeBackup? KyKiemKeBackup { get; set; }
+    public long BackupId { get; set; }
 
-    public virtual ICollection<QlvtKyKiemKeChiTietDffBackup> QlvtKyKiemKeChiTietDffBackups { get; set; } = new List<QlvtKyKiemKeChiTietDffBackup>();
+    public int? KyKiemKeId { get; set; }
+
+    public int? IdThe { get; set; }
+
+    public int? IdThayDoi { get; set; }
 }

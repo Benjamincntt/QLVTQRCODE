@@ -26,6 +26,8 @@ public partial class QlvtKyKiemKeChiTietDffBackup
 
     public int? KyKiemKeChiTietBackupId { get; set; }
 
-    public virtual QlvtKyKiemKeChiTietBackup? KyKiemKeChiTietBackup { get; set; }
+    public long BackupId { get; set; }
+
+    public int KyKiemKeChiTietId { get; set; }
 }
 

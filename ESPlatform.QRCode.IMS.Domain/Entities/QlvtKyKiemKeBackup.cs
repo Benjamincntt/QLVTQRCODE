@@ -8,7 +8,7 @@ public partial class QlvtKyKiemKeBackup
 
     public string? OrganizationCode { get; set; }
 
-    public int? PhysicalInventoryId { get; set; }
+    public int PhysicalInventoryId { get; set; }
 
     public string? PhysicalInventoryName { get; set; }
 
@@ -30,5 +30,5 @@ public partial class QlvtKyKiemKeBackup
 
     public DateTime? NgaySaoLuu { get; set; }
 
-    public virtual ICollection<QlvtKyKiemKeChiTietBackup> QlvtKyKiemKeChiTietBackups { get; set; } = new List<QlvtKyKiemKeChiTietBackup>();
+    public long BackupId { get; set; }
 }

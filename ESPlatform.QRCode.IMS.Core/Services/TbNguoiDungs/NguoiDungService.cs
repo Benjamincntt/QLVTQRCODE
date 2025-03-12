@@ -105,4 +105,16 @@ public class NguoiDungService : INguoiDungService
         nguoiDung.MaTimeZone = currentPortal != null ? currentPortal.MaTimeZone : 0;
         return await _nguoiDungRepository.InsertAsync(nguoiDung);
     }
+    
+    // Lấy mã người dùng sau khi đăng nhập
+    public async Task<int> GetCurrentUserId()
+    {
+        var username = _authorizedContextFacade.Username;
+        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        if (currentUser is null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+        }
+        return currentUser.MaNguoiDung;
+    }
 }

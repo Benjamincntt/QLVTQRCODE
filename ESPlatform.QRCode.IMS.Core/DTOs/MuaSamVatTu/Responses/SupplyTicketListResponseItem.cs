@@ -17,4 +17,16 @@ public class SupplyTicketListResponseItem
     public string MaMau { get; set; } = string.Empty;
 
     public string TenTrangThai { get; set; } = string.Empty;
+    
+    // Các trường update để ký số
+    
+    /// <summary>
+    /// Cho phép chức năng bỏ qua ký
+    /// </summary>
+    public bool IsBoQua { get; set; }
+    
+    /// <summary>
+    /// Cho phép user được ký
+    /// </summary>
+    public bool IsKySo { get; set; }
 }

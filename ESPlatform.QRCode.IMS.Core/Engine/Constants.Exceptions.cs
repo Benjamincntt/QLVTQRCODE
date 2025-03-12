@@ -52,6 +52,8 @@ public static partial class Constants {
 			{
 				public const string InvalidSupplyTicket = "Bạn chưa chọn phiếu cung ứng";
                 public const string InvalidSupplyTicketStatus = "Trạng thái phiếu cung ứng không hợp lệ";
+                public const string TicketCancelSuccess  = "Hủy phiếu thành công";
+                public const string TicketCancelFailed  = "Hủy phiếu thất bại";
 			}
 
 			public static class Cart
@@ -69,9 +71,13 @@ public static partial class Constants {
                 public const string InvalidChuKy = "Cấu hình chữ ký không tồn tại";
                 public const string Signed = "Phiếu đã được ký";
                 public const string CanNotIgnore = "Người ký không được bỏ qua chữ ký này";
+                public const string NotFoundCauHinhVanbanKy = "Người dùng chưa được cấu hình ký văn bản nào";
+                
+                
                 public const int DaKy = 1;
 				public const int HuyBo = -1;
                 public const int BoQua = 2;
+                public const string InvalidTicketId = "Mã phiếu không hợp lệ";
             }
 			
         }

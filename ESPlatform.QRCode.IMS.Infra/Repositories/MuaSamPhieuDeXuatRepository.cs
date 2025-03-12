@@ -15,18 +15,31 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
     {
     }
 
-    public async Task<PagedList<dynamic>> ListSupplyTicketAsync(string keywords, SupplyTicketStatus status, int pageIndex, int pageSize)
+    public async Task<PagedList<dynamic>> ListSupplyTicketAsync(
+        string keywords,
+        SupplyTicketStatus status,
+        int userId,
+        string maDoiTuongKy,
+        List<int> phieuDeXuatOtherIds,
+        int pageIndex, int pageSize)
     {
         var query = DbContext.QlvtMuaSamPhieuDeXuats
-            .Join(DbContext.TbCauHinhTrangThais,
+            .Join(DbContext.TbCauHinhTrangThais, 
                 x => x.TrangThai,
                 y => y.GiaTri,
                 (x, y) => new { PhieuDeXuat = x, CauHinhTrangThai = y})
-            .Where(x => x.PhieuDeXuat.TrangThai != (int?)SupplyTicketStatus.Deleted)
+            .GroupJoin(DbContext.QlvtMuaSamPdxKies
+                    .Where(pdx => pdx.MaDoiTuongKy == maDoiTuongKy), 
+                x => x.PhieuDeXuat.Id,
+                y => y.PhieuDeXuatId,
+                (x, pdxKies) => new { x.PhieuDeXuat, x.CauHinhTrangThai, PdxKies = pdxKies })
+            .SelectMany(x => x.PdxKies.DefaultIfEmpty(), (x, pdxKy) => new { x.PhieuDeXuat, x.CauHinhTrangThai, PdxKy = pdxKy })
+            .Where(x => userId == 0 || maDoiTuongKy != "NguoiLap" || x.PhieuDeXuat.MaNguoiThem == userId)
             .Where(x => status == SupplyTicketStatus.Unknown || x.PhieuDeXuat.TrangThai == (byte)status)
             .Where(x => string.IsNullOrWhiteSpace(keywords)
                         || (x.PhieuDeXuat.TenPhieu != null && x.PhieuDeXuat.TenPhieu.ToLower().Contains(keywords))
                         || (x.PhieuDeXuat.MoTa != null && x.PhieuDeXuat.MoTa.ToLower().Contains(keywords)))
+            .Where(x => !phieuDeXuatOtherIds.Any() || phieuDeXuatOtherIds.Contains(x.PhieuDeXuat.Id))
             .OrderByDescending(x => x.PhieuDeXuat.NgayThem)
             .ThenBy(x => x.PhieuDeXuat.TrangThai)
             .Select(x => new
@@ -39,6 +52,8 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
                 TrangThai = x.PhieuDeXuat.TrangThai ?? (int?)SupplyTicketStatus.Unsigned,
                 TenTrangThai = x.CauHinhTrangThai.TenTrangThai ?? string.Empty,
                 MaMau = x.CauHinhTrangThai.MaMau ?? string.Empty,
+                IsKySo = x.PdxKy != null && x.PdxKy.TrangThai == null && userId != 0,
+                IsBoQua = maDoiTuongKy == "KiemSoatAT" && x.PdxKy != null && x.PdxKy.TrangThai == null && userId != 0,
             });
         return await query.ToPagedListAsync<dynamic>(pageIndex, pageSize);
     }
@@ -87,8 +102,8 @@ public class MuaSamPhieuDeXuatRepository : EfCoreRepositoryBase<QlvtMuaSamPhieuD
         
         var combinedQuery = listSupplies
                 .Union(listSuppliesNew)
-                .OrderBy(x => x.TenVatTu)
-            ;
+                .OrderBy(x => x.TenVatTu);
         return await combinedQuery.ToListAsync();
-    }
+    } 
+
 }

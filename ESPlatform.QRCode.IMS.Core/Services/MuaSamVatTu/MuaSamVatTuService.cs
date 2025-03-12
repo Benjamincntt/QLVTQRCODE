@@ -7,6 +7,7 @@ using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Services.GioHang;
+using ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
@@ -26,6 +27,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGioHangService _gioHangService;
+    private readonly INguoiDungService _nguoiDungService;
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IMuaSamVatTuNewRepository _muaSamVatTuNewRepository;
     private readonly IMuaSamPhieuDeXuatRepository _muaSamPhieuDeXuatRepository;
@@ -37,12 +39,15 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IMuaSamPdxKyRepository _muaSamPdxKyRepository;
     private readonly IVatTuTonKhoRepository _vatTuTonKhoRepository;
     private readonly INguoiDungRepository _nguoiDungRepository;
+    private readonly IViTriCongViecRepository _viTriCongViecRepository;
+    private readonly ICauHinhVanBanKyRepository _cauHinhVanBanKyRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly ImagePath _imagePath;
     private readonly IMapper _mapper;
 
     public MuaSamVatTuService(
         IGioHangService gioHangService,
+        INguoiDungService nguoiDungService,
         IVatTuRepository vatTuRepository,
         IMuaSamVatTuNewRepository muaSamVatTuNewRepository,
         IMuaSamPhieuDeXuatRepository muaSamPhieuDeXuatRepository,
@@ -54,12 +59,15 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IMuaSamPdxKyRepository muaSamPdxKyRepository,
         IVatTuTonKhoRepository vatTuTonKhoRepository,
         INguoiDungRepository nguoiDungRepository,
+        IViTriCongViecRepository viTriCongViecRepository,
+        ICauHinhVanBanKyRepository cauHinhVanBanKyRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork,
         IOptions<ImagePath> imagePath,
         IMapper mapper)
     {
         _gioHangService = gioHangService;
+        _nguoiDungService = nguoiDungService;
         _vatTuRepository = vatTuRepository;
         _muaSamVatTuNewRepository = muaSamVatTuNewRepository;
         _muaSamPhieuDeXuatRepository = muaSamPhieuDeXuatRepository;
@@ -68,12 +76,14 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _gioHangRepository = gioHangRepository;
         _vanBanKyRepository = vanBanKyRepository;
         _vatTuBoMaRepository = vatTuBoMaRepository;
+        _muaSamPdxKyRepository = muaSamPdxKyRepository;
         _vatTuTonKhoRepository = vatTuTonKhoRepository;
         _nguoiDungRepository = nguoiDungRepository;
+        _viTriCongViecRepository = viTriCongViecRepository;
+        _cauHinhVanBanKyRepository = cauHinhVanBanKyRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _muaSamPdxKyRepository = muaSamPdxKyRepository;
         _imagePath = imagePath.Value;
     }
 
@@ -271,21 +281,112 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             }
         }
     }
-
+    
     public async Task<PagedList<SupplyTicketListResponseItem>> ListSupplyTicketAsync(SupplyTicketRequest requests)
-    {
-        if (requests.SupplyTicketStatus is <= SupplyTicketStatus.Unknown or >= SupplyTicketStatus.Deleted)
+     {
+        #region Validate  
+        if (requests.SupplyTicketStatus is not null && !Enum.IsDefined(typeof(SupplyTicketStatus), requests.SupplyTicketStatus) 
+            || requests.SupplyTicketStatus == SupplyTicketStatus.Unknown)
         {
             throw new ArgumentException(Constants.Exceptions.Messages.SupplyTicket.InvalidSupplyTicketStatus);
         }
-        var listPhieu = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketAsync(
-                string.IsNullOrWhiteSpace(requests.Keywords) ? string.Empty : requests.Keywords.ToLower(),
-                requests.SupplyTicketStatus ?? SupplyTicketStatus.Unknown,
-                requests.GetPageIndex(),
-                requests.GetPageSize()))
-            .Adapt<PagedList<SupplyTicketListResponseItem>>();
+
+        #endregion
         
-        return listPhieu;
+        #region Lấy thông tin user
+        var username = _authorizedContextFacade.Username;
+        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        if (currentUser is null)
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
+        }
+        var userId = currentUser.MaNguoiDung;
+        #endregion
+        
+        #region TH1: là quản trị viên cao cấp: được xem tất cả phiếu
+        var phieuDeXuatOtherIds = new List<int>();
+        if (currentUser.LaQuanTriVienCaoCap == true)
+        {
+            var listPhieu = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketAsync(
+                    string.IsNullOrWhiteSpace(requests.Keywords) ? string.Empty : requests.Keywords.ToLower(),
+                    requests.SupplyTicketStatus ?? SupplyTicketStatus.Unknown,
+                    0, 
+                    Constants.MaDoiTuongKy.Unknown,
+                    phieuDeXuatOtherIds,        // set phieuDeXuatOtherIds = null cho dễ query chung hàm
+                    requests.GetPageIndex(),
+                    requests.GetPageSize()))
+                .Adapt<PagedList<SupplyTicketListResponseItem>>();
+            return listPhieu;
+        }
+        #endregion
+        // TH2: là người thường vào ký
+        //var maDonViSuDung = currentUser.MaDonViSuDung;
+         
+        var viTriCongViecHienTai = await _viTriCongViecRepository.GetAsync(x => x.Id == currentUser.ViTri);
+        if (viTriCongViecHienTai is null)
+        {                                                           
+            return default;
+        }
+        var maDoiTuongKyHienTai = viTriCongViecHienTai.MaDoiTuongKy;
+        if (maDoiTuongKyHienTai is null) 
+        {
+            return default;
+        }
+        // Lấy danh sách phiếu đề xuất theo maDoiTuongKyHienTai(ví dụ: Người lập)
+        var listPhieuDeXuatIds = (await _muaSamPdxKyRepository.ListPhieuDeXuatIdsAsync(maDoiTuongKyHienTai)).ToList();
+        if (!listPhieuDeXuatIds.Any()) return default;
+        
+        #region TH2.1: Người login là người lập phiếu đề xuất
+        
+        // => Trả về các phiếu có mã người thêm = mã người đang login
+        if (maDoiTuongKyHienTai == Constants.MaDoiTuongKy.NguoiLap)
+        {
+            var listPhieu = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketAsync(
+                    string.IsNullOrWhiteSpace(requests.Keywords) ? string.Empty : requests.Keywords.ToLower(),
+                    requests.SupplyTicketStatus ?? SupplyTicketStatus.Unknown,
+                    userId,
+                    Constants.MaDoiTuongKy.NguoiLap,
+                    listPhieuDeXuatIds,
+                    requests.GetPageIndex(),
+                    requests.GetPageSize()))
+                .Adapt<PagedList<SupplyTicketListResponseItem>>();
+            return listPhieu;
+        }
+        #endregion
+        
+        #region TH2.2: Người login là người ký sau người thứ nhất => set trạng thái lùi về 1 người
+        else
+        { 
+            var previousMaDoiTuongKy = maDoiTuongKyHienTai switch
+            {
+                Constants.MaDoiTuongKy.KiemSoatAT => Constants.MaDoiTuongKy.NguoiLap, 
+                Constants.MaDoiTuongKy.TruongDonVi => Constants.MaDoiTuongKy.KiemSoatAT,
+                Constants.MaDoiTuongKy.Ph_KTAT => Constants.MaDoiTuongKy.TruongDonVi,
+                Constants.MaDoiTuongKy.Ph_KHVT => Constants.MaDoiTuongKy.Ph_KTAT,
+                Constants.MaDoiTuongKy.TongGiamDoc => Constants.MaDoiTuongKy.Ph_KHVT,
+                _ => null
+            };
+            if (previousMaDoiTuongKy == null) return default;
+            
+            // Trả về danh sách phiếu "đã ký" của người ngay trước người dùng hiện tại
+            phieuDeXuatOtherIds = (await _muaSamPdxKyRepository.ListPhieuDeXuatOtherIdsAsync(previousMaDoiTuongKy, listPhieuDeXuatIds)).ToList();
+            if (!phieuDeXuatOtherIds.Any())
+            {
+                return default;
+            }
+
+            var listPhieu = (await _muaSamPhieuDeXuatRepository.ListSupplyTicketAsync(
+                    string.IsNullOrWhiteSpace(requests.Keywords) ? string.Empty : requests.Keywords.ToLower(),
+                    requests.SupplyTicketStatus ?? SupplyTicketStatus.Unknown,
+                    userId,
+                    maDoiTuongKyHienTai,
+                    phieuDeXuatOtherIds,
+                    requests.GetPageIndex(),
+                    requests.GetPageSize()))
+                .Adapt<PagedList<SupplyTicketListResponseItem>>();
+            return listPhieu;
+        }
+        #endregion
     }
 
     private async Task<int> CreateManySupplyTicketDetailAsync(int supplyTicketId, List<SupplyTicketDetailRequest> requests)
@@ -425,7 +526,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 
     public async Task<int> CountSupplyTicketsByStatusAsync(SupplyTicketStatus status)
     {
-        if (status is <= SupplyTicketStatus.Unknown or > SupplyTicketStatus.Deleted)
+        if (status == SupplyTicketStatus.Unknown || !Enum.IsDefined(typeof(SupplyTicketStatus), status))
         {
             throw new ArgumentException(Constants.Exceptions.Messages.SupplyTicket.InvalidSupplyTicketStatus);
         }

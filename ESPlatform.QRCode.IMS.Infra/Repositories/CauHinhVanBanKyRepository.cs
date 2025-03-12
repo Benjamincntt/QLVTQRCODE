@@ -2,11 +2,8 @@
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Library.Database.EfCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace ESPlatform.QRCode.IMS.Infra.Repositories
 {
@@ -15,6 +12,13 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
         public CauHinhVanBanKyRepository(AppDbContext dbContext) : base(dbContext)
         {
 
+        }
+        public async Task<QlvtCauHinhVbKy?> GetCauHinhVbKyAsync(string maDoiTuongKyHienTai)
+        {
+            var query = DbContext.QlvtCauHinhVbKies
+                .Where(x => x.MaDoiTuongKy == maDoiTuongKyHienTai.Trim());
+
+            return await query.FirstOrDefaultAsync(); 
         }
     }
 }

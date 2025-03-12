@@ -7,6 +7,13 @@ namespace ESPlatform.QRCode.IMS.Domain.Interfaces;
 
 public interface IMuaSamPhieuDeXuatRepository : IRepositoryBase<QlvtMuaSamPhieuDeXuat>
 {
-    Task<PagedList<dynamic>> ListSupplyTicketAsync(string keywords, SupplyTicketStatus status, int pageIndex, int pageSize);
+    Task<PagedList<dynamic>> ListSupplyTicketAsync(
+        string keywords,
+        SupplyTicketStatus status,
+        int userId,
+        string maDoiTuongKy,
+        List<int> phieuDeXuatOtherIds,
+        int pageIndex,
+        int pageSize);
     Task<IEnumerable<dynamic>> ListCreatedSupplyTicketWarningAsync(List<int> vatTuIds);
 }

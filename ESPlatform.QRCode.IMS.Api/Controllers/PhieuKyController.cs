@@ -2,22 +2,16 @@
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
-using ESPlatform.QRCode.IMS.Core.Services.MuaSamVatTu;
 using ESPlatform.QRCode.IMS.Core.Services.PhieuKy;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System.Transactions;
-using static MassTransit.ValidationResultExtensions;
-using ViettelFileSigner;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
-using ESPlatform.QRCode.IMS.Library.Extensions;
 using System.Diagnostics;
+using ESPlatform.QRCode.IMS.Core.Engine;
 
 namespace ESPlatform.QRCode.IMS.Api.Controllers
 {
@@ -369,5 +363,25 @@ namespace ESPlatform.QRCode.IMS.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Huỷ 1 phiếu(dành cho người ký số 5 và 6)
+        /// </summary>
+        /// <param name="ticketId"> Mã phiếu</param>
+        /// <param name="isPhieuDeXuat"> true: phiếu đề xuất, false: phiếu duyệt</param>
+        /// <param name="reason"> Lý do huỷ </param>
+        /// <returns></returns>
+        [HttpPatch("{ticketId:int}/{isPhieuDeXuat:bool}")]
+        public async Task<IActionResult> CancelTicketAsync(int ticketId, bool isPhieuDeXuat, [FromBody] string? reason)
+        {
+            var result = await _phieuKyService.CancelTicketAsync(ticketId, isPhieuDeXuat, reason);
+            if (result > 0)
+            {
+                return Ok(Constants.Exceptions.Messages.SupplyTicket.TicketCancelSuccess);
+            }
+            else
+            {
+                return StatusCode(500, Constants.Exceptions.Messages.SupplyTicket.TicketCancelSuccess);
+            }
+        }
     }
 }

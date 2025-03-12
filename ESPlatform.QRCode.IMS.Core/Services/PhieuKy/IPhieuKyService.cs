@@ -4,11 +4,7 @@ using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
 using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 {
@@ -23,6 +19,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         Task<object> UpdateThongTinKyAsync(UpdateFileRequest request);
         Task SignViettelCA(SignMobileCaInputDto request);
         Task<object> UpdateKySimCaAsync(UpdateFileRequest request);
-        
+
+        Task<int> CancelTicketAsync(int phieuId, bool isPhieuDeXuat, string? reason);
     }
 }

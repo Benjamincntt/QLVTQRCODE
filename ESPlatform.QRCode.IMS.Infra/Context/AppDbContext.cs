@@ -14,6 +14,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<GetNewId> GetNewIds { get; set; }
 
+    public virtual DbSet<KiemKeBackupHistory> KiemKeBackupHistories { get; set; }
+
     public virtual DbSet<QlvtCauHinhVbKy> QlvtCauHinhVbKies { get; set; }
 
     public virtual DbSet<QlvtGioHang> QlvtGioHangs { get; set; }
@@ -189,6 +191,22 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.MyNewId).HasColumnName("MyNewID");
         });
 
+        modelBuilder.Entity<KiemKeBackupHistory>(entity =>
+        {
+            entity.HasKey(e => e.BackupId).HasName("PK__KiemKe_B__EB9069C245BB4A86");
+
+            entity.ToTable("KiemKe_Backup_History");
+
+            entity.Property(e => e.BackupReason).HasMaxLength(500);
+            entity.Property(e => e.BackupTime)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ErrorMessage).HasMaxLength(4000);
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<QlvtCauHinhVbKy>(entity =>
         {
             entity.ToTable("QLVT_CauHinh_Vb_Ky");
@@ -347,10 +365,12 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<QlvtKyKiemKeBackup>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__QLVT_KyK__3214EC0782418870");
+            entity.HasKey(e => new { e.PhysicalInventoryId, e.BackupId }).HasName("PK_KyKiemKe_Backup");
 
             entity.ToTable("QLVT_KyKiemKe_Backup");
 
+            entity.Property(e => e.PhysicalInventoryId).HasColumnName("physical_inventory_id");
+            entity.Property(e => e.BackupId).HasColumnName("backup_id");
             entity.Property(e => e.Description)
                 .HasMaxLength(1000)
                 .HasColumnName("description");
@@ -360,6 +380,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.FreezeDate)
                 .HasColumnType("datetime")
                 .HasColumnName("freeze_date");
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.KiemKeIdGoc).HasColumnName("KiemKe_Id_Goc");
             entity.Property(e => e.Kykiemkechinh).HasColumnName("kykiemkechinh");
             entity.Property(e => e.NgaySaoLuu).HasColumnType("datetime");
@@ -370,7 +391,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PhysicalInventoryDate)
                 .HasColumnType("datetime")
                 .HasColumnName("physical_inventory_date");
-            entity.Property(e => e.PhysicalInventoryId).HasColumnName("physical_inventory_id");
             entity.Property(e => e.PhysicalInventoryName)
                 .HasMaxLength(255)
                 .HasColumnName("physical_inventory_name");
@@ -389,6 +409,8 @@ public partial class AppDbContext : DbContext
             entity.ToTable("QLVT_KyKiemKe_ChiTiet");
 
             entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
+            entity.Property(e => e.IdThayDoi).HasColumnName("idThayDoi");
+            entity.Property(e => e.IdThe).HasColumnName("idThe");
             entity.Property(e => e.KhoChinhId).HasColumnName("KhoChinh_Id");
             entity.Property(e => e.KhoPhuId).HasColumnName("KhoPhu_Id");
             entity.Property(e => e.KyKiemKeId).HasColumnName("KyKiemKe_Id");
@@ -408,15 +430,19 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<QlvtKyKiemKeChiTietBackup>(entity =>
         {
-            entity.HasKey(e => e.KyKiemKeChiTietId).HasName("PK__QLVT_KyK__8C6FDB4E70940C27");
+            entity.HasKey(e => new { e.KyKiemKeChiTietId, e.BackupId }).HasName("PK_KyKiemKe_ChiTiet_Backup");
 
             entity.ToTable("QLVT_KyKiemKe_ChiTiet_Backup");
 
             entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
+            entity.Property(e => e.BackupId).HasColumnName("backup_id");
+            entity.Property(e => e.IdThayDoi).HasColumnName("idThayDoi");
+            entity.Property(e => e.IdThe).HasColumnName("idThe");
             entity.Property(e => e.KhoChinhId).HasColumnName("KhoChinh_Id");
             entity.Property(e => e.KhoPhuId).HasColumnName("KhoPhu_Id");
             entity.Property(e => e.KiemKeIdGoc).HasColumnName("KiemKe_Id_Goc");
             entity.Property(e => e.KyKiemKeBackupId).HasColumnName("KyKiemKe_Backup_Id");
+            entity.Property(e => e.KyKiemKeId).HasColumnName("KyKiemKe_Id");
             entity.Property(e => e.NgayKiemKe).HasColumnType("datetime");
             entity.Property(e => e.NguoiKiemKeId).HasColumnName("NguoiKiemKe_Id");
             entity.Property(e => e.NguoiKiemKeTen)
@@ -427,10 +453,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.SoLuongSoSach).HasColumnType("decimal(18, 5)");
             entity.Property(e => e.SoThe).HasMaxLength(255);
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
-
-            entity.HasOne(d => d.KyKiemKeBackup).WithMany(p => p.QlvtKyKiemKeChiTietBackups)
-                .HasForeignKey(d => d.KyKiemKeBackupId)
-                .HasConstraintName("FK_QLVT_KyKiemKe_ChiTiet_Backup_QLVT_KyKiemKe_Backup");
         });
 
         modelBuilder.Entity<QlvtKyKiemKeChiTietDff>(entity =>
@@ -456,11 +478,15 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<QlvtKyKiemKeChiTietDffBackup>(entity =>
         {
-            entity.HasKey(e => e.ChiTietDffId).HasName("PK__QLVT_KyK__687F0FA9523F00C7");
+            entity.HasKey(e => new { e.KyKiemKeChiTietId, e.BackupId }).HasName("PK_KyKiemKe_ChiTiet_DFF_Backup");
 
             entity.ToTable("QLVT_KyKiemKe_ChiTiet_DFF_Backup");
 
-            entity.Property(e => e.ChiTietDffId).HasColumnName("ChiTiet_DFF_Id");
+            entity.Property(e => e.KyKiemKeChiTietId).HasColumnName("KyKiemKe_ChiTiet_Id");
+            entity.Property(e => e.BackupId).HasColumnName("backup_id");
+            entity.Property(e => e.ChiTietDffId)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("ChiTiet_DFF_Id");
             entity.Property(e => e.KyKiemKeChiTietBackupId).HasColumnName("KyKiemKe_ChiTiet_Backup_Id");
             entity.Property(e => e.KyKiemKeIdGoc).HasColumnName("KyKiemKe_Id_Goc");
             entity.Property(e => e.PhanTramDong).HasColumnType("decimal(5, 2)");
@@ -474,10 +500,6 @@ public partial class AppDbContext : DbContext
                 .HasColumnType("decimal(18, 5)")
                 .HasColumnName("TS_KemPc_MatPc");
             entity.Property(e => e.VatTuId).HasColumnName("VatTu_Id");
-
-            entity.HasOne(d => d.KyKiemKeChiTietBackup).WithMany(p => p.QlvtKyKiemKeChiTietDffBackups)
-                .HasForeignKey(d => d.KyKiemKeChiTietBackupId)
-                .HasConstraintName("FK_QLVT_KyKiemKe_ChiTiet_DFF_Backup_QLVT_KyKiemKe_ChiTiet_Backup");
         });
 
         modelBuilder.Entity<QlvtKyKiemKeChiTietErpDemo>(entity =>
@@ -1861,38 +1883,48 @@ public partial class AppDbContext : DbContext
                 .ToTable("TempKyKiemKeChiTiet");
 
             entity.Property(e => e.IdKho).HasColumnName("idKho");
-            entity.Property(e => e.IdkyKiemKe).HasColumnName("IDKyKiemKe");
-            entity.Property(e => e.IdvatTu).HasColumnName("IDVatTu");
-            entity.Property(e => e.NgayKiemKe).HasColumnType("datetime");
-            entity.Property(e => e.PhanTramDong).HasColumnType("decimal(5, 2)");
-            entity.Property(e => e.PhanTramKemPc)
+            entity.Property(e => e.IdKy).HasColumnName("idKy");
+            entity.Property(e => e.IdThayDoi).HasColumnName("idThayDoi");
+            entity.Property(e => e.IdThe).HasColumnName("idThe");
+            entity.Property(e => e.IdVatTu).HasColumnName("idVatTu");
+            entity.Property(e => e.NgayKiemKe)
+                .HasColumnType("datetime")
+                .HasColumnName("ngayKiemKe");
+            entity.Property(e => e.PtKemPhamChat)
                 .HasColumnType("decimal(5, 2)")
-                .HasColumnName("PhanTramKemPC");
-            entity.Property(e => e.SlchenhLech)
-                .HasColumnType("decimal(18, 5)")
-                .HasColumnName("SLChenhLech");
-            entity.Property(e => e.SldeNghiThanhLy)
+                .HasColumnName("ptKemPhamChat");
+            entity.Property(e => e.PtMatPhamChat)
                 .HasColumnType("decimal(18, 2)")
-                .HasColumnName("SLDeNghiThanhLy");
-            entity.Property(e => e.Sldong)
-                .HasColumnType("decimal(18, 2)")
-                .HasColumnName("SLDong");
-            entity.Property(e => e.SlkiemKe)
+                .HasColumnName("ptMatPhamChat");
+            entity.Property(e => e.PtuDong)
+                .HasColumnType("decimal(5, 2)")
+                .HasColumnName("ptuDong");
+            entity.Property(e => e.SlChenhLech)
                 .HasColumnType("decimal(18, 5)")
-                .HasColumnName("SLKiemKe");
-            entity.Property(e => e.SlmatPhamChat)
-                .HasColumnType("decimal(18, 2)")
-                .HasColumnName("SLMatPhamChat");
-            entity.Property(e => e.SlsoSach)
+                .HasColumnName("slChenhLech");
+            entity.Property(e => e.SlKemPhamChat)
                 .HasColumnType("decimal(18, 5)")
-                .HasColumnName("SLSoSach");
+                .HasColumnName("slKemPhamChat");
+            entity.Property(e => e.SlMatPhamChat)
+                .HasColumnType("decimal(18, 5)")
+                .HasColumnName("slMatPhamChat");
+            entity.Property(e => e.SlSoSach)
+                .HasColumnType("decimal(18, 5)")
+                .HasColumnName("slSoSach");
+            entity.Property(e => e.SlThanhLy)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("slThanhLy");
+            entity.Property(e => e.SluDong)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("sluDong");
             entity.Property(e => e.SoThe)
                 .HasMaxLength(255)
-                .HasDefaultValueSql("('')");
-            entity.Property(e => e.TaiSanKemPc)
-                .HasColumnType("decimal(18, 2)")
-                .HasColumnName("TaiSanKemPC");
-            entity.Property(e => e.TrangThai).HasMaxLength(255);
+                .HasDefaultValueSql("('')")
+                .HasColumnName("soThe");
+            entity.Property(e => e.TongSoMpcKpc)
+                .HasColumnType("decimal(18, 5)")
+                .HasColumnName("tongSo_Mpc_Kpc");
+            entity.Property(e => e.TrangThai).HasColumnName("trangThai");
         });
 
         modelBuilder.Entity<TempVatTu>(entity =>
@@ -1938,3 +1970,4 @@ public partial class AppDbContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+

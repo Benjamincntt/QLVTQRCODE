@@ -1,63 +1,56 @@
-﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
-using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
+﻿using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
 using ESPlatform.QRCode.IMS.Core.Engine;
-using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
-using ESPlatform.QRCode.IMS.Infra.Context;
-using ESPlatform.QRCode.IMS.Infra.Repositories;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Mapster;
-using MassTransit;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MobileCA.Application.Services.Viettel;
 using MobileCA.Application.Services.Viettel.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ViettelFileSigner;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 {
     public class PhieuKyService : IPhieuKyService
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IPhieuKyRepository _phieuKyRepository;
-        private readonly IMuaSamPdxKyRepository _deXuatKyRepository;
+        private readonly IMuaSamPhieuDeXuatRepository _muaSamPhieuDeXuatRepository;
+        private readonly IMuaSamPdxKyRepository _muaSamPdxKyRepository;
         private readonly ICauHinhVanBanKyRepository _cauHinhVanBanKyRepository;
         private readonly IVanBanKyRepository _vanBanKyRepository;
-        private readonly IAuthorizedContextFacade _authorizedContextFacade;
         private readonly INguoiDungRepository _nguoiDungRepository;
+        private readonly IAuthorizedContextFacade _authorizedContextFacade;
         private readonly IConfiguration _configuration;
         private readonly IViettelMobileCAService _viettelCAService;
-        public PhieuKyService(IPhieuKyRepository phieuKyRepository, IAuthorizedContextFacade authorizedContextFacade
-                , IMuaSamPdxKyRepository deXuatKyRepository
-                , ICauHinhVanBanKyRepository cauHinhVanBanKyRepository
-                , IVanBanKyRepository vanBanKyRepository
-                , IConfiguration configuration
-                , IUnitOfWork unitOfWork
-                , IViettelMobileCAService viettelCAService, INguoiDungRepository nguoiDungRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public PhieuKyService(
+            IPhieuKyRepository phieuKyRepository,
+            IMuaSamPhieuDeXuatRepository muaSamPhieuDeXuatRepository,
+            IMuaSamPdxKyRepository muaSamPdxKyRepository,
+            ICauHinhVanBanKyRepository cauHinhVanBanKyRepository,
+            IVanBanKyRepository vanBanKyRepository, 
+            INguoiDungRepository nguoiDungRepository, 
+            IAuthorizedContextFacade authorizedContextFacade,
+            IConfiguration configuration,
+            IViettelMobileCAService viettelCAService,
+            IUnitOfWork unitOfWork)
         {
             _phieuKyRepository = phieuKyRepository;
-            _authorizedContextFacade = authorizedContextFacade;
-            _unitOfWork = unitOfWork;
-            _deXuatKyRepository = deXuatKyRepository;
+            _muaSamPhieuDeXuatRepository = muaSamPhieuDeXuatRepository;
+            _muaSamPdxKyRepository = muaSamPdxKyRepository;
             _cauHinhVanBanKyRepository = cauHinhVanBanKyRepository;
             _vanBanKyRepository = vanBanKyRepository;
-            _configuration = configuration;
-            this._viettelCAService = viettelCAService;
             _nguoiDungRepository = nguoiDungRepository;
+            _authorizedContextFacade = authorizedContextFacade;
+            _configuration = configuration;
+            _viettelCAService = viettelCAService;
+            _unitOfWork = unitOfWork;
+            
         }
 
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
@@ -119,7 +112,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         {
             if (!request.ItemsPhieuKy.Any() || request.ItemsPhieuKy == null)
             {
-                throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.EmptyPhieuIds);
+                throw new BadRequestException(Constants.Exceptions.Messages. KyCungUng.EmptyPhieuIds);
             }
 
             var username = _authorizedContextFacade.Username;
@@ -155,7 +148,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                             continue;
                         }
                         var maDoiTuongKy = phieuKy.MaDoiTuongKy != null ? phieuKy.MaDoiTuongKy.ToLower() : "";
-                        var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == phieuKy.ChuKyId
+                        var phieuMuaSamKy = await _muaSamPdxKyRepository.GetAsync(x => x.Id == phieuKy.ChuKyId
                                                                                     && x.ThuTuKy == phieuKy.ThuTu_Ky
                                                                                      && x.VanBanId == phieuKy.VanBan_Id
                                                                                       && (x.MaDoiTuongKy != null && x.MaDoiTuongKy.ToLower() == maDoiTuongKy));
@@ -189,7 +182,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     }
                     if (lstMuaSamPdxKy.Any())
                     {
-                        await _deXuatKyRepository.UpdateManyAsync(lstMuaSamPdxKy);
+                        await _muaSamPdxKyRepository.UpdateManyAsync(lstMuaSamPdxKy);
                     }
 
                     await _unitOfWork.CommitAsync();
@@ -251,7 +244,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 
                     }
 
-                    var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId
+                    var phieuMuaSamKy = await _muaSamPdxKyRepository.GetAsync(x => x.Id == request.ChuKyId
                                                                                  && x.VanBanId == request.VanBan_Id
                                                                                   && (x.MaDoiTuongKy != null && x.MaDoiTuongKy.ToLower() == maDoiTuongKy));
 
@@ -277,7 +270,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     phieuMuaSamKy.NguoiKyId = userId;
                     phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.BoQua;
 
-                    await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
+                    await _muaSamPdxKyRepository.UpdateAsync(phieuMuaSamKy);
 
                     await _unitOfWork.CommitAsync();
 
@@ -370,7 +363,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     }
                     // Lấy thông tin ký từ bảng QLVT_MuaSam_PhieuDeXuat_Ky
 
-                    var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
+                    var phieuMuaSamKy = await _muaSamPdxKyRepository.GetAsync(x => x.Id == request.ChuKyId);
 
                     // Kiểm tra xem chữ ký có tồn tại hay không
                     if (phieuMuaSamKy == null)
@@ -395,7 +388,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     phieuMuaSamKy.NguoiKyId = request.SignUserId;
                     phieuMuaSamKy.UsbSerial = request.SignType;
                     phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
-                    await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
+                    await _muaSamPdxKyRepository.UpdateAsync(phieuMuaSamKy);
 
                     switch (maDoiTuongKy)
                     {
@@ -458,7 +451,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 }
 
                 // Lấy thông tin ký từ bảng QLVT_MuaSam_PhieuDeXuat_Ky
-                var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
+                var phieuMuaSamKy = await _muaSamPdxKyRepository.GetAsync(x => x.Id == request.ChuKyId);
 
                 // Kiểm tra xem chữ ký có tồn tại hay không
                 if (phieuMuaSamKy == null)
@@ -485,7 +478,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 phieuMuaSamKy.UsbSerial = request.SignType;
                 phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
 
-                await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
+                await _muaSamPdxKyRepository.UpdateAsync(phieuMuaSamKy);
 
                 switch (maDoiTuongKy)
                 {
@@ -594,7 +587,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                         return new ErrorResponse { Message = $"Phiếu có Id: {request.PhieuId} không tồn tại." };
                     }
 
-                    var phieuMuaSamKy = await _deXuatKyRepository.GetAsync(x => x.Id == request.ChuKyId);
+                    var phieuMuaSamKy = await _muaSamPdxKyRepository.GetAsync(x => x.Id == request.ChuKyId);
                     if (phieuMuaSamKy == null)
                     {
                         Serilog.Log.Warning("Không tìm thấy cấu hình chữ ký - ChuKyId: {ChuKyId}", request.ChuKyId);
@@ -615,7 +608,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     phieuMuaSamKy.NguoiKyId = userId;
                     phieuMuaSamKy.UsbSerial = request.SignType;
                     phieuMuaSamKy.TrangThai = Constants.Exceptions.Messages.KyCungUng.DaKy;
-                    await _deXuatKyRepository.UpdateAsync(phieuMuaSamKy);
+                    await _muaSamPdxKyRepository.UpdateAsync(phieuMuaSamKy);
 
                     // Cập nhật trạng thái phiếu
                     phieuMuaSam.TrangThai = request.MaDoiTuongKy switch
@@ -649,9 +642,46 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 }
             }
         }
-
-
         #endregion
+        
+        public async Task<int> CancelTicketAsync(int phieuId, bool isPhieuDeXuat, string? reason)
+        {
+            // Validate
+            if (phieuId <= 0)
+            {
+                throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.InvalidTicketId);
+            }
+            var result = await _muaSamPhieuDeXuatRepository.GetAsync(x => x.Id == phieuId);
+            if (result is null)
+            {
+                throw new NotFoundException(Constants.Exceptions.Messages.KyCungUng.InvalidPdx);
+            }
+            // Nếu huỷ phiếu đề xuất => người dùng phải tạo phiếu mới 
+            // => trang thái phiếu cũ = huỷ đề xuất
+            // => 
+            if (isPhieuDeXuat)
+            {
+                
+                result.TrangThai = (byte)SupplyTicketStatus.CancelledProposal;
+            }
+            else
+            {
+                result.TrangThai = (byte)SupplyTicketStatus.CancelledApproval;
+                var listPhieuDeXuatKys = await _muaSamPdxKyRepository.ListAsync(x => x.PhieuDeXuatId == result.Id);
+                if (listPhieuDeXuatKys.Any())
+                {
+                    foreach (var item in listPhieuDeXuatKys)
+                    {
+                        item.NguoiKyId= null;
+                        item.LyDo = null;
+                        item.TrangThai = null;
+                    }
+                }
+            }
+
+            result.GhiChu = reason;
+            return await _muaSamPhieuDeXuatRepository.UpdateAsync(result);
+        }
 
 
     }

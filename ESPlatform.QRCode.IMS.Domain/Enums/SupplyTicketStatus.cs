@@ -6,5 +6,7 @@ public enum SupplyTicketStatus
     Unsigned = 1,
     SigningInProgress = 2,
     Signed = 3,
-    Deleted = 4
+    Deleted = 4,
+    CancelledProposal = 5,    // Huỷ đề xuất
+    CancelledApproval = 6     // Huỷ duyệt
 }

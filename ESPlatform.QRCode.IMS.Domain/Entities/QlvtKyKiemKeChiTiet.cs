@@ -28,7 +28,7 @@ public partial class QlvtKyKiemKeChiTiet
 
     public string? NguoiKiemKeTen { get; set; }
 
-    public virtual QlvtKyKiemKe? KyKiemKe { get; set; }
+    public int? IdThe { get; set; }
 
-    public virtual ICollection<QlvtKyKiemKeChiTietDff> QlvtKyKiemKeChiTietDffs { get; set; } = new List<QlvtKyKiemKeChiTietDff>();
+    public int? IdThayDoi { get; set; }
 }
