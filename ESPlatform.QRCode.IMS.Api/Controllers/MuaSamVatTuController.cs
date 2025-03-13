@@ -140,4 +140,22 @@ public class MuaSamVatTuController : ApiControllerBase
         var warnings = await _muaSamVatTuService.ListCreatedSupplyTicketWarningAsync(vatTuIds);
         return Ok(warnings);
     }
+    
+    /// <summary>
+    /// Cập nhật mua bổ sung vật tư vào phiếu duyệt
+    /// </summary>
+    /// <param name="ticketId"> Mã phiếu duyệt</param>
+    /// <param name="requests"> danh sách vật tư bị thay đổi số lượng</param>
+    /// <returns> Số lượng bản ghi được cập nhật</returns>
+    /// <exception cref="BadRequestException"></exception>
+    [HttpPatch("{ticketId:int}/purchase-request/supplement")]
+    public async Task<IActionResult> UpdateSupplyQuantityRequestItem(int ticketId, [FromBody]List<UpdateSupplyQuantityRequestItem> requests)
+    {
+        var updateStatus = await _muaSamVatTuService.UpdateManySupplyQuantitiesAsync(ticketId, requests);
+        if (updateStatus == 0)
+        {
+            return StatusCode(500, Constants.Exceptions.Messages.Common.UpdateFailed);
+        }
+        return Ok(updateStatus);
+    }
 }

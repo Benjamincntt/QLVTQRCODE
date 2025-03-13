@@ -409,6 +409,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 throw new BadRequestException(Constants.Exceptions.Messages.Cart.InvalidCartInfo, new List<string>{ nameof(supplyCart.VatTuId)+ " is invalid"});
             }
             await ValidationHelper.ValidateAsync(supplyCart, new SupplyTicketDetailRequestValidation());
+            
             var supplyTicketDetail = supplyCart.Adapt<QlvtMuaSamPhieuDeXuatDetail>();
             supplyTicketDetail.PhieuDeXuatId = supplyTicketId;
             listSupplyTicketDetail.Add(supplyTicketDetail);
@@ -449,15 +450,16 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         if (viTriCongViecHienTai is not null)
         {
             var maDoiTuongKyHienTai = viTriCongViecHienTai.MaDoiTuongKy;
-            if (supplyTicket.TrangThai == (byte)SupplyTicketStatus.CancelledApproval && 
-                maDoiTuongKyHienTai== Constants.MaDoiTuongKy.Ph_KTAT)
+            if (supplyTicket.TrangThai == (byte)SupplyTicketStatus.CancelledApproval 
+                && maDoiTuongKyHienTai== Constants.MaDoiTuongKy.Ph_KTAT)
             {
                 response.IsEditable = true;
             }
         }
         #endregion
+        
         #region Danh sách vật tư
-        var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId)).Adapt<IEnumerable<SupplyResponse>>().ToList();
+        var listSupplies = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(supplyTicketId)).Adapt<IEnumerable<SupplyInListResponse>>().ToList();
         if (!listSupplies.Any())
         {
             response.DanhSachVatTu = listSupplies;
@@ -470,6 +472,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             supply.Image = _gioHangService.GetSupplyImage(supply.VatTuId);
         }
         #endregion
+        
         response.DanhSachVatTu = listSupplies;
         response.Tong = response.DanhSachVatTu.Count;
         return response;
@@ -571,5 +574,43 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         return existingSupplyTickets
             .Select(x => $"Vật tư {x.TenVatTu} đã được đề xuất với số lượng {x.SoLuong.FormatDecimal()} trong 1 phiếu khác.")
             .ToList();
+    }
+
+    public async Task<int> UpdateManySupplyQuantitiesAsync(int ticketId, List<UpdateSupplyQuantityRequestItem> requests)
+    {
+        #region Validate
+        if (!requests.Any())
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.EmptySupplies);
+        }
+        var supplyTicket = await _muaSamPhieuDeXuatRepository.GetAsync(x => x.Id == ticketId);
+        if (supplyTicket is null)
+        {
+            throw new NotFoundException(Constants.Exceptions.Messages.KyCungUng.InvalidPdx);
+        }
+        #endregion
+        
+        #region Update số lượng
+        var supplyTicketDetailIds = requests.Select(x => x.Id).ToList();
+        var listSupplyTicketDetails = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => supplyTicketDetailIds.Contains(x.Id))).ToList();
+        if (!listSupplyTicketDetails.Any())
+        {
+            throw new NotFoundException(Constants.Exceptions.Messages.KyCungUng.InvalidSupply);   
+        }
+        
+        var updateList = new List<object>();
+        foreach (var item in listSupplyTicketDetails)
+        {
+            var requestItem = requests.FirstOrDefault(x => x.Id == item.Id);
+            if (requestItem != null)
+            {
+                item.SoLuong = requestItem.SoLuong;
+                updateList.Add(new { Id = item.Id, SoLuong = item.SoLuong });
+            }
+        }
+
+        return await _muaSamPhieuDeXuatDetailRepository.UpdateManyPartialAsync(listSupplyTicketDetails, updateList.ToArray());
+        
+        #endregion
     }
 }

@@ -1,5 +1,7 @@
-﻿namespace ESPlatform.QRCode.IMS.Domain.Entities;
+﻿using System.ComponentModel;
 
+namespace ESPlatform.QRCode.IMS.Domain.Entities;
+[DisplayName("Phiếu đề xuất chi tiết")]
 public partial class QlvtMuaSamPhieuDeXuatDetail
 {
     public int Id { get; set; }

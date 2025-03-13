@@ -72,7 +72,7 @@ public static partial class Constants {
                 public const string Signed = "Phiếu đã được ký";
                 public const string CanNotIgnore = "Người ký không được bỏ qua chữ ký này";
                 public const string NotFoundCauHinhVanbanKy = "Người dùng chưa được cấu hình ký văn bản nào";
-                
+                public const string InvalidSupply = "Không có vật tư nào được chọn trong phiếu này";
                 
                 public const int DaKy = 1;
 				public const int HuyBo = -1;

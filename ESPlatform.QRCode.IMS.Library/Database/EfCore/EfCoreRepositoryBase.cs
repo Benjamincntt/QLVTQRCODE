@@ -94,6 +94,8 @@ public class EfCoreRepositoryBase<T, TDbContext> : IRepositoryBase<T> where T : 
 	public async Task<int> UpdateManyPartialAsync(IEnumerable<T> tList, object[] sourceList) {
 		DbContext.ChangeTracker.Clear();
 
+        var entityType = DbContext.Model.FindEntityType(typeof(T)); 
+        var keyNames = entityType?.FindPrimaryKey()?.Properties.Select(p => p.Name).ToHashSet() ?? new HashSet<string>();
 		var i = 0;
 		foreach (var t in tList) {
 			if (i >= sourceList.Length) {
@@ -104,7 +106,10 @@ public class EfCoreRepositoryBase<T, TDbContext> : IRepositoryBase<T> where T : 
 
 			var props = SimpleMapper.Map(sourceList[i], t);
 			foreach (var prop in props) {
-				DbContext.Entry(t).Property(prop.Name).IsModified = true;
+                // Kiểm tra xem thuộc tính có phải là khóa chính không
+                if (!keyNames.Contains(prop.Name)) { 
+                    DbContext.Entry(t).Property(prop.Name).IsModified = true;
+                }
 			}
 
 			i++;

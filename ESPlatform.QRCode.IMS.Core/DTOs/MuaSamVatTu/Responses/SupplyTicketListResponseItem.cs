@@ -23,10 +23,10 @@ public class SupplyTicketListResponseItem
     /// <summary>
     /// Cho phép chức năng bỏ qua ký
     /// </summary>
-    public bool IsBoQua { get; set; }
+    public bool IsBoQua { get; set; } = false;
     
     /// <summary>
     /// Cho phép user được ký
     /// </summary>
-    public bool IsKySo { get; set; }
+    public bool IsKySo { get; set; } = false;
 }

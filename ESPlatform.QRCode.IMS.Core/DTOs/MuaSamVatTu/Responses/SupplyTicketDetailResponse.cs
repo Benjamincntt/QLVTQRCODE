@@ -6,9 +6,14 @@ public class SupplyTicketDetailResponse
 
     public string MoTa { get; set; } = string.Empty;
 
-    public List<SupplyResponse> DanhSachVatTu { get; set; } = new ();
+    public List<SupplyInListResponse> DanhSachVatTu { get; set; } = new ();
 
     public int Tong { get; set; }
     
     public bool IsEditable  { get; set; }
+}
+
+public class SupplyInListResponse: SupplyResponse
+{
+    public int Id { get; set; }
 }

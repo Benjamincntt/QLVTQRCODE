@@ -30,7 +30,8 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
                 ThongSoKyThuat = x.PhieuDeXuatDetail.ThongSoKyThuat ?? string.Empty,
                 GhiChu = x.PhieuDeXuatDetail.GhiChu ?? string.Empty,
                 SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
-                DonGia = x.VatTu.DonGia ?? 0
+                DonGia = x.VatTu.DonGia ?? 0,
+                Id = x.PhieuDeXuatDetail.Id,
             });
         // lấy thông tin từ bảng vật tư mới tạo
          var vatTuNew = DbContext.QlvtMuaSamPhieuDeXuatDetails
@@ -48,7 +49,8 @@ public class MuaSamPhieuDeXuatDetailRepository : EfCoreRepositoryBase<QlvtMuaSam
                  ThongSoKyThuat = x.PhieuDeXuatDetail.ThongSoKyThuat ?? string.Empty,
                  GhiChu = x.PhieuDeXuatDetail.GhiChu ?? string.Empty,
                  SoLuong = x.PhieuDeXuatDetail.SoLuong ?? 0,
-                 DonGia = x.VatTuNew.DonGia ?? 0
+                 DonGia = x.VatTuNew.DonGia ?? 0,
+                 Id = x.PhieuDeXuatDetail.Id,
              });
          var combinedQuery = vatTu
                  .Union(vatTuNew)

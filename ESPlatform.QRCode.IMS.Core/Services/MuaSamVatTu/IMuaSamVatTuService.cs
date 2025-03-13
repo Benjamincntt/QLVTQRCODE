@@ -22,4 +22,5 @@ public interface IMuaSamVatTuService
     Task<IEnumerable<QlvtVatTuBoMa>> ListGroupCodeAsync();
     Task<int> CountSupplyTicketsByStatusAsync(SupplyTicketStatus status);
     Task<IEnumerable<string>> ListCreatedSupplyTicketWarningAsync(List<int> vatTuIds);
+    Task<int> UpdateManySupplyQuantitiesAsync(int ticketId, List<UpdateSupplyQuantityRequestItem> requests);
 }
