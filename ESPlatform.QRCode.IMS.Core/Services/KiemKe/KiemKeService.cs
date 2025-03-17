@@ -4,6 +4,7 @@ using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Services.GioHang;
+using ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
@@ -19,39 +20,36 @@ namespace ESPlatform.QRCode.IMS.Core.Services.KiemKe;
 
 public class KiemKeService : IKiemKeService
 {
-    private readonly IGioHangService _gioHangService;
+    private readonly INguoiDungService _nguoiDungService;
     private readonly IVatTuRepository _vatTuRepository;
     private readonly IKyKiemKeChiTietDffRepository _kyKiemKeChiTietDffRepository;
     private readonly IKyKiemKeChiTietRepository _kyKiemKeChiTietRepository;
     private readonly IKyKiemKeRepository _kyKiemKeRepository;
     private readonly IVatTuTonKhoRepository _vatTuTonKhoRepository;
-    private readonly INguoiDungRepository _nguoiDungRepository;
     private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly IKhoRepository _khoRepository;
     private readonly IMapper _mapper;
     private readonly ImagePath _imagePath;
 
     public KiemKeService(
-        IGioHangService gioHangService,
+        INguoiDungService nguoiDungService,
         IVatTuRepository vatTuRepository,
         IKyKiemKeChiTietDffRepository kyKiemKeChiTietDffRepository,
         IKhoRepository khoRepository,
         IKyKiemKeChiTietRepository kyKiemKeChiTietRepository,
         IKyKiemKeRepository kyKiemKeRepository,
         IVatTuTonKhoRepository vatTuTonKhoRepository,
-        INguoiDungRepository nguoiDungRepository,
         IAuthorizedContextFacade authorizedContextFacade,
         IMapper mapper,
         IOptions<ImagePath> imagePath)
     {
-        _gioHangService = gioHangService;
+        _nguoiDungService = nguoiDungService;
         _vatTuRepository = vatTuRepository;
         _kyKiemKeChiTietDffRepository = kyKiemKeChiTietDffRepository;
         _khoRepository = khoRepository;
         _kyKiemKeChiTietRepository = kyKiemKeChiTietRepository;
         _kyKiemKeRepository = kyKiemKeRepository;
         _vatTuTonKhoRepository = vatTuTonKhoRepository;
-        _nguoiDungRepository = nguoiDungRepository;
         _authorizedContextFacade = authorizedContextFacade;
         _mapper = mapper;
         _imagePath = imagePath.Value;
@@ -337,13 +335,7 @@ public class KiemKeService : IKiemKeService
 
     public async Task<int> CreateInventoryCheckDetailAsync(int vatTuId, int kyKiemKeId, decimal soLuongKiemKe)
     {
-        var username = _authorizedContextFacade.Username;
-        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-        if (currentUser is null)
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-        }
-
+        var currentUser = await _nguoiDungService.GetCurrentUserAsync();
         var accountId = currentUser.MaNguoiDung;
         var warehouses = await _vatTuRepository.GetWarehouseIdAsync(vatTuId);
         if (warehouses != null)

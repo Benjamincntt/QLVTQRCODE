@@ -1,8 +1,12 @@
-﻿using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
+﻿using System.Net.Http.Headers;
+using System.Text.Json;
+using ESPlatform.QRCode.IMS.Core.DTOs.KySo;
+using ESPlatform.QRCode.IMS.Core.DTOs.KySo.Response;
+using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
 using ESPlatform.QRCode.IMS.Core.Engine;
-using ESPlatform.QRCode.IMS.Core.Facades.Context;
+using ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
@@ -13,59 +17,55 @@ using Mapster;
 using Microsoft.Extensions.Configuration;
 using MobileCA.Application.Services.Viettel;
 using MobileCA.Application.Services.Viettel.Dtos;
+using SignFileImgDto = ESPlatform.QRCode.IMS.Core.DTOs.Viettel.SignFileImgDto;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 {
     public class PhieuKyService : IPhieuKyService
     {
+        private readonly INguoiDungService _nguoiDungService;
         private readonly IPhieuKyRepository _phieuKyRepository;
         private readonly IMuaSamPhieuDeXuatRepository _muaSamPhieuDeXuatRepository;
         private readonly IMuaSamPdxKyRepository _muaSamPdxKyRepository;
         private readonly ICauHinhVanBanKyRepository _cauHinhVanBanKyRepository;
         private readonly IVanBanKyRepository _vanBanKyRepository;
-        private readonly INguoiDungRepository _nguoiDungRepository;
-        private readonly IAuthorizedContextFacade _authorizedContextFacade;
+        private readonly IViTriCongViecRepository _viTriCongViecRepository;
         private readonly IConfiguration _configuration;
         private readonly IViettelMobileCAService _viettelCAService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpClientFactory _httpClientFactory;
         public PhieuKyService(
+            INguoiDungService nguoiDungService,
             IPhieuKyRepository phieuKyRepository,
             IMuaSamPhieuDeXuatRepository muaSamPhieuDeXuatRepository,
             IMuaSamPdxKyRepository muaSamPdxKyRepository,
             ICauHinhVanBanKyRepository cauHinhVanBanKyRepository,
             IVanBanKyRepository vanBanKyRepository, 
-            INguoiDungRepository nguoiDungRepository, 
-            IAuthorizedContextFacade authorizedContextFacade,
+            IViTriCongViecRepository viTriCongViecRepository,
             IConfiguration configuration,
             IViettelMobileCAService viettelCAService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IHttpClientFactory httpClientFactory)
         {
+            _nguoiDungService = nguoiDungService;
             _phieuKyRepository = phieuKyRepository;
             _muaSamPhieuDeXuatRepository = muaSamPhieuDeXuatRepository;
             _muaSamPdxKyRepository = muaSamPdxKyRepository;
             _cauHinhVanBanKyRepository = cauHinhVanBanKyRepository;
             _vanBanKyRepository = vanBanKyRepository;
-            _nguoiDungRepository = nguoiDungRepository;
-            _authorizedContextFacade = authorizedContextFacade;
+            _viTriCongViecRepository = viTriCongViecRepository;
             _configuration = configuration;
             _viettelCAService = viettelCAService;
             _unitOfWork = unitOfWork;
-            
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
         {
-
-            //var userId = _authorizedContextFacade.AccountId;
-            var username = _authorizedContextFacade.Username;
-            var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-            if (currentUser is null)
-            {
-                throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-            }
+            var currentUser = await _nguoiDungService.GetCurrentUserAsync();
             var currentUserId = currentUser.MaNguoiDung;
             var lstPhieuKy = (await _phieuKyRepository.DanhSachPhieuDeXuatKy(requests, currentUserId))
-                .Adapt<IEnumerable<PhieuKyModel>>().ToList();
+                .Adapt<IEnumerable<PhieuKyModel>>().ToList(); 
             // Chuyển đổi lstPhieuKy thành DanhSachPhieuKyResponse
             var response = lstPhieuKy.Select(p => new PhieuKyModel
             {
@@ -114,15 +114,10 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             {
                 throw new BadRequestException(Constants.Exceptions.Messages. KyCungUng.EmptyPhieuIds);
             }
-
-            var username = _authorizedContextFacade.Username;
-            var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-            if (currentUser is null)
-            {
-                throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-            }
+            
+            var currentUser = await _nguoiDungService.GetCurrentUserAsync();
             var userId = currentUser.MaNguoiDung;
-            //var userId = _authorizedContextFacade.AccountId;
+            
             List<int> DanhSachIdPhieuDaKy = new List<int>();
             var lstMuaSamPdxKy = new List<QlvtMuaSamPdxKy>();
             var danhSachLoi = new List<string>(); // Danh sách để lưu trữ các lỗi
@@ -207,14 +202,8 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     Message = $"Phiếu có Id: {request.PhieuId} {Constants.Exceptions.Messages.KyCungUng.InvalidPdx}."
                 };
             }
-            //var userId = _authorizedContextFacade.AccountId;
-            var username = _authorizedContextFacade.Username;
-            var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-            if (currentUser is null)
-            {
-                throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-            }
 
+            var currentUser = await _nguoiDungService.GetCurrentUserAsync();
             var userId = currentUser.MaNguoiDung;
             using (var transaction = _unitOfWork.BeginTransactionAsync())
             {
@@ -428,14 +417,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             // Không cần bắt đầu transaction ở đây nếu transaction đã được bắt đầu ở nơi gọi
             try
             {
-                //var userId = _authorizedContextFacade.AccountId;
-                var username = _authorizedContextFacade.Username;
-                var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-                if (currentUser is null)
-                {
-                    throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-                }
-
+                var currentUser = await _nguoiDungService.GetCurrentUserAsync();
                 var userId = currentUser.MaNguoiDung;
                 // Lấy thông tin phiếu mua sắm ký từ database dựa trên Id
                 var phieuMuaSam = await _phieuKyRepository.GetAsync(x => x.Id == request.PhieuId);
@@ -567,12 +549,8 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         {
             Serilog.Log.Information("Bắt đầu cập nhật trạng thái ký số - PhieuId: {PhieuId}, ChuKyId: {ChuKyId}",
         request.PhieuId, request.ChuKyId);
-            var username = _authorizedContextFacade.Username;
-            var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-            if (currentUser is null)
-            {
-                throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-            }
+            
+            var currentUser = await _nguoiDungService.GetCurrentUserAsync();
             var userId = currentUser.MaNguoiDung;
             
             using (var transaction = _unitOfWork.BeginTransactionAsync())
@@ -683,7 +661,73 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             return await _muaSamPhieuDeXuatRepository.UpdateAsync(result);
         }
 
+        public async Task<CheckedNumberAndSignImageResponse> CheckedNumberAndSignImageAsync(int phieuId, string acessToken)
+        {   
+            var response = new CheckedNumberAndSignImageResponse();
+            
+            // Lấy thông tin chữ ký của người dùng từ API => response : sdt, image path
+            //var apiUrl = "https://app.tmhpp.com.vn/api/Admin/Profile";
+            var apiUrl = "http://thacmo.e-solutions.com.vn/api/Admin/Profile";
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", acessToken);
+            var apiThacMoResponse = await httpClient.GetAsync(apiUrl);
+        
+            if (!apiThacMoResponse.IsSuccessStatusCode)
+            {
+                throw new NotFoundException(Constants.Exceptions.Messages.KyCungUng.NotFoundSignInfo);
+            }
 
+            var jsonString = await apiThacMoResponse.Content.ReadAsStringAsync();
+            var userSignatureInfo = JsonSerializer.Deserialize<EmployeeProfileOutputDto>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            
+            if (userSignatureInfo?.Signature?.FileBytes == null)
+            {
+                return response;
+            }
+            response.ViettelSimCaMobilePhone =  userSignatureInfo.ViettelSimCaMobilePhone?? string.Empty;
+            // Lưu ảnh chữ ký vào thư mục images
+            var imageBytes = Convert.FromBase64String(userSignatureInfo.Signature.FileBytes);
+            var filePath = Path.Combine("wwwroot/images", userSignatureInfo.Signature.FileName);
+               
+            await File.WriteAllBytesAsync(filePath, imageBytes);
+            response.PathImage = $"/images/{userSignatureInfo.Signature.FileName}" ?? string.Empty;
+            return response;
+        }
+        
+        
+        private SignFileImgDto CalculateBottomCoordinatesFromString(string coordinateString)
+        {
+            if (string.IsNullOrWhiteSpace(coordinateString))
+            {
+                return default;
+            }
+            var toaDoArray = coordinateString.Split(',').Select(value => float.Parse(value.Trim())).ToArray();
+            if (toaDoArray.Length != 4 || toaDoArray.Any(float.IsNaN)) {
+                Console.Error.WriteLine("Chuỗi tọa độ không đủ hoặc chứa giá trị không hợp lệ.");
+                return default;
+            }
+
+            // Gán giá trị từ mảng
+            var x = toaDoArray[0];
+            var y = toaDoArray[1];
+            var width = toaDoArray[2];
+            var height = toaDoArray[3];
+
+            // Tính toán tọa độ
+            var bottomLeftX = Math.Round(x) + 28; // Lề bên trái
+            var bottomLeftY = Math.Round(y) + 8; // Khoảng cách trên
+
+            var bottomW = Math.Round(width) - 15; // Thu nhỏ lại để nằm trong khung
+            var bottomH = Math.Round(height) - 16; // Thu nhỏ lại để nằm trong khung
+
+            return new SignFileImgDto
+            {
+                coorX = (float)bottomLeftX,
+                coorY = (float)bottomLeftY,
+                width = (float)bottomW,
+                height = (float)bottomH
+            };
+        }
     }
 }
 

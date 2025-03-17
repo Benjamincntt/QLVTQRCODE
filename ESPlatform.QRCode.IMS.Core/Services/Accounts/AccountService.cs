@@ -1,31 +1,22 @@
 using ESPlatform.QRCode.IMS.Core.DTOs.Accounts.Requests;
 using ESPlatform.QRCode.IMS.Core.Engine;
-using ESPlatform.QRCode.IMS.Core.Facades.Context;
+using ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Extensions;
-using MapsterMapper;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.Accounts;
 
 public class AccountService : IAccountService {
+    private readonly INguoiDungService _nguoiDungService;
 	private readonly IAccountRepository _accountRepository;
 
-    private readonly INguoiDungRepository _nguoiDungRepository;
-	private readonly IAuthorizedContextFacade _authorizedContextFacade;
-	private readonly IMapper _mapper;
-
 	public AccountService(
-        IAccountRepository accountRepository,
-        INguoiDungRepository nguoiDungRepository,
-		IAuthorizedContextFacade authorizedContextFacade,
-		IMapper mapper) 
+        INguoiDungService nguoiDungService,
+        IAccountRepository accountRepository) 
     {
+        _nguoiDungService = nguoiDungService;
 		_accountRepository = accountRepository;
-        _nguoiDungRepository = nguoiDungRepository;
-		_authorizedContextFacade = authorizedContextFacade;
-		_mapper = mapper;
-       
     }
 
 	// public async Task<int> CreateAsync(AccountCreatedRequest request) {
@@ -108,13 +99,7 @@ public class AccountService : IAccountService {
 	// }
 
 	public async Task<int> UpdatePassWordAsync(ModifiedUserPasswordRequest request) {
-        var username = _authorizedContextFacade.Username;
-        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-        if (currentUser is null)
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-        }
-
+        var currentUser = await _nguoiDungService.GetCurrentUserAsync();
         var currentUserId = currentUser.MaNguoiDung;
 		var account = await _accountRepository.GetAsync(currentUserId);
 		if (account == null) {

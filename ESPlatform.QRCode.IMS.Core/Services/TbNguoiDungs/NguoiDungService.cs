@@ -106,8 +106,8 @@ public class NguoiDungService : INguoiDungService
         return await _nguoiDungRepository.InsertAsync(nguoiDung);
     }
     
-    // Lấy mã người dùng sau khi đăng nhập
-    public async Task<int> GetCurrentUserId()
+    //Lấy mã người dùng sau khi đăng nhập
+    public async Task<TbNguoiDung> GetCurrentUserAsync()
     {
         var username = _authorizedContextFacade.Username;
         var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
@@ -115,6 +115,6 @@ public class NguoiDungService : INguoiDungService
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
         }
-        return currentUser.MaNguoiDung;
+        return currentUser;
     }
 }

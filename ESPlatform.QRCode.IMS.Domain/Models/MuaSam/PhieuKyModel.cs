@@ -73,6 +73,7 @@ namespace ESPlatform.QRCode.IMS.Domain.Models.MuaSam
         public string? MaLoaiVanBan { get; set; }
         public string? FilePath { get; set; }
         public string? FileName { get; set; }
+        
         public DateTime? NgayTao { get; set; }
         public string? kySoPath { get; set; }
 

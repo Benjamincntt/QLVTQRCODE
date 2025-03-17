@@ -1,5 +1,6 @@
 using ESPlatform.QRCode.IMS.Core.DTOs.Accounts.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.NguoiDungs.Requests;
+using ESPlatform.QRCode.IMS.Domain.Entities;
 
 namespace ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
 
@@ -13,5 +14,5 @@ public interface INguoiDungService
     
     Task<int> CreateAsync(CreatedUserRequest userRequest);
 
-    Task<int> GetCurrentUserId();
+    Task<TbNguoiDung> GetCurrentUserAsync();
 }

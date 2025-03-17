@@ -38,10 +38,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
     private readonly IVatTuBoMaRepository _vatTuBoMaRepository;
     private readonly IMuaSamPdxKyRepository _muaSamPdxKyRepository;
     private readonly IVatTuTonKhoRepository _vatTuTonKhoRepository;
-    private readonly INguoiDungRepository _nguoiDungRepository;
     private readonly IViTriCongViecRepository _viTriCongViecRepository;
-    private readonly ICauHinhVanBanKyRepository _cauHinhVanBanKyRepository;
-    private readonly IAuthorizedContextFacade _authorizedContextFacade;
     private readonly ImagePath _imagePath;
     private readonly IMapper _mapper;
 
@@ -58,10 +55,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         IVatTuBoMaRepository vatTuBoMaRepository,
         IMuaSamPdxKyRepository muaSamPdxKyRepository,
         IVatTuTonKhoRepository vatTuTonKhoRepository,
-        INguoiDungRepository nguoiDungRepository,
         IViTriCongViecRepository viTriCongViecRepository,
-        ICauHinhVanBanKyRepository cauHinhVanBanKyRepository,
-        IAuthorizedContextFacade authorizedContextFacade,
         IUnitOfWork unitOfWork,
         IOptions<ImagePath> imagePath,
         IMapper mapper)
@@ -78,10 +72,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         _vatTuBoMaRepository = vatTuBoMaRepository;
         _muaSamPdxKyRepository = muaSamPdxKyRepository;
         _vatTuTonKhoRepository = vatTuTonKhoRepository;
-        _nguoiDungRepository = nguoiDungRepository;
         _viTriCongViecRepository = viTriCongViecRepository;
-        _cauHinhVanBanKyRepository = cauHinhVanBanKyRepository;
-        _authorizedContextFacade = authorizedContextFacade;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _imagePath = imagePath.Value;
@@ -233,13 +224,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 
     public async Task<int> ProcessSupplyTicketCreationAsync(ProcessSupplyTicketCreationRequest request)
     {
-        var username = _authorizedContextFacade.Username;
-        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-        if (currentUser is null)
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-        }
-
+        var currentUser = await _nguoiDungService.GetCurrentUserAsync();
         var currentUserId = currentUser.MaNguoiDung;
         if (!request.SupplyTicketDetails.Any())
         {
@@ -294,12 +279,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         #endregion
         
         #region Lấy thông tin user
-        var username = _authorizedContextFacade.Username;
-        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-        if (currentUser is null)
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-        }
+        var currentUser = await _nguoiDungService.GetCurrentUserAsync();
         var userId = currentUser.MaNguoiDung;
         #endregion
         
@@ -419,14 +399,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
 
     public async Task<SupplyTicketDetailResponse> GetSupplyTicketDetailAsync(int supplyTicketId)
     {
-        #region Lấy thông tin user hiện tại
-        var username = _authorizedContextFacade.Username;
-        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
-        if (currentUser is null)
-        {
-            throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);
-        }
-        #endregion
+        var currentUser = await _nguoiDungService.GetCurrentUserAsync();
 
         var response = new SupplyTicketDetailResponse();
         response.IsEditable = false;

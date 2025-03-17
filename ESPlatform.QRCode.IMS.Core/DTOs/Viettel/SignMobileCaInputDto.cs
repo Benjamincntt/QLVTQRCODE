@@ -61,7 +61,6 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.Viettel
         public int ChuKyId { get; set; }
         public int? NguoiKyId { get; set; }
         public IFormFile? FileDataImageSign { get; set; }
-
     }
 
 }

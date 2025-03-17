@@ -1,4 +1,5 @@
 ﻿using ESPlatform.QRCode.IMS.Core.DTOs.KiemKe.Requests;
+using ESPlatform.QRCode.IMS.Core.DTOs.KySo.Response;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
@@ -19,7 +20,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         Task<object> UpdateThongTinKyAsync(UpdateFileRequest request);
         Task SignViettelCA(SignMobileCaInputDto request);
         Task<object> UpdateKySimCaAsync(UpdateFileRequest request);
-
         Task<int> CancelTicketAsync(int phieuId, bool isPhieuDeXuat, string? reason);
+        Task<CheckedNumberAndSignImageResponse> CheckedNumberAndSignImageAsync(int phieuId, string accessToken);
     }
 }

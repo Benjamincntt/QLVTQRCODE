@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using System.Diagnostics;
+using ESPlatform.QRCode.IMS.Core.DTOs.KySo.Response;
 using ESPlatform.QRCode.IMS.Core.Engine;
 
 namespace ESPlatform.QRCode.IMS.Api.Controllers;
@@ -27,23 +28,59 @@ public class PhieuKyController : ApiControllerBase
         _phieuKyService = phieuKyService;
         _unitOfWork = unitOfWork;
     }
-
-    [HttpGet("danh-sach-phieu")]
-    [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<PhieuKyModel>>> DanhSachPhieuKyAsync(
-        [FromQuery] DanhSachPhieuKyFilter request)
+    
+    /// <summary>
+    /// Huỷ 1 phiếu(dành cho người ký số 5 và 6)
+    /// </summary>
+    /// <param name="ticketId"> Mã phiếu</param>
+    /// <param name="isPhieuDeXuat"> true: phiếu đề xuất, false: phiếu duyệt</param>
+    /// <param name="reason"> Lý do huỷ </param>
+    /// <returns></returns>
+    [HttpPatch("{ticketId:int}/{isPhieuDeXuat:bool}/cancel-ticket")]
+    public async Task<IActionResult> CancelTicketAsync(int ticketId, bool isPhieuDeXuat, [FromBody] string? reason)
     {
-        try
+        var result = await _phieuKyService.CancelTicketAsync(ticketId, isPhieuDeXuat, reason);
+        if (result > 0)
         {
-            var result = await _phieuKyService.GetDanhSachPhieuKyAsync(request);
-            return Ok(result);
+            return Ok(Constants.Exceptions.Messages.SupplyTicket.TicketCancelSuccess);
         }
-        catch (Exception ex)
+        else
         {
-            // Xử lý lỗi và trả về mã lỗi phù hợp
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return StatusCode(500, Constants.Exceptions.Messages.SupplyTicket.TicketCancelSuccess);
         }
     }
+
+    [HttpGet("{phieuId:int}/check-sign-info")]
+    public async Task<IActionResult> CheckedNumberAndSignImageAsync(int phieuId)
+    {
+        var accessToken = GetAccessToken();
+        var signInfo = await _phieuKyService.CheckedNumberAndSignImageAsync(phieuId, accessToken);
+        if (signInfo is null)
+        {
+            return StatusCode(500, Constants.Exceptions.Messages.KyCungUng.NotFoundSignInfo);
+        }
+        return Ok(signInfo);
+    }
+
+    
+    
+    
+    // [HttpGet("danh-sach-phieu")]
+    // [AllowAnonymous]
+    // public async Task<ActionResult<IEnumerable<PhieuKyModel>>> DanhSachPhieuKyAsync(
+    //     [FromQuery] DanhSachPhieuKyFilter request)
+    // {
+    //     try
+    //     {
+    //         var result = await _phieuKyService.GetDanhSachPhieuKyAsync(request);
+    //         return Ok(result);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         // Xử lý lỗi và trả về mã lỗi phù hợp
+    //         return StatusCode(500, $"Internal server error: {ex.Message}");
+    //     }
+    // }
 
     [HttpPost("bo-qua-ky")]
     public async Task<IActionResult> BoQuaKyAsync([FromBody] ModifiedKySo requests)
@@ -373,24 +410,5 @@ public class PhieuKyController : ApiControllerBase
         }
     }
 
-    /// <summary>
-    /// Huỷ 1 phiếu(dành cho người ký số 5 và 6)
-    /// </summary>
-    /// <param name="ticketId"> Mã phiếu</param>
-    /// <param name="isPhieuDeXuat"> true: phiếu đề xuất, false: phiếu duyệt</param>
-    /// <param name="reason"> Lý do huỷ </param>
-    /// <returns></returns>
-    [HttpPatch("{ticketId:int}/{isPhieuDeXuat:bool}/cancel-ticket")]
-    public async Task<IActionResult> CancelTicketAsync(int ticketId, bool isPhieuDeXuat, [FromBody] string? reason)
-    {
-        var result = await _phieuKyService.CancelTicketAsync(ticketId, isPhieuDeXuat, reason);
-        if (result > 0)
-        {
-            return Ok(Constants.Exceptions.Messages.SupplyTicket.TicketCancelSuccess);
-        }
-        else
-        {
-            return StatusCode(500, Constants.Exceptions.Messages.SupplyTicket.TicketCancelSuccess);
-        }
-    }
+
 }

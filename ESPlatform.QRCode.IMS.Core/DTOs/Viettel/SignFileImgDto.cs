@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ESPlatform.QRCode.IMS.Core.DTOs.Viettel
-{
+﻿namespace ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
     public class SignFileImgDto
     {
         public int numberPageSign { get; set; }
@@ -16,4 +9,4 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.Viettel
         public string? pathImage { get; set; }
         public string? MSSFormat { get; set; }
     }
-}
+
