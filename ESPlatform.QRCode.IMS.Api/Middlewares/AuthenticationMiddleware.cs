@@ -20,7 +20,7 @@ public class AuthenticationMiddleware {
 		var requestPath = context.Request.Path.Value;
 
 		// Danh sách các phần mở rộng hình ảnh thường gặp
-		var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg" };
+		var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg" , ".pdf"};
 
 		// Kiểm tra nếu đường dẫn yêu cầu kết thúc bằng một trong các phần mở rộng hình ảnh
 		if (requestPath != null && imageExtensions.Any(ext => requestPath.EndsWith(ext, StringComparison.OrdinalIgnoreCase))) {
