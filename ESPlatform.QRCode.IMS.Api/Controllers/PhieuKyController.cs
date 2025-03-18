@@ -282,8 +282,7 @@ public class PhieuKyController : ApiControllerBase
     [HttpPost("sign-viettel")]
     public async Task<IActionResult> SignViettelCA([FromBody] SignMobileCaInputDto input, int? phieuId)
     {
-        Serilog.Log.Information("Bắt đầu ký số Viettel CA - PhieuId: {input.ChuKyRequest.PhieuId}, VanBanId: {input.ChuKyRequest.VanBanId}",
-            phieuId, input?.ChuKyRequest?.VanBanId);
+        Serilog.Log.Information("Bắt đầu ký số Viettel CA - PhieuId: {PhieuId}, VanBanId: {VanBanId}", input?.ChuKyRequest?.PhieuId, input?.ChuKyRequest?.VanBanId);
 
         if (input?.ChuKyRequest == null)
         {
