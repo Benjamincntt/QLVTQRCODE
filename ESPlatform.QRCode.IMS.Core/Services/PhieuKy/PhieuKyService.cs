@@ -737,15 +737,15 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             if (!string.IsNullOrWhiteSpace(phieuKy.ToaDo))
             {
                 var toaDo = CalculateBottomCoordinatesFromString(phieuKy.ToaDo);
-                if (toaDo is not null)
+                response.SignFileInfo = new SignFileImgDto()
                 {
-                    response.SignFileInfo.numberPageSign = phieuKy.Page ?? 1;
-                    response.SignFileInfo.coorX = toaDo.coorX;
-                    response.SignFileInfo.coorY = toaDo.coorY;
-                    response.SignFileInfo.width = toaDo.width;
-                    response.SignFileInfo.height = toaDo.height;
-                }
-               
+                    numberPageSign = phieuKy.Page ?? 1,
+                    coorX = toaDo.coorX,
+                    coorY = toaDo.coorY,
+                    width = toaDo.width,
+                    height = toaDo.height,
+                };
+
             };
             // ChuKyRequest
             response.ChuKyRequest = new ChuKyRequest
@@ -761,8 +761,8 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             var vanBanKy = await _vanBanKyRepository.GetAsync(x => x.Id == phieuKy.VanBanId);
             if (vanBanKy is not null && !string.IsNullOrWhiteSpace(vanBanKy.FilePath))
             {
-                response.PdfPath =  await GetFullFilePath(vanBanKy.FilePath);
-                response.PdfPath = response.PdfPath;
+                response.PdfPath =  vanBanKy.FilePath;
+                response.PdfPathSigned = vanBanKy.FilePath;
             }
             
             // SignTicketResponseItems
@@ -772,6 +772,12 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 return response;
             }
             response.SignTicketResponseItems = listSignHistoryResponse;
+
+            if (maDoiTuongKyHienTai == Constants.MaDoiTuongKy.Ph_KHVT || maDoiTuongKyHienTai == Constants.MaDoiTuongKy.TongGiamDoc)
+            {
+                response.IsHuyDuyet = true;
+                response.IsHuyDeXuat = true;
+            }
             return response;
         }
 

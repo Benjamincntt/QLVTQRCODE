@@ -16,10 +16,17 @@ public class SignInfomationReponse
     //Thời gian chờ ký
     public long? TimeOut { get; set; }
     
+    public bool IsHuyDeXuat { get; set; } = false;
+    
+    public bool IsHuyDuyet { get; set; } = false;
+    
+    
+    
     /// Thông tin file ký
     public SignFileImgDto? SignFileInfo { get; set; }
 
     public ChuKyRequest? ChuKyRequest { get; set; } = new ChuKyRequest();
 
     public List<SignHistoryResponseItem> SignTicketResponseItems { get; set; } = new List<SignHistoryResponseItem>();
+    
 }
