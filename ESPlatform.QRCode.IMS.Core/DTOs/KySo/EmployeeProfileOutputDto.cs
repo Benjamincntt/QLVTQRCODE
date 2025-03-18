@@ -2,6 +2,13 @@
 
 public class EmployeeProfileOutputDto
 {
+    public Result Result { get; set; }
+    public bool? IsSuccess { get; set; }
+    public bool? Error { get; set; }
+}
+
+public class Result
+{
     public int Id { get; set; }
     public string Username { get; set; }
     public string MobilePhone { get; set; }
@@ -11,7 +18,7 @@ public class EmployeeProfileOutputDto
     public string MaPhongBan { get; set; }
     public string TenPhongBan { get; set; }
     public string PhongBanColor { get; set; }
-    public int CaLamViecId { get; set; }
+    public string CaLamViecId { get; set; }
     public Avatar Avatar { get; set; }
     public Signature Signature { get; set; }
 }

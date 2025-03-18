@@ -6,6 +6,7 @@ using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
 using ESPlatform.QRCode.IMS.Core.Engine;
+using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
 using ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
 using ESPlatform.QRCode.IMS.Domain.Entities;
 using ESPlatform.QRCode.IMS.Domain.Enums;
@@ -34,6 +35,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         private readonly IViettelMobileCAService _viettelCAService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpClientFactory _httpClientFactory;
+        //private readonly ImagePath _imagePath;
         public PhieuKyService(
             INguoiDungService nguoiDungService,
             IPhieuKyRepository phieuKyRepository,
@@ -45,7 +47,9 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             IConfiguration configuration,
             IViettelMobileCAService viettelCAService,
             IUnitOfWork unitOfWork,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory
+            //ImagePath imagePath
+            )
         {
             _nguoiDungService = nguoiDungService;
             _phieuKyRepository = phieuKyRepository;
@@ -58,6 +62,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _viettelCAService = viettelCAService;
             _unitOfWork = unitOfWork;
             _httpClientFactory = httpClientFactory;
+            //_imagePath = imagePath;
         }
 
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
@@ -679,18 +684,36 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
 
             var jsonString = await apiThacMoResponse.Content.ReadAsStringAsync();
             var userSignatureInfo = JsonSerializer.Deserialize<EmployeeProfileOutputDto>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            
-            if (userSignatureInfo?.Signature?.FileBytes == null)
+            if (userSignatureInfo is null)
             {
                 return response;
             }
-            response.ViettelSimCaMobilePhone =  userSignatureInfo.ViettelSimCaMobilePhone?? string.Empty;
+            response.ViettelSimCaMobilePhone =  userSignatureInfo.Result.ViettelSimCaMobilePhone?? string.Empty;
+            if (userSignatureInfo?.Result.Signature is null)
+            {
+                return response;
+            }
+           
             // Lưu ảnh chữ ký vào thư mục images
-            var imageBytes = Convert.FromBase64String(userSignatureInfo.Signature.FileBytes);
-            var filePath = Path.Combine("wwwroot/images", userSignatureInfo.Signature.FileName);
-               
-            await File.WriteAllBytesAsync(filePath, imageBytes);
-            response.PathImage = $"/images/{userSignatureInfo.Signature.FileName}" ?? string.Empty;
+            var imageBytes = Convert.FromBase64String(userSignatureInfo.Result.Signature.FileBytes);
+            var filePath = Path.Combine("wwwroot", userSignatureInfo.Result.Signature.FileName).Replace("\\", "/");
+            
+            // var rootPath = _imagePath.RootPath; 
+            // var relativeBasePath = _imagePath.RelativeBasePath; 
+            // var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\"); 
+
+            // // Tạo ảnh mới
+            // var fileName = userSignatureInfo..ToFileName();
+            //
+            // // nếu thư mục chứa ảnh chưa tồn tại => tạo thư mục theo Id => lưu ảnh
+            // var localFolder = Path.Combine(localBasePath, vatTuId.ToString());
+            // if (!Directory.Exists(localFolder))
+            // {
+            //     Directory.CreateDirectory(localFolder);
+            // }
+            //
+            // await File.WriteAllBytesAsync(filePath, imageBytes);
+            response.PathImage = $"/images/{userSignatureInfo.Result.Signature.FileName}".Replace("\\", "/") ?? string.Empty;
             return response;
         }
         
