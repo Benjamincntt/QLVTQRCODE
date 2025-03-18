@@ -7,4 +7,5 @@ public interface IMuaSamPdxKyRepository : IRepositoryBase<QlvtMuaSamPdxKy>
 {
     Task<IEnumerable<int>> ListPhieuDeXuatIdsAsync(string maDoiTuongKy);
     Task<IEnumerable<int>> ListPhieuDeXuatOtherIdsAsync(string previousMaDoiTuongKy, List<int> listPhieuDeXuatIds);
+    Task<IEnumerable<dynamic>> GetSignHistoryAsync(int phieuId);
 }

@@ -110,7 +110,7 @@ public class NguoiDungService : INguoiDungService
     public async Task<TbNguoiDung> GetCurrentUserAsync()
     {
         var username = _authorizedContextFacade.Username;
-        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username);
+        var currentUser = await _nguoiDungRepository.GetAsync(x => x.TenDangNhap == username && x.MaDonViSuDung == 202);// Mã đơn vị sử dụng mặc định
         if (currentUser is null)
         {
             throw new BadRequestException(Constants.Exceptions.Messages.Login.FirstTimeLogin);

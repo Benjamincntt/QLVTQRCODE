@@ -55,7 +55,7 @@ public class PhieuKyController : ApiControllerBase
     /// </summary>
     /// <param name="phieuId"> Mã phiếu </param>
     /// <returns> Ảnh chữ ký và số điện thoại </returns>
-    [HttpGet("{phieuId:int}/check-sign-info")]
+    [HttpGet("{phieuId:int}/check-sign-user-info")]
     public async Task<IActionResult> CheckedNumberAndSignImageAsync(int phieuId)
     {
         var accessToken = GetAccessToken();
@@ -67,6 +67,11 @@ public class PhieuKyController : ApiControllerBase
         return Ok(signInfo);
     }
     
+    /// <summary>
+    /// Chi tiêt thông tin ký số
+    /// </summary>
+    /// <param name="phieuId"></param>
+    /// <returns></returns>
     [HttpGet("{phieuId:int}")]
     public async Task<IActionResult> GetAsync(int phieuId)
     {
@@ -77,9 +82,6 @@ public class PhieuKyController : ApiControllerBase
         }
         return Ok(result);
     }
-
-    
-    
     
     // [HttpGet("danh-sach-phieu")]
     // [AllowAnonymous]
@@ -125,6 +127,7 @@ public class PhieuKyController : ApiControllerBase
             return StatusCode(500, new { message = "Có lỗi xảy ra, vui lòng thử lại sau." });
         }
     }
+
 
     [HttpGet("check-file-exists")]
     public async Task<IActionResult> CheckFileExistsAsync(int id)

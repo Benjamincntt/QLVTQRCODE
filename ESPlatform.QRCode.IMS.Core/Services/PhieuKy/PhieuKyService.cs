@@ -701,10 +701,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             var rootPath = _imagePath.RootPath; 
             var relativeBasePath = _imagePath.RelativeBasePath; 
             var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\"); 
-
-            // // Tạo ảnh mới
-
-            // // nếu thư mục chứa ảnh chưa tồn tại => tạo thư mục theo Id => lưu ảnh
+            // nếu thư mục chứa ảnh chưa tồn tại => tạo thư mục theo Id => lưu ảnh
             var localFolder = Path.Combine(localBasePath);
             if (!Directory.Exists(localFolder))
             {
@@ -717,9 +714,65 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             return response;
         }
 
-        public Task<SignInfomationReponse> GetAsync(int phieuId)
+        public async Task<SignInfomationReponse> GetAsync(int phieuId)
         {
-            throw new NotImplementedException();
+            var currentUser = await _nguoiDungService.GetCurrentUserAsync();
+            
+            // SignFileInfo
+            var viTriCongViecHienTai = await _viTriCongViecRepository.GetAsync(x => x.Id == currentUser.ViTri);
+            if (viTriCongViecHienTai is null)
+            {                                                           
+                return default;
+            }
+            var maDoiTuongKyHienTai = viTriCongViecHienTai.MaDoiTuongKy;
+            // thông tin phiếu ký
+            var phieuKy = await _muaSamPdxKyRepository.GetAsync(x => x.PhieuDeXuatId == phieuId && x.MaDoiTuongKy == maDoiTuongKyHienTai);
+            if (phieuKy is null)
+            {
+                return default;
+            }
+            
+            // SignFileImgDto 
+            var response = new SignInfomationReponse();
+            if (!string.IsNullOrWhiteSpace(phieuKy.ToaDo))
+            {
+                var toaDo = CalculateBottomCoordinatesFromString(phieuKy.ToaDo);
+                if (toaDo is not null)
+                {
+                    response.SignFileInfo.numberPageSign = phieuKy.Page ?? 1;
+                    response.SignFileInfo.coorX = toaDo.coorX;
+                    response.SignFileInfo.coorY = toaDo.coorY;
+                    response.SignFileInfo.width = toaDo.width;
+                    response.SignFileInfo.height = toaDo.height;
+                }
+               
+            };
+            // ChuKyRequest
+            response.ChuKyRequest = new ChuKyRequest
+            {
+                PhieuId = phieuId,
+                VanBanId = phieuKy.VanBanId ?? 0,
+                SignUserId = currentUser.MaNguoiDung,
+                MaDoiTuongKy = phieuKy.MaDoiTuongKy,
+                ThuTuKy = phieuKy.ThuTuKy ?? 0,
+                ChuKyId = phieuKy.Id,
+            };
+            // Đường dẫn pdf trước khi ký
+            var vanBanKy = await _vanBanKyRepository.GetAsync(x => x.Id == phieuKy.VanBanId);
+            if (vanBanKy is not null && !string.IsNullOrWhiteSpace(vanBanKy.FilePath))
+            {
+                response.PdfPath =  await GetFullFilePath(vanBanKy.FilePath);
+                response.PdfPath = response.PdfPath;
+            }
+            
+            // SignTicketResponseItems
+            var listSignHistoryResponse = (await _muaSamPdxKyRepository.GetSignHistoryAsync(phieuId)).Adapt<IEnumerable<SignHistoryResponseItem>>().ToList();
+            if (!listSignHistoryResponse.Any())
+            {
+                return response;
+            }
+            response.SignTicketResponseItems = listSignHistoryResponse;
+            return response;
         }
 
 

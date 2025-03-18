@@ -33,5 +33,31 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                 .Select(x => x.PhieuDeXuatId.Value); 
             return await query.ToListAsync();
         }
+
+        public async Task<IEnumerable<dynamic>> GetSignHistoryAsync(int phieuId)
+        {
+            var query = DbContext.QlvtMuaSamPdxKies
+                .GroupJoin( DbContext.TbNguoiDungs,
+                        x => x.NguoiKyId,
+                        y => y.MaNguoiDung,
+                        (x, y) => new { QlvtMuaSamPdxKies = x, TbNguoiDungs = y })
+                .SelectMany
+                        (x => x.TbNguoiDungs.DefaultIfEmpty(),
+                        (x, y) => new { x.QlvtMuaSamPdxKies, TbNguoiDungs = y }) 
+                .Join(DbContext.TbViTriCongViecs,
+                    x => x.TbNguoiDungs.ViTri,
+                    y => y.Id,
+                    (x, y) => new { x.QlvtMuaSamPdxKies, x.TbNguoiDungs, TbViTriCongViecs = y })
+                .Where(x => x.QlvtMuaSamPdxKies.PhieuDeXuatId == phieuId)
+                .Where(x => x.QlvtMuaSamPdxKies.TrangThai >= (byte)TrangThaiChuKy.Signed)
+                .Select(x => new
+                {
+                    UserName = x.TbNguoiDungs.Ten + " " + x.TbNguoiDungs.Ho,
+                    x.TbViTriCongViecs.TenViTriCongViec,
+                    x.QlvtMuaSamPdxKies.NgayKy,
+                    x.QlvtMuaSamPdxKies.TrangThai,
+                });
+            return await query.ToListAsync();
+        }
     }
 }
