@@ -16,6 +16,7 @@ using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Mapster;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using MobileCA.Application.Services.Viettel;
 using MobileCA.Application.Services.Viettel.Dtos;
 using SignFileImgDto = ESPlatform.QRCode.IMS.Core.DTOs.Viettel.SignFileImgDto;
@@ -35,7 +36,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         private readonly IViettelMobileCAService _viettelCAService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpClientFactory _httpClientFactory;
-        //private readonly ImagePath _imagePath;
+        private readonly ImagePath _imagePath;
         public PhieuKyService(
             INguoiDungService nguoiDungService,
             IPhieuKyRepository phieuKyRepository,
@@ -47,8 +48,8 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             IConfiguration configuration,
             IViettelMobileCAService viettelCAService,
             IUnitOfWork unitOfWork,
-            IHttpClientFactory httpClientFactory
-            //ImagePath imagePath
+            IHttpClientFactory httpClientFactory,
+            IOptions<ImagePath> imagePath
             )
         {
             _nguoiDungService = nguoiDungService;
@@ -62,7 +63,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _viettelCAService = viettelCAService;
             _unitOfWork = unitOfWork;
             _httpClientFactory = httpClientFactory;
-            //_imagePath = imagePath;
+            _imagePath = imagePath.Value;
         }
 
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
@@ -696,24 +697,23 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
            
             // Lưu ảnh chữ ký vào thư mục images
             var imageBytes = Convert.FromBase64String(userSignatureInfo.Result.Signature.FileBytes);
-            var filePath = Path.Combine("wwwroot", userSignatureInfo.Result.Signature.FileName).Replace("\\", "/");
             
-            // var rootPath = _imagePath.RootPath; 
-            // var relativeBasePath = _imagePath.RelativeBasePath; 
-            // var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\"); 
+            var rootPath = _imagePath.RootPath; 
+            var relativeBasePath = _imagePath.RelativeBasePath; 
+            var localBasePath = (rootPath + relativeBasePath).Replace("/", "\\"); 
 
             // // Tạo ảnh mới
-            // var fileName = userSignatureInfo..ToFileName();
-            //
+
             // // nếu thư mục chứa ảnh chưa tồn tại => tạo thư mục theo Id => lưu ảnh
-            // var localFolder = Path.Combine(localBasePath, vatTuId.ToString());
-            // if (!Directory.Exists(localFolder))
-            // {
-            //     Directory.CreateDirectory(localFolder);
-            // }
-            //
-            // await File.WriteAllBytesAsync(filePath, imageBytes);
-            response.PathImage = $"/images/{userSignatureInfo.Result.Signature.FileName}".Replace("\\", "/") ?? string.Empty;
+            var localFolder = Path.Combine(localBasePath);
+            if (!Directory.Exists(localFolder))
+            {
+                Directory.CreateDirectory(localFolder);
+            }
+            var filePath = Path.Combine(localFolder, userSignatureInfo.Result.Signature.FileName);
+            await File.WriteAllBytesAsync(filePath, imageBytes);
+            response.PathImage = Path.Combine(_imagePath.RelativeBasePath, userSignatureInfo.Result.Signature.FileName)
+                .Replace("\\", "/");
             return response;
         }
         
