@@ -50,6 +50,11 @@ public class PhieuKyController : ApiControllerBase
         }
     }
 
+    /// <summary>
+    /// Hiển thị thông tin người ký
+    /// </summary>
+    /// <param name="phieuId"> Mã phiếu </param>
+    /// <returns> Ảnh chữ ký và số điện thoại </returns>
     [HttpGet("{phieuId:int}/check-sign-info")]
     public async Task<IActionResult> CheckedNumberAndSignImageAsync(int phieuId)
     {
@@ -60,6 +65,17 @@ public class PhieuKyController : ApiControllerBase
             return StatusCode(500, Constants.Exceptions.Messages.KyCungUng.NotFoundSignInfo);
         }
         return Ok(signInfo);
+    }
+    
+    [HttpGet("{phieuId:int}")]
+    public async Task<IActionResult> GetAsync(int phieuId)
+    {
+        var result = await _phieuKyService.GetAsync(phieuId);
+        if (result is null)
+        {
+            return NotFound(Constants.Exceptions.Messages.KyCungUng.NotFoundSignInfo);
+        }
+        return Ok(result);
     }
 
     

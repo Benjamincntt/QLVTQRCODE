@@ -22,5 +22,6 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         Task<object> UpdateKySimCaAsync(UpdateFileRequest request);
         Task<int> CancelTicketAsync(int phieuId, bool isPhieuDeXuat, string? reason);
         Task<CheckedNumberAndSignImageResponse> CheckedNumberAndSignImageAsync(int phieuId, string accessToken);
+        Task<SignInfomationReponse> GetAsync(int phieuId);
     }
 }

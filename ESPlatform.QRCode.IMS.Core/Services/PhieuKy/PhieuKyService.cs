@@ -716,8 +716,13 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 .Replace("\\", "/");
             return response;
         }
-        
-        
+
+        public Task<SignInfomationReponse> GetAsync(int phieuId)
+        {
+            throw new NotImplementedException();
+        }
+
+
         private SignFileImgDto CalculateBottomCoordinatesFromString(string coordinateString)
         {
             if (string.IsNullOrWhiteSpace(coordinateString))
