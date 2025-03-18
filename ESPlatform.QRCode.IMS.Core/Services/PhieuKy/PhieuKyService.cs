@@ -15,6 +15,7 @@ using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Mapster;
+using MassTransit.Initializers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MobileCA.Application.Services.Viettel;
@@ -758,12 +759,23 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 ChuKyId = phieuKy.Id,
             };
             // Đường dẫn pdf trước khi ký
-            var vanBanKy = await _vanBanKyRepository.GetAsync(x => x.Id == phieuKy.VanBanId);
-            if (vanBanKy is not null && !string.IsNullOrWhiteSpace(vanBanKy.FilePath))
+            var vanBanKyHienTai = await _vanBanKyRepository.GetAsync(x => x.Id == phieuKy.VanBanId);
+            if (vanBanKyHienTai is not null && !string.IsNullOrWhiteSpace(vanBanKyHienTai.FilePath))
             {
-                response.PdfPath =  vanBanKy.FilePath;
-                response.PdfPathSigned = vanBanKy.FilePath;
+                response.PdfPath =  vanBanKyHienTai.FilePath;
+                response.PdfPathSigned = vanBanKyHienTai.FilePath;
             }
+            var listPaths = await _vanBanKyRepository.ListVanbanKyUrlAsync(phieuId);
+            var listPathsResponse = new List<string>();
+            if (listPaths.Any())
+            {
+                foreach (var item in listPaths)
+                {
+                    var path = GetRelativePath(item);
+                    listPathsResponse.Add(path);
+                }
+            }
+            response.ListFullPaths = listPathsResponse;
             
             // SignTicketResponseItems
             var listSignHistoryResponse = (await _muaSamPdxKyRepository.GetSignHistoryAsync(phieuId)).Adapt<IEnumerable<SignHistoryResponseItem>>().ToList();
@@ -814,6 +826,19 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 width = (float)bottomW,
                 height = (float)bottomH
             };
+        }
+        private string GetRelativePath(string filePath)
+        {
+            var kySoPath = _configuration.GetSection("KySoPath");
+            var relativeBasePath = kySoPath.GetValue<string>("RelativeBasePath");
+
+            if (string.IsNullOrEmpty(relativeBasePath))
+            {
+                throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
+            }
+
+            // Chuẩn hóa đường dẫn thành backslash cho Windows
+            return Path.Combine(relativeBasePath, filePath).Replace("\\","/");
         }
     }
 }

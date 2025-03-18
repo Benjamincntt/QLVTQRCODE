@@ -2,6 +2,7 @@
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
 using ESPlatform.QRCode.IMS.Infra.Context;
 using ESPlatform.QRCode.IMS.Library.Database.EfCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace ESPlatform.QRCode.IMS.Infra.Repositories;
 
@@ -9,5 +10,13 @@ public class VanBanKyRepository : EfCoreRepositoryBase<QlvtVanBanKy, AppDbContex
 {
     public VanBanKyRepository(AppDbContext dbContext) : base(dbContext)
     {
+    }
+
+    public async Task<List<string?>> ListVanbanKyUrlAsync(int phieuId)
+    {
+        var query = DbContext.QlvtVanBanKies
+            .Where(x => x.PhieuId == phieuId)
+            .Select(x => x.FilePath);
+        return await query.ToListAsync();
     }
 }

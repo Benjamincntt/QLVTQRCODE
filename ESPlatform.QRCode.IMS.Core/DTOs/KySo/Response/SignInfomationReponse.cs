@@ -29,4 +29,6 @@ public class SignInfomationReponse
 
     public List<SignHistoryResponseItem> SignTicketResponseItems { get; set; } = new List<SignHistoryResponseItem>();
     
+    public List<string> ListFullPaths { get; set; } = null!;
+    
 }
