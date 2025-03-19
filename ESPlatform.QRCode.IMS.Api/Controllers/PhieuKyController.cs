@@ -83,22 +83,6 @@ public class PhieuKyController : ApiControllerBase
         return Ok(result);
     }
     
-    // [HttpGet("danh-sach-phieu")]
-    // [AllowAnonymous]
-    // public async Task<ActionResult<IEnumerable<PhieuKyModel>>> DanhSachPhieuKyAsync(
-    //     [FromQuery] DanhSachPhieuKyFilter request)
-    // {
-    //     try
-    //     {
-    //         var result = await _phieuKyService.GetDanhSachPhieuKyAsync(request);
-    //         return Ok(result);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         // Xử lý lỗi và trả về mã lỗi phù hợp
-    //         return StatusCode(500, $"Internal server error: {ex.Message}");
-    //     }
-    // }
 
     [HttpPost("bo-qua-ky")]
     public async Task<IActionResult> BoQuaKyAsync([FromBody] ModifiedKySo requests)

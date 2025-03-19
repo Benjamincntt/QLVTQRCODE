@@ -749,6 +749,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             }
             var filePath = Path.Combine(localFolder, userSignatureInfo.Result.Signature.FileName);
             await File.WriteAllBytesAsync(filePath, imageBytes);
+            response.PhysicalFilePath = filePath;
             response.PathImage = Path.Combine(_imagePath.RelativeBasePath, userSignatureInfo.Result.Signature.FileName)
                 .Replace("\\", "/");
             return response;
@@ -796,13 +797,14 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 MaDoiTuongKy = phieuKy.MaDoiTuongKy,
                 ThuTuKy = phieuKy.ThuTuKy ?? 0,
                 ChuKyId = phieuKy.Id,
+                SignType = phieuKy.UsbSerial ?? string.Empty,
             };
             // Đường dẫn pdf trước khi ký
             var vanBanKyHienTai = await _vanBanKyRepository.GetAsync(x => x.Id == phieuKy.VanBanId);
             if (vanBanKyHienTai is not null && !string.IsNullOrWhiteSpace(vanBanKyHienTai.FilePath))
             {
                 response.PdfPath =  vanBanKyHienTai.FilePath.Replace("KySo", "Storage_SignedFile");;
-                response.PdfPathSigned = response.PdfPath;
+                //response.PdfPathSigned = response.PdfPath;
             }
             var listPaths = await _vanBanKyRepository.ListVanbanKyUrlAsync(phieuId);
             

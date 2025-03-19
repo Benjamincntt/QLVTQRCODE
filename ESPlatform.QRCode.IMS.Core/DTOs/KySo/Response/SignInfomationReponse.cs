@@ -5,16 +5,10 @@ namespace ESPlatform.QRCode.IMS.Core.DTOs.KySo.Response;
 
 public class SignInfomationReponse
 {
-    //public string ViettelSimCaMobilePhone { get; set; } = null!;
-
-    //Đường dẫn file Pdf trước khi ký
     public string? PdfPath { get; set; }
-
-    //Đường dẫn file Pdf sau khi ký số
-    public string? PdfPathSigned { get; set; }
     
     //Thời gian chờ ký
-    public long? TimeOut { get; set; }
+    public long? TimeOut { get; set; } = 1000;
     
     public bool IsHuyDeXuat { get; set; } = false;
     
