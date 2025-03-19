@@ -630,7 +630,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             }
         }
         #endregion
-        
+
         public async Task<int> CancelTicketAsync(int phieuId, bool isPhieuDeXuat, string? reason)
         {
             // Validate
@@ -638,36 +638,73 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             {
                 throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.InvalidTicketId);
             }
-            var result = await _muaSamPhieuDeXuatRepository.GetAsync(x => x.Id == phieuId);
-            if (result is null)
+
+            var phieuDeXuat = await _muaSamPhieuDeXuatRepository.GetAsync(x => x.Id == phieuId);
+            if (phieuDeXuat is null)
             {
                 throw new NotFoundException(Constants.Exceptions.Messages.KyCungUng.InvalidPdx);
             }
-            // Nếu huỷ phiếu đề xuất => người dùng phải tạo phiếu mới 
-            // => trang thái phiếu cũ = huỷ đề xuất
-            // => 
+            // Nếu huỷ phiếu đề xuất => trang thái phiếu cũ = huỷ đề xuất 
+
             if (isPhieuDeXuat)
             {
-                
-                result.TrangThai = (byte)SupplyTicketStatus.CancelledProposal;
+                phieuDeXuat.TrangThai = (byte)SupplyTicketStatus.CancelledProposal;
+                phieuDeXuat.GhiChu = reason;
+                return await _muaSamPhieuDeXuatRepository.UpdateAsync(phieuDeXuat);
             }
+            // Nếu huỷ phiếu duyệt => trang thái phiếu cũ = huỷ duyệt
+            //                     => Xoá thông tin các phiếu duyệt
             else
             {
-                result.TrangThai = (byte)SupplyTicketStatus.CancelledApproval;
-                var listPhieuDeXuatKys = await _muaSamPdxKyRepository.ListAsync(x => x.PhieuDeXuatId == result.Id);
-                if (listPhieuDeXuatKys.Any())
+                using (var transaction = _unitOfWork.BeginTransactionAsync())
                 {
-                    foreach (var item in listPhieuDeXuatKys)
+                    try
                     {
-                        item.NguoiKyId= null;
-                        item.LyDo = null;
-                        item.TrangThai = null;
+                        phieuDeXuat.TrangThai = (byte)SupplyTicketStatus.CancelledApproval;
+                        phieuDeXuat.GhiChu = reason;
+                        var response = await _muaSamPhieuDeXuatRepository.UpdateAsync(phieuDeXuat);
+                        if (response == 0)
+                        {
+                            return response;
+                        }
+
+                        var listPhieuDeXuatKys = (await _muaSamPdxKyRepository
+                                .ListAsync(x => x.PhieuDeXuatId == phieuDeXuat.Id
+                                                && (x.MaDoiTuongKy == Constants.MaDoiTuongKy.Ph_KTAT
+                                                    || x.MaDoiTuongKy == Constants.MaDoiTuongKy.TongGiamDoc
+                                                    || x.MaDoiTuongKy == Constants.MaDoiTuongKy.Ph_KHVT
+                                                )))
+                            .ToList();
+                        if (!listPhieuDeXuatKys.Any())
+                        {
+                            return response;
+                        }
+
+                        var updateList = new List<object>();
+                        foreach (var item in listPhieuDeXuatKys)
+                        {
+                            item.NguoiKyId = null;
+                            item.LyDo = null;
+                            item.TrangThai = null;
+                            item.NgayKy = null;
+                            updateList.Add(new
+                            {
+                                Id = item.Id, NguoiKyId = item.NguoiKyId, LyDo = item.LyDo, TrangThai = item.TrangThai, NgayKy = item.NgayKy
+                            });
+                        }
+
+                        await _muaSamPdxKyRepository.UpdateManyPartialAsync(listPhieuDeXuatKys, updateList.ToArray());
+                        await _unitOfWork.CommitAsync();
+                        return response;
+                    }
+                    catch
+                    {
+                        await _unitOfWork.RollbackAsync();
+                        throw;
                     }
                 }
-            }
 
-            result.GhiChu = reason;
-            return await _muaSamPhieuDeXuatRepository.UpdateAsync(result);
+            }
         }
 
         public async Task<CheckedNumberAndSignImageResponse> CheckedNumberAndSignImageAsync(int phieuId, string acessToken)

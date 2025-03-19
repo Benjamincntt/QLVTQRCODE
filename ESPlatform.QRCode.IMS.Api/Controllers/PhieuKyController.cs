@@ -68,9 +68,9 @@ public class PhieuKyController : ApiControllerBase
     }
     
     /// <summary>
-    /// Chi tiêt thông tin ký số
+    /// Chi tiết thông tin ký số
     /// </summary>
-    /// <param name="phieuId"></param>
+    /// <param name="phieuId"> Mã phiếu</param>
     /// <returns></returns>
     [HttpGet("{phieuId:int}")]
     public async Task<IActionResult> GetAsync(int phieuId)
