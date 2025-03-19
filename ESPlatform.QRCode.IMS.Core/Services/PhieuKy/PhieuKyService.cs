@@ -840,7 +840,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             {
                 return default;
             }
-            var toaDoArray = coordinateString.Split(',').Select(value => float.Parse(value.Trim())).ToArray();
+            var toaDoArray = coordinateString.Split(';').Select(value => float.Parse(value.Trim())).ToArray();
             if (toaDoArray.Length != 4 || toaDoArray.Any(float.IsNaN)) {
                 Console.Error.WriteLine("Chuỗi tọa độ không đủ hoặc chứa giá trị không hợp lệ.");
                 return default;
