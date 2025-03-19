@@ -16,6 +16,7 @@ public class VanBanKyRepository : EfCoreRepositoryBase<QlvtVanBanKy, AppDbContex
     {
         var query = DbContext.QlvtVanBanKies
             .Where(x => x.PhieuId == phieuId)
+            .Where(x => x.FilePath != null)
             .Select(x => x.FilePath);
         return await query.ToListAsync();
     }

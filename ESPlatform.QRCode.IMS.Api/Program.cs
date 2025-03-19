@@ -22,7 +22,8 @@ builder.Services
 	  // .RegisterMessageBroker()
        .AddHttpClient() 
 	   .RegisterOtherServices()
-	   .RegisterImageRootPathService(builder.Configuration);
+	   .RegisterImageRootPathService(builder.Configuration)
+       .RegisterKySoRootPathService(builder.Configuration);
 
 // Configure services
 builder.Services

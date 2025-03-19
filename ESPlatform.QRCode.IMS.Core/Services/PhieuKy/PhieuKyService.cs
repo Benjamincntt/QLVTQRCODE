@@ -38,6 +38,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ImagePath _imagePath;
+        private readonly KySoPathVersion2 _kySoPathVersion2;
         public PhieuKyService(
             INguoiDungService nguoiDungService,
             IPhieuKyRepository phieuKyRepository,
@@ -50,8 +51,8 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             IViettelMobileCAService viettelCAService,
             IUnitOfWork unitOfWork,
             IHttpClientFactory httpClientFactory,
-            IOptions<ImagePath> imagePath
-            )
+            IOptions<ImagePath> imagePath,
+            IOptions<KySoPathVersion2> kySoPathVersion2)
         {
             _nguoiDungService = nguoiDungService;
             _phieuKyRepository = phieuKyRepository;
@@ -65,6 +66,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             _unitOfWork = unitOfWork;
             _httpClientFactory = httpClientFactory;
             _imagePath = imagePath.Value;
+            _kySoPathVersion2 = kySoPathVersion2.Value;
         }
 
         public async Task<List<PhieuKyModel>> GetDanhSachPhieuKyAsync(DanhSachPhieuKyFilter requests)
@@ -762,16 +764,17 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             var vanBanKyHienTai = await _vanBanKyRepository.GetAsync(x => x.Id == phieuKy.VanBanId);
             if (vanBanKyHienTai is not null && !string.IsNullOrWhiteSpace(vanBanKyHienTai.FilePath))
             {
-                response.PdfPath =  vanBanKyHienTai.FilePath;
-                response.PdfPathSigned = vanBanKyHienTai.FilePath;
+                response.PdfPath =  vanBanKyHienTai.FilePath.Replace("KySo", "Storage_SignedFile");;
+                response.PdfPathSigned = response.PdfPath;
             }
             var listPaths = await _vanBanKyRepository.ListVanbanKyUrlAsync(phieuId);
+            
             var listPathsResponse = new List<string>();
             if (listPaths.Any())
             {
                 foreach (var item in listPaths)
                 {
-                    var path = GetRelativePath(item);
+                    var path = GetRelativePathVer2(item);
                     listPathsResponse.Add(path);
                 }
             }
@@ -827,16 +830,22 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                 height = (float)bottomH
             };
         }
-        private string GetRelativePath(string filePath)
+        private string GetRelativePathVer2(string filePath)
         {
-            var kySoPath = _configuration.GetSection("KySoPath");
-            var relativeBasePath = kySoPath.GetValue<string>("RelativeBasePath");
+           //var kySoPath = _kySoPathVersion2.RootPath;
+            var relativeBasePath = _kySoPathVersion2.RelativeBasePath;
 
             if (string.IsNullOrEmpty(relativeBasePath))
             {
                 throw new Exception("RootPath hoặc RelativeBasePath không được cấu hình đúng.");
             }
 
+            // Kiểm tra nếu filePath bắt đầu bằng "KySo". Phần này do db thiết kế cũ lởm nên phải replace
+            if (filePath.StartsWith("KySo", StringComparison.OrdinalIgnoreCase))
+            {
+                filePath = filePath.Replace("KySo", "Storage_SignedFile");
+            }
+            
             // Chuẩn hóa đường dẫn thành backslash cho Windows
             return Path.Combine(relativeBasePath, filePath).Replace("\\","/");
         }

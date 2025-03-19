@@ -15,6 +15,8 @@ public class AppConfig {
 	public OtpSettings OtpSettings { get; set; } = new();
 	
 	public ImagePath ImagePath { get; set; }
+    
+    public KySoPathVersion2 KySoPathVersion2 { get; set; }
 
 	/* END Settings */
 
