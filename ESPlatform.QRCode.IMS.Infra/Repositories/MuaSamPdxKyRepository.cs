@@ -52,7 +52,7 @@ namespace ESPlatform.QRCode.IMS.Infra.Repositories
                 .Where(x => x.QlvtMuaSamPdxKies.TrangThai >= (byte)TrangThaiChuKy.Signed)
                 .Select(x => new
                 {
-                    UserName = x.TbNguoiDungs.Ten + " " + x.TbNguoiDungs.Ho,
+                    UserName = x.TbNguoiDungs.Ho + " " + x.TbNguoiDungs.Ten,
                     x.TbViTriCongViecs.TenViTriCongViec,
                     x.QlvtMuaSamPdxKies.NgayKy,
                     x.QlvtMuaSamPdxKies.TrangThai,

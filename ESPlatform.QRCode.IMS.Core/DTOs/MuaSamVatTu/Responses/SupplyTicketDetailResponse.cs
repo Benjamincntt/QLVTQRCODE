@@ -15,5 +15,5 @@ public class SupplyTicketDetailResponse
 
 public class SupplyInListResponse: SupplyResponse
 {
-    public int Id { get; set; }
+    public int PhieuDeXuatDetailId { get; set; }
 }

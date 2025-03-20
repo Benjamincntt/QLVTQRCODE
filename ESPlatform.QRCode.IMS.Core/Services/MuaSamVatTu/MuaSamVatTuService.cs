@@ -564,7 +564,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         #endregion
         
         #region Update số lượng
-        var supplyTicketDetailIds = requests.Select(x => x.Id).ToList();
+        var supplyTicketDetailIds = requests.Select(x => x.PhieuDeXuatDetailId).ToList();
         var listSupplyTicketDetails = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => supplyTicketDetailIds.Contains(x.Id))).ToList();
         if (!listSupplyTicketDetails.Any())
         {
@@ -574,7 +574,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         var updateList = new List<object>();
         foreach (var item in listSupplyTicketDetails)
         {
-            var requestItem = requests.FirstOrDefault(x => x.Id == item.Id);
+            var requestItem = requests.FirstOrDefault(x => x.PhieuDeXuatDetailId == item.Id);
             if (requestItem != null)
             {
                 item.SoLuong = requestItem.SoLuong;
@@ -586,4 +586,5 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         
         #endregion
     }
+    
 }

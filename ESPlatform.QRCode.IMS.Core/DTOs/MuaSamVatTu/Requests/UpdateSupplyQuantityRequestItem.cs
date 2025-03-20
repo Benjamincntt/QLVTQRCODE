@@ -2,7 +2,7 @@
 
 public class UpdateSupplyQuantityRequestItem
 {
-    public int Id { get; set; }
+    public int PhieuDeXuatDetailId { get; set; }
     
     public int SoLuong { get; set; } 
 }

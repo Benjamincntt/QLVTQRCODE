@@ -1,0 +1,5 @@
+### Chi tiết vật tư mua sắm
+GET {{host}}/{{muaSamVatTuPath}}/{{vatTuId}}/chi-tiet-vat-tu
+Content-Type: application/json
+kikiemke-id: {{kikiemkeId}}
+Authorization: Bearer {{accessToken}}

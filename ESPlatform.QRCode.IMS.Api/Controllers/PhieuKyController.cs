@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using System.Diagnostics;
+using ESPlatform.QRCode.IMS.Core.DTOs.KySo.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KySo.Response;
 using ESPlatform.QRCode.IMS.Core.Engine;
 
@@ -33,13 +34,11 @@ public class PhieuKyController : ApiControllerBase
     /// Huỷ 1 phiếu(dành cho người ký số 5 và 6)
     /// </summary>
     /// <param name="ticketId"> Mã phiếu</param>
-    /// <param name="isPhieuDeXuat"> true: phiếu đề xuất, false: phiếu duyệt</param>
-    /// <param name="reason"> Lý do huỷ </param>
     /// <returns></returns>
-    [HttpPatch("{ticketId:int}/{isPhieuDeXuat:bool}/cancel-ticket")]
-    public async Task<IActionResult> CancelTicketAsync(int ticketId, bool isPhieuDeXuat, [FromBody] string? reason)
+    [HttpPatch("{ticketId:int}/cancel-ticket")]
+    public async Task<IActionResult> CancelTicketAsync(int ticketId, [FromBody] CancelTicketRequest request)
     {
-        var result = await _phieuKyService.CancelTicketAsync(ticketId, isPhieuDeXuat, reason);
+        var result = await _phieuKyService.CancelTicketAsync(ticketId, request);
         if (result > 0)
         {
             return Ok(Constants.Exceptions.Messages.SupplyTicket.TicketCancelSuccess);

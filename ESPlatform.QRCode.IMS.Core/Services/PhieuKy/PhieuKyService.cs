@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using ESPlatform.QRCode.IMS.Core.DTOs.KySo;
+using ESPlatform.QRCode.IMS.Core.DTOs.KySo.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.KySo.Response;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Requests;
 using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
@@ -631,7 +632,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         }
         #endregion
 
-        public async Task<int> CancelTicketAsync(int phieuId, bool isPhieuDeXuat, string? reason)
+        public async Task<int> CancelTicketAsync(int phieuId, CancelTicketRequest request)
         {
             // Validate
             if (phieuId <= 0)
@@ -646,10 +647,10 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             }
             // Nếu huỷ phiếu đề xuất => trang thái phiếu cũ = huỷ đề xuất 
 
-            if (isPhieuDeXuat)
+            if (request.IsPhieuDeXuat)
             {
                 phieuDeXuat.TrangThai = (byte)SupplyTicketStatus.CancelledProposal;
-                phieuDeXuat.GhiChu = reason;
+                phieuDeXuat.GhiChu = request.Reason;
                 return await _muaSamPhieuDeXuatRepository.UpdateAsync(phieuDeXuat);
             }
             // Nếu huỷ phiếu duyệt => trang thái phiếu cũ = huỷ duyệt
@@ -661,7 +662,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                     try
                     {
                         phieuDeXuat.TrangThai = (byte)SupplyTicketStatus.CancelledApproval;
-                        phieuDeXuat.GhiChu = reason;
+                        phieuDeXuat.GhiChu = request.Reason;
                         var response = await _muaSamPhieuDeXuatRepository.UpdateAsync(phieuDeXuat);
                         if (response == 0)
                         {
@@ -692,8 +693,18 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
                                 Id = item.Id, NguoiKyId = item.NguoiKyId, LyDo = item.LyDo, TrangThai = item.TrangThai, NgayKy = item.NgayKy
                             });
                         }
-
                         await _muaSamPdxKyRepository.UpdateManyPartialAsync(listPhieuDeXuatKys, updateList.ToArray());
+                        
+                        // Xoá file pdf đã ký
+                        if (request.PhieuDuyetRelativePath is not null)
+                        {
+                            var fullFilePath = (_imagePath.RootPath + request.PhieuDuyetRelativePath).Replace("/","\\");
+                            if (File.Exists(fullFilePath))
+                            {
+                                File.Delete(fullFilePath);
+                            }
+                        }
+                        
                         await _unitOfWork.CommitAsync();
                         return response;
                     }
