@@ -581,10 +581,16 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 updateList.Add(new { Id = item.Id, SoLuong = item.SoLuong });
             }
         }
-
-        return await _muaSamPhieuDeXuatDetailRepository.UpdateManyPartialAsync(listSupplyTicketDetails, updateList.ToArray());
+        var result = await _muaSamPhieuDeXuatDetailRepository.UpdateManyPartialAsync(listSupplyTicketDetails, updateList.ToArray());
         
         #endregion
+        
+        #region Update status phiếu
+        supplyTicket.TrangThai = (byte)SupplyTicketStatus.SigningInProgress;
+        await _muaSamPhieuDeXuatRepository.UpdateAsync(supplyTicket);
+        #endregion
+
+        return result;
     }
     
 }
