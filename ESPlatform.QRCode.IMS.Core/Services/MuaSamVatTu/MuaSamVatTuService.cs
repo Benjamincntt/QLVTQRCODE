@@ -18,6 +18,7 @@ using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using WarehouseResponseItem = ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses.WarehouseResponseItem;
 
@@ -589,26 +590,28 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                     }
                 }
 
-                var result =
-                    await _muaSamPhieuDeXuatDetailRepository.UpdateManyPartialAsync(listSupplyTicketDetails,
-                        updateList.ToArray());
-
+                var result = await _muaSamPhieuDeXuatDetailRepository.UpdateManyPartialAsync(listSupplyTicketDetails, updateList.ToArray());
                 #endregion
 
                 #region Update status phiếu thành "Đang ký"
-
                 supplyTicket.TrangThai = (byte)SupplyTicketStatus.SigningInProgress;
-                await _muaSamPhieuDeXuatRepository.UpdateAsync(supplyTicket);
-
+                var updatesupplyTicketStatus = await _muaSamPhieuDeXuatRepository.UpdateAsync(supplyTicket);
+                if (updatesupplyTicketStatus <= 0)
+                {
+                    throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.UpdateTicketStatusFailed);
+                }
+                
                 #endregion
 
                 #region Cập nhật trạng thái tạo file duyệt
 
-                var vanbanKy =
-                    await _vanBanKyRepository.GetAsync(x => x.PhieuId == ticketId && x.MaLoaiVanBan == "PhieuDuyet");
+                var vanbanKy = await _vanBanKyRepository.GetAsync(x => x.PhieuId == ticketId && x.MaLoaiVanBan == "PhieuDuyet");
                 vanbanKy.TrangThaiTaoFile = false;
-                await _vanBanKyRepository.UpdateAsync(vanbanKy);
-
+                var updateVanBanKyStatus = await _vanBanKyRepository.UpdateAsync(vanbanKy);
+                if (updateVanBanKyStatus <= 0)
+                {
+                    throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.UpdateVanBanKyStatusFailed);
+                }
                 #endregion
 
                 await _unitOfWork.CommitAsync();

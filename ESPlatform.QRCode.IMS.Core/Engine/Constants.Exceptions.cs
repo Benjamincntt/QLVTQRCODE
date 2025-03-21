@@ -75,7 +75,8 @@ public static partial class Constants {
                 public const string InvalidSupply = "Không có vật tư nào được chọn trong phiếu này";
                 public const string NotFoundSignInfo = "Không có thông tin ký cho phiếu này";
                 public const string CancelSignFailedMessage  = "Huỷ ký không thành công";
-                
+                public const string UpdateTicketStatusFailed = "Cập nhật trạng thái phiếu không thành công";
+                public const string UpdateVanBanKyStatusFailed = "Cập nhật trạng thái văn bản ký không thành công";
                 public const int DaKy = 1;
 				public const int HuyBo = -1;
                 public const int BoQua = 2;
