@@ -22,7 +22,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
         Task SignViettelCA(SignMobileCaInputDto request);
         Task<object> UpdateKySimCaAsync(UpdateFileRequest request);
         Task<int> CancelTicketAsync(int phieuId, CancelTicketRequest request);
-        Task<CheckedNumberAndSignImageResponse> CheckedNumberAndSignImageAsync(int phieuId, string accessToken);
+        Task<CheckedNumberAndSignImageResponse> CheckedNumberAndSignImageAsync(string accessToken);
         Task<SignInfomationReponse> GetAsync(int phieuId);
     }
 }

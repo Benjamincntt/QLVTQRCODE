@@ -718,7 +718,7 @@ namespace ESPlatform.QRCode.IMS.Core.Services.PhieuKy
             }
         }
 
-        public async Task<CheckedNumberAndSignImageResponse> CheckedNumberAndSignImageAsync(int phieuId, string acessToken)
+        public async Task<CheckedNumberAndSignImageResponse> CheckedNumberAndSignImageAsync(string acessToken)
         {   
             var response = new CheckedNumberAndSignImageResponse();
             

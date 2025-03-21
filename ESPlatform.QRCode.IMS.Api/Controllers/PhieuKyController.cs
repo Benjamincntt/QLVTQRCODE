@@ -52,13 +52,12 @@ public class PhieuKyController : ApiControllerBase
     /// <summary>
     /// Hiển thị thông tin người ký
     /// </summary>
-    /// <param name="phieuId"> Mã phiếu </param>
     /// <returns> Ảnh chữ ký và số điện thoại </returns>
-    [HttpGet("{phieuId:int}/check-sign-user-info")]
-    public async Task<IActionResult> CheckedNumberAndSignImageAsync(int phieuId)
+    [HttpGet("check-sign-user-info")]
+    public async Task<IActionResult> CheckedNumberAndSignImageAsync()
     {
         var accessToken = GetAccessToken();
-        var signInfo = await _phieuKyService.CheckedNumberAndSignImageAsync(phieuId, accessToken);
+        var signInfo = await _phieuKyService.CheckedNumberAndSignImageAsync(accessToken);
         if (signInfo is null)
         {
             return StatusCode(500, Constants.Exceptions.Messages.KyCungUng.NotFoundSignInfo);
