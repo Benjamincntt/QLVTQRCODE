@@ -562,35 +562,63 @@ public class MuaSamVatTuService : IMuaSamVatTuService
             throw new NotFoundException(Constants.Exceptions.Messages.KyCungUng.InvalidPdx);
         }
         #endregion
-        
-        #region Update số lượng
-        var supplyTicketDetailIds = requests.Select(x => x.PhieuDeXuatDetailId).ToList();
-        var listSupplyTicketDetails = (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => supplyTicketDetailIds.Contains(x.Id))).ToList();
-        if (!listSupplyTicketDetails.Any())
+
+        using (var transaction = _unitOfWork.BeginTransactionAsync())
         {
-            throw new NotFoundException(Constants.Exceptions.Messages.KyCungUng.InvalidSupply);   
-        }
-        
-        var updateList = new List<object>();
-        foreach (var item in listSupplyTicketDetails)
-        {
-            var requestItem = requests.FirstOrDefault(x => x.PhieuDeXuatDetailId == item.Id);
-            if (requestItem != null)
+            try
             {
-                item.SoLuong = requestItem.SoLuong;
-                updateList.Add(new { Id = item.Id, SoLuong = item.SoLuong });
+                #region Update số lượng
+
+                var supplyTicketDetailIds = requests.Select(x => x.PhieuDeXuatDetailId).ToList();
+                var listSupplyTicketDetails =
+                    (await _muaSamPhieuDeXuatDetailRepository.ListAsync(x => supplyTicketDetailIds.Contains(x.Id)))
+                    .ToList();
+                if (!listSupplyTicketDetails.Any())
+                {
+                    throw new NotFoundException(Constants.Exceptions.Messages.KyCungUng.InvalidSupply);
+                }
+
+                var updateList = new List<object>();
+                foreach (var item in listSupplyTicketDetails)
+                {
+                    var requestItem = requests.FirstOrDefault(x => x.PhieuDeXuatDetailId == item.Id);
+                    if (requestItem != null)
+                    {
+                        item.SoLuong = requestItem.SoLuong;
+                        updateList.Add(new { Id = item.Id, SoLuong = item.SoLuong });
+                    }
+                }
+
+                var result =
+                    await _muaSamPhieuDeXuatDetailRepository.UpdateManyPartialAsync(listSupplyTicketDetails,
+                        updateList.ToArray());
+
+                #endregion
+
+                #region Update status phiếu thành "Đang ký"
+
+                supplyTicket.TrangThai = (byte)SupplyTicketStatus.SigningInProgress;
+                await _muaSamPhieuDeXuatRepository.UpdateAsync(supplyTicket);
+
+                #endregion
+
+                #region Cập nhật trạng thái tạo file duyệt
+
+                var vanbanKy =
+                    await _vanBanKyRepository.GetAsync(x => x.PhieuId == ticketId && x.MaLoaiVanBan == "PhieuDuyet");
+                vanbanKy.TrangThaiTaoFile = false;
+                await _vanBanKyRepository.UpdateAsync(vanbanKy);
+
+                #endregion
+
+                await _unitOfWork.CommitAsync();
+                return result;
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
             }
         }
-        var result = await _muaSamPhieuDeXuatDetailRepository.UpdateManyPartialAsync(listSupplyTicketDetails, updateList.ToArray());
-        
-        #endregion
-        
-        #region Update status phiếu
-        supplyTicket.TrangThai = (byte)SupplyTicketStatus.SigningInProgress;
-        await _muaSamPhieuDeXuatRepository.UpdateAsync(supplyTicket);
-        #endregion
-
-        return result;
     }
-    
 }
