@@ -5,7 +5,6 @@ using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.TraCuu.Responses;
 using ESPlatform.QRCode.IMS.Core.Engine;
 using ESPlatform.QRCode.IMS.Core.Engine.Configuration;
-using ESPlatform.QRCode.IMS.Core.Facades.Context;
 using ESPlatform.QRCode.IMS.Core.Services.GioHang;
 using ESPlatform.QRCode.IMS.Core.Services.TbNguoiDungs;
 using ESPlatform.QRCode.IMS.Core.Validations.VatTus;
@@ -18,7 +17,6 @@ using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using ESPlatform.QRCode.IMS.Library.Utils.Validation;
 using Mapster;
 using MapsterMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using WarehouseResponseItem = ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses.WarehouseResponseItem;
 
@@ -562,6 +560,12 @@ public class MuaSamVatTuService : IMuaSamVatTuService
         {
             throw new NotFoundException(Constants.Exceptions.Messages.KyCungUng.InvalidPdx);
         }
+
+        if (requests.Exists(x => x.SoLuong <= 0))
+        {
+            throw new BadRequestException(Constants.Exceptions.Messages.Supplies.InvalidQuantity);
+        }
+
         #endregion
 
         using (var transaction = _unitOfWork.BeginTransactionAsync())
@@ -612,6 +616,7 @@ public class MuaSamVatTuService : IMuaSamVatTuService
                 {
                     throw new BadRequestException(Constants.Exceptions.Messages.KyCungUng.UpdateVanBanKyStatusFailed);
                 }
+                
                 #endregion
 
                 await _unitOfWork.CommitAsync();

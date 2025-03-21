@@ -16,7 +16,6 @@ using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
 using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Mapster;
-using MassTransit.Initializers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MobileCA.Application.Services.Viettel;

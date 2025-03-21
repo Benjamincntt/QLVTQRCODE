@@ -4,15 +4,11 @@ using ESPlatform.QRCode.IMS.Core.DTOs.MuaSamVatTu.Responses;
 using ESPlatform.QRCode.IMS.Core.DTOs.Viettel;
 using ESPlatform.QRCode.IMS.Core.Services.PhieuKy;
 using ESPlatform.QRCode.IMS.Domain.Interfaces;
-using ESPlatform.QRCode.IMS.Domain.Models.MuaSam;
 using ESPlatform.QRCode.IMS.Library.Exceptions;
-using ESPlatform.QRCode.IMS.Library.Utils.Filters;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using System.Diagnostics;
 using ESPlatform.QRCode.IMS.Core.DTOs.KySo.Requests;
-using ESPlatform.QRCode.IMS.Core.DTOs.KySo.Response;
 using ESPlatform.QRCode.IMS.Core.Engine;
 
 namespace ESPlatform.QRCode.IMS.Api.Controllers;
